@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/candidats")
+@RequestMapping("mic1/candidats")
 public class CandidatRestApi {
     //simple web service for testing
     @GetMapping("/hello")
     public String sayHello() {
-        return "Hello World";
+        return "Hello I'm Microservice Candidat";
     }
     @Autowired
     private CandidatService candidatService;

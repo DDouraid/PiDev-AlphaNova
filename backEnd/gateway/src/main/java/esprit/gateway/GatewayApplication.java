@@ -17,9 +17,9 @@ public class GatewayApplication {
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("candidat",
-                        r->r.path("/candidats/**")
-                        .uri("lb://candidat")).
+                .route("Internship",
+                        r->r.path("/api/**")
+                        .uri("http://localhost:8082")).
                 build();
      }
 

@@ -1,6 +1,7 @@
 package tn.esprit.application.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ public class Internship {
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;
+
 
     @Enumerated(EnumType.STRING)
     private InternStatus status;

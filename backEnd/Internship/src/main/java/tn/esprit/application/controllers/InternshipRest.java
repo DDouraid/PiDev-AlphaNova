@@ -34,15 +34,16 @@ public class InternshipRest {
     // Create an internship
     @PostMapping
     public ResponseEntity<Internship> createInternship(@RequestBody Internship internship) {
-        return new ResponseEntity<>(internshipService.save(internship), HttpStatus.CREATED);
+        System.out.println("Received Internship: " + internship.getTitle());
+        Internship savedInternship = internshipService.save(internship);
+        return new ResponseEntity<>(savedInternship, HttpStatus.CREATED);
     }
+
 
     // Update an internship
     @PutMapping("/{id}")
-    public ResponseEntity<Internship> updateInternship(@PathVariable Long id, @RequestBody Internship updatedInternship) {
-        return internshipService.update(id, updatedInternship)
-                .map(internship -> new ResponseEntity<>(internship, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<Internship> updateInternship( @RequestBody Internship updatedInternship) {
+        return new ResponseEntity<>(internshipService.update(updatedInternship), HttpStatus.OK);
     }
 
     // Delete an internship

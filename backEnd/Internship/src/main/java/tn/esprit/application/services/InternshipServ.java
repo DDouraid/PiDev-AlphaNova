@@ -14,34 +14,20 @@ public class InternshipServ {
     @Autowired
     private InternshipRepo internshipRepository;
 
-    // Get all internships
     public List<Internship> findAll() {
         return internshipRepository.findAll();
     }
 
-    // Get internship by ID
     public Optional<Internship> findById(Long id) {
         return internshipRepository.findById(id);
     }
 
-    // Create an internship
     public Internship save(Internship internship) {
         return internshipRepository.save(internship);
     }
 
-    // Update an internship
-    public Optional<Internship> update(Long id, Internship updatedInternship) {
-        return internshipRepository.findById(id).map(existingInternship -> {
-            existingInternship.setTitle(updatedInternship.getTitle());
-            existingInternship.setDescription(updatedInternship.getDescription());
-            existingInternship.setStartDate(updatedInternship.getStartDate());
-            existingInternship.setEndDate(updatedInternship.getEndDate());
-            existingInternship.setStatus(updatedInternship.getStatus());
-            return internshipRepository.save(existingInternship);
-        });
-    }
+    public Internship update(Internship internship) {return internshipRepository.save(internship); }
 
-    // Delete an internship
     public void delete(Long id) {
         internshipRepository.deleteById(id);
     }

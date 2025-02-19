@@ -9,6 +9,7 @@
         <module name="candidat" />
         <module name="job" />
         <module name="Gestion_Utilisateurs" />
+        <module name="Application" />
         <module name="eureka" />
         <module name="gateway" />
       </profile>
@@ -16,6 +17,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Application" options="-parameters" />
       <module name="Gestion_Utilisateurs" options="-parameters" />
       <module name="candidat" options="-parameters" />
       <module name="eureka" options="-parameters" />

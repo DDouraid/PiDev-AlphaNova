@@ -7,14 +7,18 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="candidat" />
+        <module name="Library" />
         <module name="job" />
         <module name="eureka" />
         <module name="gateway" />
+        <module name="Documents" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Documents" options="-parameters" />
+      <module name="Library" options="-parameters" />
       <module name="candidat" options="-parameters" />
       <module name="eureka" options="-parameters" />
       <module name="gateway" options="-parameters" />

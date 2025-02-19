@@ -5,10 +5,14 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/backEnd/microservices/Gestion_Utilisateurs/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/Feedback/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/Tasks/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/eureka/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/gateway/pom.xml" />
       </list>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_22" project-jdk-name="openjdk-23" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="openjdk-22" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

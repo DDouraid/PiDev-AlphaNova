@@ -1,0 +1,4 @@
+package org.example.tasks.repo;
+
+public interface TasksRepo {
+}

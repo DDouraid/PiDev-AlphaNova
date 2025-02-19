@@ -9,11 +9,13 @@
         <module name="candidat" />
         <module name="job" />
         <module name="Gestion_Utilisateurs" />
-        <module name="Application" />
         <module name="eureka" />
         <module name="gateway" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Application" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

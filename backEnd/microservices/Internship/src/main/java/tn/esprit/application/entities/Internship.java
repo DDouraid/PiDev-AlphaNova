@@ -23,35 +23,26 @@ public class Internship {
     @Enumerated(EnumType.STRING)
     private InternStatus status;
 
-    // Many internships belong to one user
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
 
-    // Many internships can be linked to one offer
-    @ManyToOne
-    @JoinColumn(name = "internship_offer_id", nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "internship_offer_id", nullable = true)
     private InternshipOffer internshipOffer;
 
-    // One internship can be linked to one internship request
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "internship_request_id", nullable = true)
     private InternshipRequest internshipRequest;
 
-    // One internship can have multiple matchings
-    @OneToMany(mappedBy = "internship", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Matching> matchings;
 
-    // Constructors
+
     public Internship() {}
 
-    public Internship(String title, String description, Date startDate, Date endDate, InternStatus status, User user, InternshipOffer internshipOffer) {
+    public Internship(String title, String description, Date startDate, Date endDate, InternStatus status, InternshipOffer internshipOffer) {
         this.title = title;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
-        this.user = user;
         this.internshipOffer = internshipOffer;
     }
 
@@ -104,13 +95,9 @@ public class Internship {
         this.status = status;
     }
 
-    public User getUser() {
-        return user;
-    }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+
+
 
     public InternshipOffer getInternshipOffer() {
         return internshipOffer;
@@ -128,11 +115,6 @@ public class Internship {
         this.internshipRequest = internshipRequest;
     }
 
-    public List<Matching> getMatchings() {
-        return matchings;
-    }
 
-    public void setMatchings(List<Matching> matchings) {
-        this.matchings = matchings;
-    }
+
 }

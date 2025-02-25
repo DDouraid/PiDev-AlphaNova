@@ -1,34 +1,18 @@
-// Document/src/main/java/tn/esprit/application/entities/Document.java
+// Document/src/main/java/tn/esprit/documents/entities/Document.java
 package tn.esprit.documents.entities;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "documents")
 public class Document {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private DocumentType type;
-
-    @Lob
-    @Column(nullable = false)
-    private byte[] data;
-
-    public Document() {}
-
-    public Document(String name, DocumentType type, byte[] data) {
-        this.name = name;
-        this.type = type;
-        this.data = data;
-    }
+    private String url;
 
     public Long getId() {
         return id;
@@ -46,19 +30,11 @@ public class Document {
         this.name = name;
     }
 
-    public DocumentType getType() {
-        return type;
+    public String getUrl() {
+        return url;
     }
 
-    public void setType(DocumentType type) {
-        this.type = type;
-    }
-
-    public byte[] getData() {
-        return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

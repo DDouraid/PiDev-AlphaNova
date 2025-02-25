@@ -1,4 +1,4 @@
-// Document/src/main/java/tn/esprit/application/controllers/DocumentController.java
+// Document/src/main/java/tn/esprit/documents/controllers/DocumentController.java
 package tn.esprit.documents.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +10,8 @@ import tn.esprit.documents.entities.Document;
 import tn.esprit.documents.services.DocumentService;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -58,11 +60,12 @@ public class DocumentController {
     }
 
     @GetMapping("/download/{id}")
-    public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id) {
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id) throws IOException {
         Document document = documentService.getDocumentById(id);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("attachment", document.getName() + ".pdf");
-        return ResponseEntity.ok().headers(headers).body(document.getData());
+        byte[] fileContent = Files.readAllBytes(Paths.get(document.getUrl()));
+        return ResponseEntity.ok().headers(headers).body(fileContent);
     }
 }

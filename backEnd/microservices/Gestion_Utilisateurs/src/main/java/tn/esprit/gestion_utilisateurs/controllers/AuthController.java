@@ -3,6 +3,7 @@ package tn.esprit.gestion_utilisateurs.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -50,23 +51,67 @@ public class AuthController {
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String jwt = jwtUtils.generateJwtToken(String.valueOf(authentication));
-
+		String jwt = jwtUtils.generateJwtToken(authentication);
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 		List<String> roles = userDetails.getAuthorities().stream()
 				.map(GrantedAuthority::getAuthority)
 				.collect(Collectors.toList());
-
-		return ResponseEntity.ok(new JwtResponse(jwt,
+		return ResponseEntity.ok(new JwtResponse(
+				jwt,
 				userDetails.getId(),
 				userDetails.getUsername(),
 				userDetails.getEmail(),
-				roles));
+				roles
+		));
+	}
+
+	@GetMapping("/users")
+	 // Restrict to admins only
+	public ResponseEntity<List<UserDTO>> getAllUsers() {
+		List<UserDTO> users = userRepository.findAll().stream()
+				.map(user -> new UserDTO(
+						user.getId(),
+						user.getUsername(),
+						user.getEmail(),
+						user.getRoles().stream().map(Role::getName).map(UserRole::name).collect(Collectors.toList())
+				))
+				.collect(Collectors.toList());
+		return ResponseEntity.ok(users);
+	}
+
+	// DTO to match frontend expectations
+	public static class UserDTO {
+		private Long id;
+		private String username;
+		private String email;
+		private List<String> roles;
+
+		public UserDTO(Long id, String username, String email, List<String> roles) {
+			this.id = id;
+			this.username = username;
+			this.email = email;
+			this.roles = roles;
+		}
+
+		// Getters
+		public Long getId() { return id; }
+		public String getUsername() { return username; }
+		public String getEmail() { return email; }
+		public List<String> getRoles() { return roles; }}
+
+	@GetMapping("/me")
+	public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+		if (authentication == null || !authentication.isAuthenticated()) {
+			return ResponseEntity.status(401).body(new MessageResponse("Error: User not authenticated"));
+		}
+		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+		List<String> roles = userDetails.getAuthorities().stream()
+				.map(GrantedAuthority::getAuthority)
+				.collect(Collectors.toList());
+		return ResponseEntity.ok(new JwtResponse(null, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles));
 	}
 
 	@PostMapping("/signup")

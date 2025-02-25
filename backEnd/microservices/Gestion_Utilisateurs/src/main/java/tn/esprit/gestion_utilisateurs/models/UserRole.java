@@ -1,4 +1,4 @@
-package tn.esprit.gestion_users.models;
+package tn.esprit.gestion_utilisateurs.models;
 
 
 public enum UserRole {

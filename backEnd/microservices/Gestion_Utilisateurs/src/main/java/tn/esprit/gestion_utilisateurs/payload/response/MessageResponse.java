@@ -1,4 +1,4 @@
-package tn.esprit.gestion_users.payload.response;
+package tn.esprit.gestion_utilisateurs.payload.response;
 
 public class MessageResponse {
 	private String message;

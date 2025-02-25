@@ -1,4 +1,4 @@
-package tn.esprit.gestion_users.controllers;
+package tn.esprit.gestion_utilisateurs.controllers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,17 +12,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import tn.esprit.gestion_users.models.Role;
-import tn.esprit.gestion_users.models.User;
-import tn.esprit.gestion_users.models.UserRole;
-import tn.esprit.gestion_users.payload.request.LoginRequest;
-import tn.esprit.gestion_users.payload.request.SignupRequest;
-import tn.esprit.gestion_users.payload.response.JwtResponse;
-import tn.esprit.gestion_users.payload.response.MessageResponse;
-import tn.esprit.gestion_users.repository.RoleRepository;
-import tn.esprit.gestion_users.repository.UserRepository;
-import tn.esprit.gestion_users.security.jwt.JwtUtils;
-import tn.esprit.gestion_users.security.services.UserDetailsImpl;
+import tn.esprit.gestion_utilisateurs.models.Role;
+import tn.esprit.gestion_utilisateurs.models.User;
+import tn.esprit.gestion_utilisateurs.models.UserRole;
+import tn.esprit.gestion_utilisateurs.payload.request.LoginRequest;
+import tn.esprit.gestion_utilisateurs.payload.request.SignupRequest;
+import tn.esprit.gestion_utilisateurs.payload.response.JwtResponse;
+import tn.esprit.gestion_utilisateurs.payload.response.MessageResponse;
+import tn.esprit.gestion_utilisateurs.repository.RoleRepository;
+import tn.esprit.gestion_utilisateurs.repository.UserRepository;
+import tn.esprit.gestion_utilisateurs.security.jwt.JwtUtils;
+import tn.esprit.gestion_utilisateurs.security.services.UserDetailsImpl;
 
 import java.util.HashSet;
 import java.util.List;

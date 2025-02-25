@@ -1,10 +1,10 @@
-package tn.esprit.gestion_users.security.services;
+package tn.esprit.gestion_utilisateurs.security.services;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import tn.esprit.gestion_users.models.User;
+import tn.esprit.gestion_utilisateurs.models.User;
 
 import java.io.Serial;
 import java.util.Collection;

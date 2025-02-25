@@ -1,4 +1,4 @@
-package tn.esprit.gestion_users.security.services;
+package tn.esprit.gestion_utilisateurs.security.services;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tn.esprit.gestion_users.repository.UserRepository;
-import tn.esprit.gestion_users.models.User;
+import tn.esprit.gestion_utilisateurs.repository.UserRepository;
+import tn.esprit.gestion_utilisateurs.models.User;
 
 
 @Service

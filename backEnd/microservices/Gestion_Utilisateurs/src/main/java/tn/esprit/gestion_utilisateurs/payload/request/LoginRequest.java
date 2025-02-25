@@ -1,4 +1,4 @@
-package tn.esprit.gestion_users.payload.request;
+package tn.esprit.gestion_utilisateurs.payload.request;
 
 import jakarta.validation.constraints.NotBlank;
 

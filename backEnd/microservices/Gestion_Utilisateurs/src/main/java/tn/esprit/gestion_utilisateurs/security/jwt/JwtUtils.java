@@ -1,4 +1,4 @@
-package tn.esprit.gestion_users.security.jwt;
+package tn.esprit.gestion_utilisateurs.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

@@ -1,0 +1,21 @@
+<h2>Register</h2>
+<form (ngSubmit)="onSubmit()">
+  <div>
+    <label>Username:</label>
+    <input type="text" [(ngModel)]="signupRequest.username" name="username" required />
+  </div>
+  <div>
+    <label>Email:</label>
+    <input type="email" [(ngModel)]="signupRequest.email" name="email" required />
+  </div>
+  <div>
+    <label>Password:</label>
+    <input type="password" [(ngModel)]="signupRequest.password" name="password" required />
+  </div>
+  <div>
+    <label>Roles (comma-separated, e.g., admin, student):</label>
+    <input type="text" (input)="onRoleInput($event)" name="role" />  </div>
+  <button type="submit">Register</button>
+</form>
+<p *ngIf="successMessage" style="color: green;">{{ successMessage }}</p>
+<p *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</p>

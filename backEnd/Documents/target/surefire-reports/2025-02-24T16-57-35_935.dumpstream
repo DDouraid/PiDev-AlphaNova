@@ -1,0 +1,5 @@
+# Created at 2025-02-24T16:57:36.198
+Boot Manifest-JAR contains absolute paths in classpath 'M:\Cours\Printemps (Esprit 4SAE9)\PiDev\PiDev-AlphaNova\backEnd\Documents\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+

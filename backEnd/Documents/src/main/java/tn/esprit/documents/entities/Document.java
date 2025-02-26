@@ -1,9 +1,9 @@
-// Document/src/main/java/tn/esprit/documents/entities/Document.java
 package tn.esprit.documents.entities;
 
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "document")
 public class Document {
 
     @Id

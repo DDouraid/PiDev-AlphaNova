@@ -1,14 +1,61 @@
-<h2>Login</h2>
-<form (ngSubmit)="onSubmit()">
-  <div>
-    <label>Username:</label>
-    <input type="text" [(ngModel)]="loginRequest.username" name="username" required />
+<div class="university-login-wrapper">
+  <div class="image-panel">
+    <div class="image-slider">
+      <img src="assets/internship-1.jpg" alt="Internship Image 1" class="slide active" />
+      <img src="assets/internship-2.jpg" alt="Internship Image 2" class="slide" />
+      <img src="assets/internship-3.jpg" alt="Internship Image 3" class="slide" />
+    </div>
   </div>
-  <div>
-    <label>Password:</label>
-    <input type="password" [(ngModel)]="loginRequest.password" name="password" required />
+  <div class="login-container">
+    <div class="login-card">
+      <h2 class="title">Student Login</h2>
+      <p class="subtitle">Access Your Internship Journey</p>
+      <form (ngSubmit)="onSubmit()" class="login-form">
+        <div class="input-group">
+          <label for="username">University ID</label>
+          <input
+            type="text"
+            id="username"
+            [(ngModel)]="loginRequest.username"
+            name="username"
+            required
+            placeholder="e.g., U123456"
+            class="input-field"
+          />
+        </div>
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            [(ngModel)]="loginRequest.password"
+            name="password"
+            required
+            placeholder="Enter your password"
+            class="input-field"
+          />
+        </div>
+        <button type="submit" class="login-button" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Sign In</span>
+          <span *ngIf="isLoading" class="spinner"></span>
+        </button>
+      </form>
+      <div class="divider">
+        <span>OR</span>
+      </div>
+      <div class="social-login">
+        <button class="social-button linkedin" (click)="loginWithLinkedIn()">
+          <i class="fab fa-linkedin-in"></i> Login with LinkedIn
+        </button>
+        <button class="social-button google" (click)="loginWithGoogle()">
+          <i class="fab fa-google"></i> Login with Google
+        </button>
+      </div>
+      <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
+      <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+    </div>
   </div>
-  <button type="submit">Login</button>
-</form>
-<p *ngIf="successMessage" style="color: green;">{{ successMessage }}</p>
-<p *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</p>
+  <div class="footer-bar">
+    <p>© {{ currentYear }} Esprit University. All Rights Reserved.</p>
+  </div>
+</div>

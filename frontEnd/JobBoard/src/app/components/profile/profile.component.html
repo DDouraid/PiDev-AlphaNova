@@ -1,132 +1,18 @@
-<!--**********************************
-    Main wrapper start
-***********************************-->
-<div id="main-wrapper">
-  <!--**********************************
-      Nav header start
-  ***********************************-->
-  <div class="nav-header">
-    <a href="#" class="brand-logo">
-      <i class="logo-abbr fa-brands fa-stumbleupon"></i>
-      <h2 class="brand-title">Profile</h2>
-    </a>
-    <div class="nav-control">
-      <div class="hamburger">
-        <span class="line"></span><span class="line"></span><span class="line"></span>
+<div class="row">
+  <div class="col-xl-6 col-xxl-12">
+    <div class="card">
+      <div class="card-header border-0">
+        <h4 class="fs-20 mb-0 text-black">User Profile</h4>
+      </div>
+      <div class="card-body text-center">
+        <div class="profile-photo">
+          <img src="assets/img/man (1).png" width="100" class="img-fluid rounded-circle" alt="Profile Picture">
+        </div>
+        <h3 class="mt-4 mb-1">{{ profile.username }}</h3>
+        <p class="text-muted">{{ profile.email }}</p>
+        <p class="text-muted">Roles: {{ profile.roles.join(', ') }}</p>
+        <button class="btn btn-primary btn-rounded mt-3 px-5" (click)="logout()">Logout</button>
       </div>
     </div>
   </div>
-  <!--**********************************
-      Nav header end
-  ***********************************-->
-
-  <!--**********************************
-      Header start
-  ***********************************-->
-  <div class="header">
-    <div class="header-content">
-      <nav class="navbar navbar-expand">
-        <div class="collapse navbar-collapse justify-content-between">
-          <div class="header-left">
-            <div class="dashboard_bar">
-              Profile
-            </div>
-          </div>
-          <ul class="navbar-nav header-right">
-            <li class="nav-item dropdown header-profile">
-              <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown">
-                <img src="assets/img/man (1).png" width="20" alt=""/>
-                <div class="header-info">
-                  <span>{{ profile.username || 'User' }}</span>
-                  <small>{{ profile.roles.length > 0 ? profile.roles[0] : 'User' }}</small>
-                </div>
-              </a>
-              <div class="dropdown-menu dropdown-menu-end">
-                <a href="#" class="dropdown-item ai-icon" [routerLink]="['/profile']">
-                  <svg id="icon-user1" xmlns="http://www.w3.org/2000/svg" class="text-primary" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                  <span class="ms-2">Profile </span>
-                </a>
-                <a href="#" class="dropdown-item ai-icon" (click)="logout()">
-                  <svg id="icon-logout" xmlns="http://www.w3.org/2000/svg" class="text-danger" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                  <span class="ms-2">Logout </span>
-                </a>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </nav>
-    </div>
-  </div>
-  <!--**********************************
-      Header end
-  ***********************************-->
-
-  <!--**********************************
-      Sidebar start
-  ***********************************-->
-  <div class="deznav">
-    <div class="deznav-scroll">
-      <ul class="metismenu" id="menu">
-        <li><a href="#" [routerLink]="['/home']">
-          <i class="flaticon-layout"></i>
-          <span class="nav-text">Home</span>
-        </a></li>
-        <li><a href="#" [routerLink]="['/profile']">
-          <i class="flaticon-user"></i>
-          <span class="nav-text">Profile</span>
-        </a></li>
-        <li *ngIf="isAdmin"><a href="#" [routerLink]="['/dashboard']">
-          <i class="flaticon-layout"></i>
-          <span class="nav-text">Dashboard</span>
-        </a></li>
-      </ul>
-    </div>
-  </div>
-  <!--**********************************
-      Sidebar end
-  ***********************************-->
-
-  <!--**********************************
-      Content body start
-  ***********************************-->
-  <div class="content-body">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-xl-6 col-xxl-12">
-          <div class="card">
-            <div class="card-header border-0">
-              <h4 class="fs-20 mb-0 text-black">User Profile</h4>
-            </div>
-            <div class="card-body text-center">
-              <div class="profile-photo">
-                <img src="assets/img/man (1).png" width="100" class="img-fluid rounded-circle" alt="Profile Picture">
-              </div>
-              <h3 class="mt-4 mb-1">{{ profile.username }}</h3>
-              <p class="text-muted">{{ profile.email }}</p>
-              <p class="text-muted">Roles: {{ profile.roles.join(', ') }}</p>
-              <button class="btn btn-primary btn-rounded mt-3 px-5" (click)="logout()">Logout</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!--**********************************
-      Content body end
-  ***********************************-->
-
-  <!--**********************************
-      Footer start
-  ***********************************-->
-  <div class="footer">
-    <div class="copyright">
-      <p>Designed <span class="heart"></span> <a href="#">with love</a> 2023</p>
-    </div>
-  </div>
-  <!--**********************************
-      Footer end
-  ***********************************-->
 </div>
-<!--**********************************
-    Main wrapper end
-***********************************-->

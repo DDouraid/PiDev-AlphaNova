@@ -1,21 +1,74 @@
-<h2>Register</h2>
-<form (ngSubmit)="onSubmit()">
-  <div>
-    <label>Username:</label>
-    <input type="text" [(ngModel)]="signupRequest.username" name="username" required />
+<div class="register-wrapper">
+  <div class="image-panel">
+    <div class="image-slider">
+      <img src="assets/internship-1.jpg" alt="Internship Image 1" class="slide active" />
+      <img src="assets/internship-2.jpg" alt="Internship Image 2" class="slide" />
+      <img src="assets/internship-3.jpg" alt="Internship Image 3" class="slide" />
+    </div>
   </div>
-  <div>
-    <label>Email:</label>
-    <input type="email" [(ngModel)]="signupRequest.email" name="email" required />
+  <div class="register-container">
+    <div class="card">
+      <div class="card-header border-0">
+        <h4 class="fs-20 mb-0 text-black">Register for Internships</h4>
+      </div>
+      <div class="card-body text-center">
+        <form (ngSubmit)="onSubmit()" class="register-form">
+          <div class="input-group">
+            <label for="username">Username</label>
+            <input
+              type="text"
+              id="username"
+              [(ngModel)]="signupRequest.username"
+              name="username"
+              required
+              placeholder="Enter your username"
+              class="input-field"
+            />
+          </div>
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              [(ngModel)]="signupRequest.email"
+              name="email"
+              required
+              placeholder="Enter your email"
+              class="input-field"
+            />
+          </div>
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              [(ngModel)]="signupRequest.password"
+              name="password"
+              required
+              placeholder="Enter your password"
+              class="input-field"
+            />
+          </div>
+          <div class="input-group">
+            <label for="role">Roles (comma-separated, e.g., student, admin)</label>
+            <input
+              type="text"
+              id="role"
+              (input)="onRoleInput($event)"
+              name="role"
+              placeholder="e.g., student, admin"
+              class="input-field"
+            />
+          </div>
+          <button type="submit" class="register-button" [disabled]="isLoading">
+            <span *ngIf="!isLoading">Register</span>
+            <span *ngIf="isLoading" class="spinner"></span>
+          </button>
+        </form>
+        <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
+        <p *ngIf="redirectMessage" class="redirect-message">{{ redirectMessage }}</p>
+        <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+      </div>
+    </div>
   </div>
-  <div>
-    <label>Password:</label>
-    <input type="password" [(ngModel)]="signupRequest.password" name="password" required />
-  </div>
-  <div>
-    <label>Roles (comma-separated, e.g., admin, student):</label>
-    <input type="text" (input)="onRoleInput($event)" name="role" />  </div>
-  <button type="submit">Register</button>
-</form>
-<p *ngIf="successMessage" style="color: green;">{{ successMessage }}</p>
-<p *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</p>
+</div>

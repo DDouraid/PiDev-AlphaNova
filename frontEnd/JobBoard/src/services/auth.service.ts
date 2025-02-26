@@ -11,12 +11,25 @@ import { MessageResponse } from '../models/message-response';
   providedIn: 'root'
 })
 export class AuthService {
+
   private authApiUrl = 'http://localhost:8088/api/auth'; // For authentication endpoints
   private dashboardApiUrl = 'http://localhost:8088/api/dashboard'; // For dashboard endpoints
   private tokenSubject = new BehaviorSubject<string | null>(localStorage.getItem('token'));
 
   constructor(private http: HttpClient) {
     console.log('AuthService initialized, initial token:', this.tokenSubject.value);
+  }
+
+  exchangeLinkedInCode(authCode: string): Observable<any> {
+    const url = 'https://api.linkedin.com/v2/oauth2/token';
+    const body = {
+      grant_type: 'authorization_code',
+      code: authCode,
+      redirect_uri: 'YOUR_REDIRECT_URI',
+      client_id: 'YOUR_CLIENT_ID',
+      client_secret: 'YOUR_CLIENT_SECRET'
+    };
+    return this.http.post<any>(url, body);
   }
 
   login(loginRequest: LoginRequest): Observable<JwtResponse> {

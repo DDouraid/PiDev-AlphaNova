@@ -1,90 +1,254 @@
-/* Center the login form below the nav */
-:host {
+.university-login-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f0f2f5; /* Light gray background */
+  font-family: 'Roboto', sans-serif;
+  overflow: hidden; /* Prevent overflow from slider */
+}
+
+/* Image panel on the left (using sidebar space) */
+.image-panel {
+  width: 600px; /* Increased width for larger layout */
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background: #f0f2f5; /* Match background for now, can be styled differently */
+  z-index: 5;
+  overflow: hidden;
+}
+
+/* Image slider */
+.image-slider {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.slide {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  object-fit: cover;
+}
+
+/* Apply red transparency as a background overlay for all slides */
+.slide::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 77, 77, 0.5); /* Semi-transparent red (#ff4d4d with 50% opacity) */
+  z-index: 1;
+}
+
+.slide.active {
+  opacity: 1;
+  z-index: 2; /* Ensure the active slide stays on top of the overlay */
+}
+
+/* Login container (larger and centered) */
+.login-container {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 41px); /* Adjust for nav height (10px padding + 1px border + content) */
-  background-color: #f8f8f8; /* Match nav background */
+  padding: 40px; /* Increased padding for larger layout */
+  margin-left: 600px; /* Offset for larger image panel */
+  background: transparent;
 }
 
-/* Form container */
-form {
-  background-color: #fff; /* White background for contrast */
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+/* Login card (larger) */
+.login-card {
+  background: #ffffff;
+  border-radius: 12px; /* Larger radius for a bolder look */
+  padding: 50px; /* Increased padding */
   width: 100%;
-  max-width: 400px; /* Consistent form width */
+  max-width: 500px; /* Increased max-width for a larger card */
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+  border-top: 6px solid #ff4d4d; /* Thicker red border at the top */
 }
 
-/* Heading */
-h2 {
+.title {
+  color: #ff4d4d; /* Red title */
+  font-size: 2.5rem; /* Larger title */
+  font-weight: 700;
   text-align: center;
-  color: #333; /* Dark gray */
-  margin-bottom: 20px;
-  font-family: Arial, sans-serif;
+  margin-bottom: 15px; /* Increased margin */
 }
 
-/* Form field containers */
-div {
-  margin-bottom: 15px;
+.subtitle {
+  color: #666;
+  font-size: 1.1rem; /* Larger subtitle */
+  text-align: center;
+  margin-bottom: 30px; /* Increased margin */
 }
 
-/* Labels */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Increased gap */
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
 label {
-  display: block;
-  margin-bottom: 5px;
-  color: #555; /* Medium gray */
-  font-weight: bold;
+  color: #ff4d4d; /* Red labels */
+  font-size: 1.1rem; /* Larger labels */
+  font-weight: 500;
+  margin-bottom: 8px; /* Increased margin */
 }
 
-/* Inputs */
-input[type="text"],
-input[type="password"] {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd; /* Light gray border */
-  border-radius: 4px;
-  font-size: 16px;
-  box-sizing: border-box;
-  transition: border-color 0.3s ease;
+.input-field {
+  padding: 14px; /* Larger padding */
+  border: 2px solid #b0bec5; /* Slightly thicker border */
+  border-radius: 6px; /* Larger radius */
+  font-size: 1.2rem; /* Larger text */
+  color: #333;
+  background: #f0f8ff; /* Light blue background for inputs */
+  transition: all 0.3s ease;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus {
-  border-color: #007bff; /* Match nav link color */
+.input-field:focus {
+  border-color: #ff4d4d; /* Red border on focus */
+  box-shadow: 0 0 8px rgba(255, 77, 77, 0.4); /* Enhanced shadow */
   outline: none;
 }
 
-/* Button */
-button {
-  width: 100%;
-  padding: 12px;
-  background-color: #007bff; /* Match nav link color */
-  color: white;
+.login-button {
+  padding: 16px; /* Larger padding */
+  background: #ff4d4d; /* Red button */
   border: none;
-  border-radius: 4px;
-  font-size: 16px;
+  border-radius: 6px; /* Larger radius */
+  color: #ffffff;
+  font-size: 1.2rem; /* Larger text */
+  font-weight: 600;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
-button:hover {
-  background-color: #0056b3; /* Darker blue, consistent with nav hover */
+.login-button:disabled {
+  background: #90a4ae;
+  cursor: not-allowed;
 }
 
-/* Messages */
-p {
+.spinner {
+  display: inline-block;
+  width: 24px; /* Larger spinner */
+  height: 24px; /* Larger spinner */
+  border: 4px solid rgba(255, 255, 255, 0.3); /* Thicker border */
+  border-radius: 50%;
+  border-top-color: #ffffff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.login-button:hover:not(:disabled) {
+  background: #e41b1b; /* Darker red */
+  box-shadow: 0 4px 8px rgba(255, 77, 77, 0.4); /* Enhanced shadow */
+}
+
+.divider {
+  display: flex;
+  align-items: center;
   text-align: center;
-  margin-top: 15px;
-  font-size: 14px;
-  font-family: Arial, sans-serif;
+  margin: 20px 0; /* Increased margin */
 }
 
-p[style="color: green"] {
-  color: #28a745; /* Green for success */
+.divider span {
+  color: #666;
+  font-size: 1rem; /* Larger text */
+  padding: 0 15px; /* Increased padding */
+  background: #ffffff;
 }
 
-p[style="color: red"] {
-  color: #dc3545; /* Red for error */
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 2px solid #ddd; /* Thicker divider */
+}
+
+.social-login {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Increased gap */
+}
+
+.social-button {
+  padding: 14px; /* Larger padding */
+  border: none;
+  border-radius: 6px; /* Larger radius */
+  font-size: 1.1rem; /* Larger text */
+  font-weight: 500;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px; /* Increased gap */
+  transition: all 0.3s ease;
+}
+
+.linkedin {
+  background: #0077b5; /* LinkedIn blue */
+}
+
+.linkedin:hover {
+  background: #005f8f;
+}
+
+.google {
+  background: #4285f4; /* Google blue */
+}
+
+.google:hover {
+  background: #3267d6;
+}
+
+.social-button i {
+  font-size: 1.3rem; /* Larger icons */
+}
+
+.success-message {
+  text-align: center;
+  color: #2ecc71;
+  font-size: 1rem; /* Larger text */
+  margin-top: 20px; /* Increased margin */
+  animation: fadeIn 0.5s ease;
+}
+
+.error-message {
+  text-align: center;
+  color: #e74c3c;
+  font-size: 1rem; /* Larger text */
+  margin-top: 20px; /* Increased margin */
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.footer-bar {
+  background: #f5f7fa;
+  padding: 15px; /* Larger padding */
+  text-align: center;
+  font-size: 0.9rem; /* Larger text */
+  color: #666;
 }

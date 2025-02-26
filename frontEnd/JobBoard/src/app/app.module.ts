@@ -8,7 +8,8 @@ import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { HomeComponent } from './components/home/home.component';
-import { ProfileComponent } from './components/profile/profile.component'; // Add DashboardComponent
+import { ProfileComponent } from './components/profile/profile.component';
+import { AuthCallbackComponent } from './auth-callback/auth-callback.component'; // Add DashboardComponent
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { ProfileComponent } from './components/profile/profile.component'; // Ad
     RegisterComponent,
     DashboardComponent,
     HomeComponent,
-    ProfileComponent // Add this
+    ProfileComponent,
+    AuthCallbackComponent // Add this
   ],
   imports: [
     BrowserModule,

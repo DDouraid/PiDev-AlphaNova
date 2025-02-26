@@ -1,0 +1,50 @@
+<div class="content-body d-flex justify-content-center align-items-center min-vh-100">
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-xl-6 col-xxl-6 col-lg-8 col-md-10 col-sm-12">
+        <div class="card card-bd">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Add Internship</h5>
+            </div>
+            <div class="modal-body">
+              <form #internForm="ngForm" (ngSubmit)="internForm.valid && onSubmitInternship()" name="internshipForm">
+                <div class="form-group">
+                  <label class="text-black font-w500">Title</label>
+                  <input [(ngModel)]="internship.title" name="title" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="text-black font-w500">Description</label>
+                  <input [(ngModel)]="internship.description" name="description" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="text-black font-w500">Start Date</label>
+                  <div class="cal-icon">
+                    <input type="date" [(ngModel)]="internship.startDate" name="startDate" class="form-control" required>
+                    <i class="far fa-calendar-alt"></i>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="text-black font-w500">End Date</label>
+                  <div class="cal-icon">
+                    <input type="date" [(ngModel)]="internship.endDate" name="endDate" class="form-control" required>
+                    <i class="far fa-calendar-alt"></i>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="text-black font-w500">Status</label>
+                  <select [(ngModel)]="internship.status" name="status" class="form-control">
+                    <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <button type="submit" class="btn btn-primary" [disabled]="!internForm.valid">Save Internship</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

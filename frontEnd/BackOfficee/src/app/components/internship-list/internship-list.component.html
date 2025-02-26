@@ -1,0 +1,51 @@
+<div class="content-body">
+<h2 class="text-center my-4">Internships</h2>
+
+    <div class="container d-flex justify-content-center">
+
+      <div class="table-responsive" style="max-width: 300%;">
+        <table class="table table-bordered table-hover table-striped text-center align-middle shadow-lg rounded">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let internship of internships">
+              <td>{{ internship.id }}</td>
+              <td class="text-truncate" style="max-width: 150px;">{{ internship.title }}</td>
+              <td class="text-truncate" style="max-width: 200px;">{{ internship.description }}</td>
+              <td>{{ internship.startDate }}</td>
+              <td>{{ internship.endDate }}</td>
+              <td>
+                <span class="badge px-3 py-2" [ngClass]="{
+              'bg-primary': internship.status === 'IN_PROGRESS',
+              'bg-success': internship.status === 'COMPLETED',
+              'bg-danger': internship.status === 'CANCELED'
+            }">
+                  {{ internship.status.replace('_', ' ') }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-danger btn-sm" (click)="deleteInternship(internship.id!)">
+                  <i class="bi bi-trash"></i> Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Message si aucun stage n'est trouvé -->
+    <div *ngIf="internships.length === 0" class="alert alert-warning text-center mt-3">
+      No internships found.
+    </div>
+
+  </div>

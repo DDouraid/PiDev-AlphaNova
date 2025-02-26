@@ -8,7 +8,7 @@ import tn.esprit.application.entities.InternshipOffer;
 import tn.esprit.application.services.InternshipOfferServ;
 
 import java.util.List;
-
+@CrossOrigin(origins = "http://localhost:4200", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 @RestController
 @RequestMapping("/internship-offers")
 public class InternshipOfferRest {

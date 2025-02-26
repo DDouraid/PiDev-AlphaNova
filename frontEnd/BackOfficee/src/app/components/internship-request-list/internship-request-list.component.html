@@ -1,0 +1,35 @@
+<div class="content-body">
+    <h2 class="text-center my-4">Internship Requests</h2>
+  
+    <div class="container d-flex justify-content-center">
+      <div class="table-responsive" style="max-width: 300%;">
+        <table class="table table-bordered table-hover table-striped text-center align-middle shadow-lg rounded">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let request of internshipRequests">
+              <td>{{ request.id }}</td>
+              <td class="text-truncate" style="max-width: 150px;">{{ request.title }}</td>
+              <td class="text-truncate" style="max-width: 200px;">{{ request.description }}</td>
+              <td>
+                <button class="btn btn-danger btn-sm" (click)="deleteInternshipRequest(request.id!)">
+                  <i class="bi bi-trash"></i> Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+    <!-- Message if no internship requests are found -->
+    <div *ngIf="internshipRequests.length === 0" class="alert alert-warning text-center mt-3">
+      No internship requests found.
+    </div>
+  </div>

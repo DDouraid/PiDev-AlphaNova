@@ -1,0 +1,30 @@
+<div class="content-body d-flex justify-content-center align-items-center min-vh-100">
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+        <div class="col-xl-6 col-xxl-6 col-lg-8 col-md-10 col-sm-12">
+          <div class="card card-bd">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Add Internship Offer</h5>
+              </div>
+              <div class="modal-body">
+                <form #offerForm="ngForm" (ngSubmit)="onSubmitOffer(offerForm)" name="offerForm">
+                  <div class="form-group">
+                    <label class="text-black font-w500">Title</label>
+                    <input [(ngModel)]="internshipOffer.title" name="offerTitle" class="form-control" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="text-black font-w500">Description</label>
+                    <input [(ngModel)]="internshipOffer.description" name="offerDescription" class="form-control" required>
+                  </div>
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary" [disabled]="!offerForm.valid">Save Offer</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

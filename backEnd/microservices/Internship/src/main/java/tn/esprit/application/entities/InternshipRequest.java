@@ -3,6 +3,7 @@ package tn.esprit.application.entities;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "internship_request")
 public class InternshipRequest {
 
     @Id

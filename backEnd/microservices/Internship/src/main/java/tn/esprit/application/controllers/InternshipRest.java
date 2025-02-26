@@ -10,7 +10,7 @@ import tn.esprit.application.services.InternshipServ;
 
 import java.util.List;
 
-@RestController
+@CrossOrigin(origins = "http://localhost:4200", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})@RestController
 @RequestMapping("/internships")
 public class InternshipRest {
 
@@ -46,7 +46,6 @@ public class InternshipRest {
         return new ResponseEntity<>(internshipService.update(updatedInternship), HttpStatus.OK);
     }
 
-    // Delete an internship
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInternship(@PathVariable Long id) {
         internshipService.delete(id);

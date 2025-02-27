@@ -1,7 +1,8 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { SignupRequest } from 'src/models/signup-request';
 import { AuthService } from 'src/services/auth.service';
 import { Router } from '@angular/router';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-register',
@@ -13,9 +14,11 @@ export class RegisterComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   redirectMessage = '';
-  isLoading = false; // Add loading state
+  isLoading = false;
   currentSlide = 0;
-  countdown = 5; // Countdown timer in seconds
+  countdown = 5;
+
+  @ViewChild('registerForm') registerForm!: NgForm;
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -37,6 +40,13 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit() {
+    if (this.registerForm.invalid) {
+      this.registerForm.form.markAllAsTouched(); // Highlight all invalid fields
+      this.errorMessage = 'Please fix the form errors before submitting.';
+      this.isLoading = false;
+      return;
+    }
+
     this.isLoading = true;
     this.authService.register(this.signupRequest).subscribe({
       next: (response) => {
@@ -72,7 +82,19 @@ export class RegisterComponent implements OnInit {
   onRoleInput(event: Event) {
     const target = event.target as HTMLInputElement;
     if (target) {
-      this.signupRequest.role = target.value.split(',').map(role => role.trim()); // Trim whitespace
+      this.signupRequest.role = target.value.split(',').map((role: string) => role.trim());
     }
+  }
+
+  registerWithGoogle() {
+    this.isLoading = true;
+    console.log('Register with Google clicked');
+    window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=YOUR_GOOGLE_CLIENT_ID&redirect_uri=http://localhost:4200/auth/register-callback&scope=email%20profile';
+  }
+
+  registerWithGitHub() {
+    this.isLoading = true;
+    console.log('Register with GitHub clicked');
+    window.location.href = 'https://github.com/login/oauth/authorize?client_id=YOUR_GITHUB_CLIENT_ID&redirect_uri=http://localhost:4200/auth/register-callback&scope=user:email';
   }
 }

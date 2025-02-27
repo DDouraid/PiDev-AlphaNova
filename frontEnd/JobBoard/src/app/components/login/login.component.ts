@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/services/auth.service';
 import { LoginRequest } from 'src/models/login-request';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
@@ -15,6 +16,8 @@ export class LoginComponent implements OnInit {
   isLoading = false;
   currentYear = new Date().getFullYear();
   currentSlide = 0;
+
+  @ViewChild('loginForm') loginForm!: NgForm;
 
   constructor(private authService: AuthService, public router: Router) {}
 
@@ -36,6 +39,13 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit() {
+    if (this.loginForm.invalid) {
+      this.loginForm.form.markAllAsTouched(); // Highlight all invalid fields
+      this.errorMessage = 'Please fix the form errors before submitting.';
+      this.isLoading = false;
+      return;
+    }
+
     this.isLoading = true;
     this.authService.login(this.loginRequest).subscribe({
       next: (response) => {

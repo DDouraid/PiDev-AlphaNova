@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { JwtResponse } from 'src/models/jwt-response';
 import { AuthService } from 'src/services/auth.service';
 
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

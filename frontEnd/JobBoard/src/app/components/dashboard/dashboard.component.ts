@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/services/auth.service';
 
@@ -13,22 +13,24 @@ export class DashboardComponent implements OnInit {
     email: '',
     roles: [] as string[]
   };
-  registeredUsers: { id: number; username: string; email: string; roles: string[] }[] = [];
+  registeredUsers: { id: number; username: string; email: string; roles: string[]; isBlocked: boolean }[] = [];
   stats = {
     totalUsers: 0,
     adminCount: 0,
-    nonAdminCount: 0
+    nonAdminCount: 0,
+    blockedCount: 0
   };
   newUser = {
     username: '',
     email: '',
     password: '',
-    role: [] as string[] // Changed from 'roles' to 'role'
+    role: [] as string[]
   };
-  editUser: { id: number; username: string; email: string; roles: string[] } | null = null;
+  editUser: { id: number; username: string; email: string; roles: string[]; isBlocked: boolean } | null = null;
   availableRoles = ['ADMIN', 'STUDENT', 'COMPANY', 'ACADEMIC_SUPERVISOR'];
+  errorMessage = ''; // Add error message for display
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.loadUserInfo();
@@ -45,6 +47,7 @@ export class DashboardComponent implements OnInit {
         this.user.username = response.username;
         this.user.email = response.email;
         this.user.roles = response.roles || [];
+        console.log('User info loaded:', this.user);
       },
       error: (err) => {
         console.error('Error fetching user info:', err);
@@ -63,11 +66,16 @@ export class DashboardComponent implements OnInit {
           id: user.id,
           username: user.username,
           email: user.email,
-          roles: user.roles || []
+          roles: user.roles || [],
+          isBlocked: user.isBlocked
         }));
+        this.errorMessage = ''; // Clear error on successful load
+        console.log('Loaded registered users with isBlocked:', this.registeredUsers.map(u => ({ id: u.id, isBlocked: u.isBlocked })));
         this.calculateStats();
+        this.cdr.detectChanges(); // Ensure re-render
       },
       error: (err) => {
+        this.errorMessage = 'Error fetching users: ' + (err.message || 'Unknown error');
         console.error('Error fetching registered users:', err);
         this.router.navigate(['/login']);
       }
@@ -80,21 +88,26 @@ export class DashboardComponent implements OnInit {
       user.roles.some(role => role.toUpperCase() === 'ADMIN')
     ).length;
     this.stats.nonAdminCount = this.stats.totalUsers - this.stats.adminCount;
+    this.stats.blockedCount = this.registeredUsers.filter(user => user.isBlocked).length;
   }
 
   createUser(): void {
     this.authService.register(this.newUser).subscribe({
-      next: () => {
-        this.loadRegisteredUsers(); // Refresh list
+      next: (response) => {
+        console.log('Create user response:', response);
+        this.loadRegisteredUsers();
         this.resetNewUser();
         this.closeModal('createUserModal');
       },
-      error: (err) => console.error('Error creating user:', err)
+      error: (err) => {
+        this.errorMessage = 'Error creating user: ' + (err.message || 'Unknown error');
+        console.error('Error creating user:', err);
+      }
     });
   }
 
-  editUserStart(user: { id: number; username: string; email: string; roles: string[] }): void {
-    this.editUser = { ...user }; // Clone user for editing
+  editUserStart(user: { id: number; username: string; email: string; roles: string[]; isBlocked: boolean }): void {
+    this.editUser = { ...user };
   }
 
   updateUser(): void {
@@ -102,28 +115,43 @@ export class DashboardComponent implements OnInit {
     this.authService.updateUser(this.editUser.id, {
       username: this.editUser.username,
       email: this.editUser.email,
-      roles: this.editUser.roles // Note: 'roles' here matches backend UserDTO
+      roles: this.editUser.roles
     }).subscribe({
-      next: () => {
-        this.loadRegisteredUsers(); // Refresh list
+      next: (response) => {
+        console.log('Update user response:', response);
+        this.loadRegisteredUsers();
         this.editUser = null;
         this.closeModal('editUserModal');
       },
-      error: (err) => console.error('Error updating user:', err)
+      error: (err) => {
+        this.errorMessage = 'Error updating user: ' + (err.message || 'Unknown error');
+        console.error('Error updating user:', err);
+      }
     });
   }
 
-  deleteUser(userId: number): void {
-    if (confirm('Are you sure you want to delete this user?')) {
-      this.authService.deleteUser(userId).subscribe({
-        next: () => this.loadRegisteredUsers(), // Refresh list
-        error: (err) => console.error('Error deleting user:', err)
+  blockUser(userId: number): void {
+    const userToBlock = this.registeredUsers.find(user => user.id === userId);
+    if (userToBlock) {
+      userToBlock.isBlocked = !userToBlock.isBlocked; // Toggle locally
+      this.cdr.detectChanges(); // Force re-render
+      this.authService.blockUser(userId).subscribe({
+        next: (response) => {
+          console.log('Block response:', response.message);
+          this.loadRegisteredUsers(); // Sync with backend
+        },
+        error: (err) => {
+          userToBlock.isBlocked = !userToBlock.isBlocked; // Revert on failure
+          this.cdr.detectChanges();
+          this.errorMessage = 'Error blocking user: ' + (err.message || 'Unknown error');
+          console.error('Error blocking user:', err);
+        }
       });
     }
   }
 
   resetNewUser(): void {
-    this.newUser = { username: '', email: '', password: '', role: [] }; // Changed to 'role'
+    this.newUser = { username: '', email: '', password: '', role: [] };
   }
 
   toggleRole(role: string, event: Event): void {

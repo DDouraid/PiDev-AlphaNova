@@ -1,8 +1,6 @@
 package tn.esprit.gestion_utilisateurs.models;
 
 import jakarta.persistence.*;
-
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -10,10 +8,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(	name = "users",
-		uniqueConstraints = { 
-			@UniqueConstraint(columnNames = "username"),
-			@UniqueConstraint(columnNames = "email") 
+@Table(name = "users",
+		uniqueConstraints = {
+				@UniqueConstraint(columnNames = "username"),
+				@UniqueConstraint(columnNames = "email")
 		})
 public class User {
 	@Id
@@ -34,10 +32,14 @@ public class User {
 	private String password;
 
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(	name = "user_roles", 
-				joinColumns = @JoinColumn(name = "user_id"), 
-				inverseJoinColumns = @JoinColumn(name = "role_id"))
+	@JoinTable(name = "user_roles",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
+
+	// Add isBlocked field with default value false
+	@Column(name = "is_blocked", nullable = false, columnDefinition = "boolean default false")
+	private boolean isBlocked = false;
 
 	public User() {
 	}
@@ -86,5 +88,15 @@ public class User {
 
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
+	}
+
+	// Getter for isBlocked
+	public boolean isBlocked() {
+		return this.isBlocked;
+	}
+
+	// Setter for isBlocked
+	public void setBlocked(boolean isBlocked) {
+		this.isBlocked = isBlocked;
 	}
 }

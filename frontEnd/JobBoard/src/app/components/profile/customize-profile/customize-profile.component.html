@@ -1,0 +1,149 @@
+<p>customize-profile works!</p>
+<div class="container mt-4">
+  <h2 class="text-center">Customize Your CV, {{ user.username || 'User' }}!</h2>
+  <p class="text-center text-muted">Email: {{ user.email || 'N/A' }}</p>
+  <p class="text-center text-muted">Roles: {{ (user.roles && user.roles.length > 0) ? user.roles.join(', ') : 'None' }}</p>
+
+  <div class="card mt-4 shadow-sm">
+    <div class="card-body">
+      <h4 class="card-title">CV Customization</h4>
+      <form [formGroup]="cvForm" (ngSubmit)="saveCV()" class="needs-validation" novalidate>
+        <!-- Personal Information -->
+        <div class="mb-4">
+          <h5>Personal Information</h5>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="fullName" formControlName="personalInfo.fullName" [class.is-invalid]="cvForm.get('personalInfo')?.get('fullName')?.invalid && cvForm.get('personalInfo')?.get('fullName')?.touched">
+              <div *ngIf="cvForm.get('personalInfo')?.get('fullName')?.invalid && cvForm.get('personalInfo')?.get('fullName')?.touched" class="invalid-feedback">
+                Name is required and must be 2-50 characters.
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="phone" class="form-label">Phone</label>
+              <input type="tel" class="form-control" id="phone" formControlName="personalInfo.phone" [class.is-invalid]="cvForm.get('personalInfo')?.get('phone')?.invalid && cvForm.get('personalInfo')?.get('phone')?.touched">
+              <div *ngIf="cvForm.get('personalInfo')?.get('phone')?.invalid && cvForm.get('personalInfo')?.get('phone')?.touched" class="invalid-feedback">
+                Please enter a 10-digit phone number.
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="address" class="form-label">Address</label>
+              <input type="text" class="form-control" id="address" formControlName="personalInfo.address">
+            </div>
+          </div>
+        </div>
+
+        <!-- Education -->
+        <div class="mb-4" formArrayName="education">
+          <h5>Education</h5>
+          <div *ngIf="educationArray.controls.length > 0">
+            <div *ngFor="let education of educationArray.controls; let i=index" [formGroupName]="i" class="mb-3 p-3 border rounded">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label [for]="'institution' + i" class="form-label">Institution <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [id]="'institution' + i" formControlName="institution" [class.is-invalid]="education.get('institution')?.invalid && education.get('institution')?.touched">
+                  <div *ngIf="education.get('institution')?.invalid && education.get('institution')?.touched" class="invalid-feedback">
+                    Institution is required and max 100 characters.
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label [for]="'degree' + i" class="form-label">Degree <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [id]="'degree' + i" formControlName="degree" [class.is-invalid]="education.get('degree')?.invalid && education.get('degree')?.touched">
+                  <div *ngIf="education.get('degree')?.invalid && education.get('degree')?.touched" class="invalid-feedback">
+                    Degree is required and max 100 characters.
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <label [for]="'year' + i" class="form-label">Year <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [id]="'year' + i" formControlName="year" [class.is-invalid]="education.get('year')?.invalid && education.get('year')?.touched">
+                  <div *ngIf="education.get('year')?.invalid && education.get('year')?.touched" class="invalid-feedback">
+                    Year must be a 4-digit number between 1900 and {{ currentYear }}.
+                  </div>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                  <button type="button" class="btn btn-danger" (click)="removeEducation(i)" [disabled]="educationArray.length <= 1">Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="educationArray.length === 0" class="alert alert-info">No education entries added yet.</div>
+          <button type="button" class="btn btn-secondary" (click)="addEducation()">Add Education</button>
+        </div>
+
+        <!-- Experience -->
+        <div class="mb-4" formArrayName="experience">
+          <h5>Experience</h5>
+          <div *ngIf="experienceArray.controls.length > 0">
+            <div *ngFor="let experience of experienceArray.controls; let i=index" [formGroupName]="i" class="mb-3 p-3 border rounded">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label [for]="'company' + i" class="form-label">Company <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [id]="'company' + i" formControlName="company" [class.is-invalid]="experience.get('company')?.invalid && experience.get('company')?.touched">
+                  <div *ngIf="experience.get('company')?.invalid && experience.get('company')?.touched" class="invalid-feedback">
+                    Company is required and max 100 characters.
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <label [for]="'position' + i" class="form-label">Position <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [id]="'position' + i" formControlName="position" [class.is-invalid]="experience.get('position')?.invalid && experience.get('position')?.touched">
+                  <div *ngIf="experience.get('position')?.invalid && experience.get('position')?.touched" class="invalid-feedback">
+                    Position is required and max 100 characters.
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <label [for]="'duration' + i" class="form-label">Duration <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [id]="'duration' + i" formControlName="duration" [class.is-invalid]="experience.get('duration')?.invalid && experience.get('duration')?.touched">
+                  <div *ngIf="experience.get('duration')?.invalid && experience.get('duration')?.touched" class="invalid-feedback">
+                    Duration is required and max 50 characters.
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <label [for]="'description' + i" class="form-label">Description</label>
+                  <input type="text" class="form-control" [id]="'description' + i" formControlName="description" [class.is-invalid]="experience.get('description')?.invalid && experience.get('description')?.touched">
+                  <div *ngIf="experience.get('description')?.invalid && experience.get('description')?.touched" class="invalid-feedback">
+                    Description max 500 characters.
+                  </div>
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                  <button type="button" class="btn btn-danger" (click)="removeExperience(i)" [disabled]="experienceArray.length <= 1">Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="experienceArray.length === 0" class="alert alert-info">No experience entries added yet.</div>
+          <button type="button" class="btn btn-secondary" (click)="addExperience()">Add Experience</button>
+        </div>
+
+        <!-- Skills -->
+        <div class="mb-4">
+          <h5>Skills</h5>
+          <textarea class="form-control" id="skills" formControlName="skills" rows="3" placeholder="Enter your skills (one per line)" [class.is-invalid]="cvForm.get('skills')?.invalid && cvForm.get('skills')?.touched"></textarea>
+          <div *ngIf="cvForm.get('skills')?.invalid && cvForm.get('skills')?.touched" class="invalid-feedback">
+            Skills are required and max 500 characters.
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary me-2" [disabled]="isSaving">
+            <span *ngIf="!isSaving">Save CV</span>
+            <span *ngIf="isSaving" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="togglePreview()">Preview CV</button>
+        </div>
+      </form>
+      <p *ngIf="errorMessage" class="text-danger mt-2">{{ errorMessage }}</p>
+
+      <!-- CV Preview -->
+      <div *ngIf="previewVisible" class="mt-4 p-3 border rounded bg-light">
+        <h5>CV Preview</h5>
+        <div class="cv-preview-content">
+          <pre>{{ generateCVText() }}</pre>
+        </div>
+        <button class="btn btn-success mt-2" (click)="downloadCV()">Download CV</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary mt-3" (click)="logout()">Logout</button>
+</div>

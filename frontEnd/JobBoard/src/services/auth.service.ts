@@ -6,14 +6,14 @@ import { LoginRequest } from '../models/login-request';
 import { SignupRequest } from '../models/signup-request';
 import { JwtResponse } from '../models/jwt-response';
 import { MessageResponse } from '../models/message-response';
+import { CvData } from 'src/models/cv-data';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-
-  private authApiUrl = 'http://localhost:8088/api/auth'; // For authentication endpoints
-  private dashboardApiUrl = 'http://localhost:8088/api/dashboard'; // For dashboard endpoints
+  private authApiUrl = 'http://localhost:8088/api/auth';
+  private dashboardApiUrl = 'http://localhost:8088/api/dashboard';
   private tokenSubject = new BehaviorSubject<string | null>(localStorage.getItem('token'));
 
   constructor(private http: HttpClient) {
@@ -48,9 +48,24 @@ export class AuthService {
       }),
       catchError(err => {
         console.error('Login error:', err);
-        return throwError(() => new Error('Login failed: ' + (err.error?.message || 'Unknown error')));
+        const errorMessage = err.error?.message || 'Login failed: Unknown error';
+        if (errorMessage.includes('Your account has been blocked')) {
+          console.warn('Account blocked detected:', errorMessage);
+          return throwError(() => new Error('Login failed: Your account has been blocked. Contact support for assistance.'));
+        }
+        return throwError(() => new Error(errorMessage));
       })
     );
+  }
+
+  // Enhanced method to get is_blocked status from token
+  getIsBlocked(): boolean {
+    const token = this.getToken();
+    if (token && this.validateToken(token)) {
+      const payload = this.parseJwt(token);
+      return payload?.isBlocked === 1 || payload?.is_blocked === 1 || false; // Adjust key based on your token structure
+    }
+    return false; // Default to not blocked if token is invalid or missing
   }
 
   register(signupRequest: SignupRequest): Observable<MessageResponse> {
@@ -113,7 +128,6 @@ export class AuthService {
     return true;
   }
 
-  // Existing methods (unchanged)
   getRoles(): string[] {
     const token = this.getToken();
     if (token && this.validateToken(token)) {
@@ -155,6 +169,27 @@ export class AuthService {
     }
   }
 
+  blockUser(userId: number): Observable<MessageResponse> {
+    const token = this.getToken();
+    if (!token || !this.validateToken(token)) {
+      console.error('Invalid or missing token for block request:', token);
+      return throwError(() => new Error('Invalid or missing token'));
+    }
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    console.log('Blocking user:', userId);
+    return this.http.put<MessageResponse>(`${this.dashboardApiUrl}/users/${userId}/block`, {}, { headers }).pipe(
+      tap(response => {
+        console.log('User blocked/unblocked response:', response);
+      }),
+      catchError(err => {
+        console.error('Error blocking user:', err);
+        return throwError(() => new Error('Failed to block user: ' + (err.message || 'Unknown error')));
+      })
+    );
+  }
+
   getCurrentUser(): { username: string; email: string; roles: string[] } | null {
     const token = this.getToken();
     return token && this.validateToken(token) ? this.getUserDetailsFromToken(token) : null;
@@ -165,16 +200,18 @@ export class AuthService {
     return roles.includes(role.toUpperCase());
   }
 
-  // CRUD methods using /api/dashboard
-  getRegisteredUsers(): Observable<{ id: number; username: string; email: string; roles: string[] }[]> {
+  getRegisteredUsers(): Observable<{ isBlocked: boolean; id: number; username: string; email: string; roles: string[] }[]> {
     const token = this.getToken();
     if (!token || !this.validateToken(token)) {
       console.error('Cannot fetch users: Invalid or missing token:', token);
       return throwError(() => new Error('Invalid or missing token'));
     }
     const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-    return this.http.get<{ id: number; username: string; email: string; roles: string[] }[]>(`${this.dashboardApiUrl}/users`, { headers }).pipe(
-      tap(users => console.log('Registered users response:', users)),
+    return this.http.get<{ isBlocked: boolean; id: number; username: string; email: string; roles: string[] }[]>(`${this.dashboardApiUrl}/users?t=${new Date().getTime()}`, { headers }).pipe(
+      tap(users => {
+        console.log('Registered users response:', users);
+        users.forEach(user => console.log(`User ${user.username} isBlocked: ${user.isBlocked}`));
+      }),
       catchError(err => {
         console.error('Error fetching users:', err);
         return throwError(() => new Error('Failed to fetch users'));
@@ -220,7 +257,25 @@ export class AuthService {
     );
   }
 
-  // Example stats method (adjust as needed)
+  saveCV(cvData: CvData): Observable<MessageResponse> {
+    const token = this.getToken();
+    if (!token || !this.validateToken(token)) {
+      console.error('Invalid or missing token for saveCV request:', token);
+      return throwError(() => new Error('Invalid or missing token'));
+    }
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    console.log('Saving CV with data:', cvData);
+    return this.http.post<MessageResponse>(`${this.dashboardApiUrl}/cv`, cvData, { headers }).pipe(
+      tap(response => console.log('CV saved:', response)),
+      catchError(err => {
+        console.error('Error saving CV:', err);
+        return throwError(() => new Error('Failed to save CV: ' + (err.message || 'Unknown error')));
+      })
+    );
+  }
+
   getStats(): Observable<{ totalUsers: number; adminCount: number }> {
     const token = this.getToken();
     if (!token || !this.validateToken(token)) {

@@ -51,21 +51,32 @@ public class AuthController {
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+		// Authenticate user
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		String jwt = jwtUtils.generateJwtToken(authentication);
+
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+		User user = userRepository.findByUsername(userDetails.getUsername())
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		if (user.isBlocked()) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Login failed: Your account has been blocked. Contact support for assistance."));
+		}
+
 		List<String> roles = userDetails.getAuthorities().stream()
 				.map(GrantedAuthority::getAuthority)
 				.collect(Collectors.toList());
-		return ResponseEntity.ok(new JwtResponse(
-				jwt,
+
+		return ResponseEntity.ok(new JwtResponse(jwt,
 				userDetails.getId(),
 				userDetails.getUsername(),
 				userDetails.getEmail(),
-				roles
-		));
+				roles));
 	}
 
 	@GetMapping("/users")

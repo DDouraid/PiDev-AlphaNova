@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/services/auth.service';
 import { LoginRequest } from 'src/models/login-request';
@@ -19,7 +19,6 @@ export class LoginComponent implements OnInit {
   constructor(private authService: AuthService, public router: Router) {}
 
   ngOnInit(): void {
-    // Optional: Auto-slide images every 5 seconds
     this.startSlider();
   }
 
@@ -43,18 +42,34 @@ export class LoginComponent implements OnInit {
         this.successMessage = 'Login successful!';
         this.errorMessage = '';
         this.isLoading = false;
-        setTimeout(() => {
-          if (this.authService.hasRole('ADMIN')) {
-            this.router.navigate(['/dashboard']);
-          } else {
-            this.router.navigate(['/home']);
-          }
-        }, 1000);
+        const isBlocked = this.authService.getIsBlocked();
+        if (isBlocked) { // Check if user is blocked (true or 1)
+          this.errorMessage = 'Login failed: Your account has been blocked. Contact support for assistance.';
+          console.warn('Account blocked detected from token:', isBlocked);
+          this.successMessage = '';
+        } else {
+          setTimeout(() => {
+            if (this.authService.hasRole('ADMIN')) {
+              this.router.navigate(['/dashboard']);
+            } else if (this.authService.hasRole('STUDENT')) {
+              this.router.navigate(['/customize-profile']);
+            } else {
+              this.router.navigate(['/home']);
+            }
+          }, 1000);
+        }
       },
       error: (err) => {
-        this.errorMessage = 'Login failed: ' + (err.error.message || 'Unknown error');
-        this.successMessage = '';
         this.isLoading = false;
+        const errorMsg = err.message || 'Login failed: Unknown error';
+        console.log('Login error received:', errorMsg);
+        if (errorMsg.includes('Your account has been blocked')) {
+          this.errorMessage = errorMsg;
+          console.warn('Account blocked:', errorMsg);
+        } else {
+          this.errorMessage = errorMsg;
+        }
+        this.successMessage = '';
       }
     });
   }

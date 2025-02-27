@@ -5,7 +5,7 @@
 
 <!-- Statistics Section -->
 <div class="row mt-4">
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="card">
       <div class="card-body text-center">
         <h5>Total Users</h5>
@@ -13,7 +13,7 @@
       </div>
     </div>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="card">
       <div class="card-body text-center">
         <h5>Admins</h5>
@@ -21,11 +21,19 @@
       </div>
     </div>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="card">
       <div class="card-body text-center">
         <h5>Non-Admins</h5>
         <p class="fs-20">{{ stats.nonAdminCount }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body text-center">
+        <h5>Blocked Users</h5>
+        <p class="fs-20">{{ stats.blockedCount }}</p>
       </div>
     </div>
   </div>
@@ -48,6 +56,7 @@
                 <th>Username</th>
                 <th>Email</th>
                 <th>Roles</th>
+                <th>Blocked</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -57,22 +66,26 @@
                 <td>{{ regUser.username }}</td>
                 <td>{{ regUser.email }}</td>
                 <td>{{ regUser.roles.join(', ') }}</td>
+                <td>{{ regUser.isBlocked ? 'Yes' : 'No' }}</td>
                 <td>
                   <button class="btn btn-sm btn-warning me-2" (click)="editUserStart(regUser)" data-bs-toggle="modal" data-bs-target="#editUserModal">Edit</button>
-                  <button class="btn btn-sm btn-danger" (click)="deleteUser(regUser.id)">Delete</button>
+                  <button class="btn btn-sm btn-secondary" (click)="blockUser(regUser.id)" [class.btn-danger]="regUser.isBlocked">
+                    {{ regUser.isBlocked ? 'Unblock' : 'Block' }}
+                  </button>
                 </td>
               </tr>
               <tr *ngIf="registeredUsers.length === 0">
-                <td colspan="5" class="text-center">No users found</td>
+                <td colspan="6" class="text-center">No users found</td>
               </tr>
             </tbody>
           </table>
         </div>
+        <p *ngIf="errorMessage" class="text-danger">{{ errorMessage }}</p> <!-- Display error message -->
+        <button class="btn btn-secondary mt-2" (click)="loadRegisteredUsers()">Refresh Manually</button> <!-- Debug button -->
       </div>
     </div>
   </div>
 </div>
-
 <button class="btn btn-primary" (click)="logout()">Logout</button>
 
 <!-- Create User Modal -->
@@ -119,7 +132,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+        <h4 class="card-title" id="editUserModalLabel">Edit User</h4>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" *ngIf="editUser">

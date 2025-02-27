@@ -9,6 +9,7 @@ import { InternshipOffer } from '../../models/internship-offer';
 })
 export class InternshipOfferListComponent implements OnInit {
   internshipOffers: InternshipOffer[] = [];
+  selectedInternshipOffer: InternshipOffer = {} as InternshipOffer; // Holds the offer being updated
 
   constructor(private internshipOfferService: InternshipOfferService) {}
 
@@ -36,6 +37,25 @@ export class InternshipOfferListComponent implements OnInit {
       error => {
         console.error('Error deleting internship offer:', error);
         alert('Failed to delete internship offer. Please try again or contact support.');
+      }
+    );
+  }
+
+  // Select the internship offer to update
+  selectInternshipOffer(offer: InternshipOffer): void {
+    this.selectedInternshipOffer = { ...offer }; // Create a copy to avoid direct mutation
+  }
+
+  // Update the internship offer
+  updateInternshipOffer(): void {
+    this.internshipOfferService.updateInternshipOffer(this.selectedInternshipOffer).subscribe(
+      () => {
+        this.loadInternshipOffers(); // Refresh the list after update
+        console.log('Internship offer updated successfully');
+      },
+      error => {
+        console.error('Error updating internship offer:', error);
+        alert('Failed to update internship offer. Please try again or contact support.');
       }
     );
   }

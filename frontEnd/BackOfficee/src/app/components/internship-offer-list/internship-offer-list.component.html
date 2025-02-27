@@ -1,35 +1,69 @@
 <div class="content-body">
-    <h2 class="text-center my-4">Internship Offers</h2>
-  
-    <div class="container d-flex justify-content-center">
-      <div class="table-responsive" style="max-width: 300%;">
-        <table class="table table-bordered table-hover table-striped text-center align-middle shadow-lg rounded">
-          <thead class="table-dark">
-            <tr>
-              <th>ID</th>
-              <th>Title</th>
-              <th>Description</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let offer of internshipOffers">
-              <td>{{ offer.id }}</td>
-              <td class="text-truncate" style="max-width: 150px;">{{ offer.title }}</td>
-              <td class="text-truncate" style="max-width: 200px;">{{ offer.description }}</td>
-              <td>
-                <button class="btn btn-danger btn-sm" (click)="deleteInternshipOffer(offer.id!)">
-                  <i class="bi bi-trash"></i> Delete
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  
-    <!-- Message if no internship offers are found -->
-    <div *ngIf="internshipOffers.length === 0" class="alert alert-warning text-center mt-3">
-      No internship offers found.
+  <h2 class="text-center my-4">Internship Offers</h2>
+
+  <div class="container d-flex justify-content-center">
+    <div class="table-responsive" style="max-width: 300%;">
+      <table class="table table-bordered table-hover table-striped text-center align-middle shadow-lg rounded">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let offer of internshipOffers">
+            <td>{{ offer.id }}</td>
+            <td class="text-truncate" style="max-width: 150px;">{{ offer.title }}</td>
+            <td class="text-truncate" style="max-width: 200px;">{{ offer.description }}</td>
+            <td>
+              <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal"
+                      [attr.data-bs-target]="'#updateInternshipOfferModal' + offer.id"
+                      (click)="selectInternshipOffer(offer)">
+                <i class="bi bi-pencil"></i> Update
+              </button>
+              <button class="btn btn-danger btn-sm" (click)="deleteInternshipOffer(offer.id!)">
+                <i class="bi bi-trash"></i> Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
+
+  <!-- Message if no internship offers are found -->
+  <div *ngIf="internshipOffers.length === 0" class="alert alert-warning text-center mt-3">
+    No internship offers found.
+  </div>
+
+  <!-- Update Internship Offer Modal -->
+  <ng-container *ngFor="let offer of internshipOffers">
+    <div class="modal fade" [id]="'updateInternshipOfferModal' + offer.id" tabindex="-1" aria-labelledby="updateOfferModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateOfferModalLabel">Update Internship Offer</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form #updateOfferForm="ngForm" (ngSubmit)="updateOfferForm.valid && updateInternshipOffer()">
+              <div class="form-group">
+                <label class="text-black font-w500">Title</label>
+                <input [(ngModel)]="selectedInternshipOffer.title" name="offerTitle" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="text-black font-w500">Description</label>
+                <input [(ngModel)]="selectedInternshipOffer.description" name="offerDescription" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary" [disabled]="!updateOfferForm.valid" data-bs-dismiss="modal">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

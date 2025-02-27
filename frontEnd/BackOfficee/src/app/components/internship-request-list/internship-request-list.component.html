@@ -1,35 +1,69 @@
 <div class="content-body">
-    <h2 class="text-center my-4">Internship Requests</h2>
-  
-    <div class="container d-flex justify-content-center">
-      <div class="table-responsive" style="max-width: 300%;">
-        <table class="table table-bordered table-hover table-striped text-center align-middle shadow-lg rounded">
-          <thead class="table-dark">
-            <tr>
-              <th>ID</th>
-              <th>Title</th>
-              <th>Description</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let request of internshipRequests">
-              <td>{{ request.id }}</td>
-              <td class="text-truncate" style="max-width: 150px;">{{ request.title }}</td>
-              <td class="text-truncate" style="max-width: 200px;">{{ request.description }}</td>
-              <td>
-                <button class="btn btn-danger btn-sm" (click)="deleteInternshipRequest(request.id!)">
-                  <i class="bi bi-trash"></i> Delete
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  
-    <!-- Message if no internship requests are found -->
-    <div *ngIf="internshipRequests.length === 0" class="alert alert-warning text-center mt-3">
-      No internship requests found.
+  <h2 class="text-center my-4">Internship Requests</h2>
+
+  <div class="container d-flex justify-content-center">
+    <div class="table-responsive" style="max-width: 300%;">
+      <table class="table table-bordered table-hover table-striped text-center align-middle shadow-lg rounded">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let request of internshipRequests">
+            <td>{{ request.id }}</td>
+            <td class="text-truncate" style="max-width: 150px;">{{ request.title }}</td>
+            <td class="text-truncate" style="max-width: 200px;">{{ request.description }}</td>
+            <td>
+              <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal"
+                      [attr.data-bs-target]="'#updateInternshipRequestModal' + request.id"
+                      (click)="selectInternshipRequest(request)">
+                <i class="bi bi-pencil"></i> Update
+              </button>
+              <button class="btn btn-danger btn-sm" (click)="deleteInternshipRequest(request.id!)">
+                <i class="bi bi-trash"></i> Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
+
+  <!-- Message if no internship requests are found -->
+  <div *ngIf="internshipRequests.length === 0" class="alert alert-warning text-center mt-3">
+    No internship requests found.
+  </div>
+
+  <!-- Update Internship Request Modal -->
+  <ng-container *ngFor="let request of internshipRequests">
+    <div class="modal fade" [id]="'updateInternshipRequestModal' + request.id" tabindex="-1" aria-labelledby="updateRequestModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateRequestModalLabel">Update Internship Request</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form #updateRequestForm="ngForm" (ngSubmit)="updateRequestForm.valid && updateInternshipRequest()">
+              <div class="form-group">
+                <label class="text-black font-w500">Title</label>
+                <input [(ngModel)]="selectedInternshipRequest.title" name="requestTitle" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="text-black font-w500">Description</label>
+                <input [(ngModel)]="selectedInternshipRequest.description" name="requestDescription" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary" [disabled]="!updateRequestForm.valid" data-bs-dismiss="modal">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

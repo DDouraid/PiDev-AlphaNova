@@ -9,6 +9,7 @@ import { InternshipRequest } from '../../models/internship-request';
 })
 export class InternshipRequestListComponent implements OnInit {
   internshipRequests: InternshipRequest[] = [];
+  selectedInternshipRequest: InternshipRequest = {} as InternshipRequest; // Holds the request being updated
 
   constructor(private internshipRequestService: InternshipRequestService) {}
 
@@ -36,6 +37,25 @@ export class InternshipRequestListComponent implements OnInit {
       error => {
         console.error('Error deleting internship request:', error);
         alert('Failed to delete internship request. Please try again or contact support.');
+      }
+    );
+  }
+
+  // Select the internship request to update
+  selectInternshipRequest(request: InternshipRequest): void {
+    this.selectedInternshipRequest = { ...request }; // Create a copy to avoid direct mutation
+  }
+
+  // Update the internship request
+  updateInternshipRequest(): void {
+    this.internshipRequestService.updateInternshipRequest(this.selectedInternshipRequest).subscribe(
+      () => {
+        this.loadInternshipRequests(); // Refresh the list after update
+        console.log('Internship request updated successfully');
+      },
+      error => {
+        console.error('Error updating internship request:', error);
+        alert('Failed to update internship request. Please try again or contact support.');
       }
     );
   }

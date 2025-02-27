@@ -1,51 +1,103 @@
 <div class="content-body">
-<h2 class="text-center my-4">Internships</h2>
+  <h2 class="text-center my-4">Internships</h2>
 
-    <div class="container d-flex justify-content-center">
+  <div class="container d-flex justify-content-center">
+    <div class="table-responsive" style="max-width: 300%;">
+      <table class="table table-bordered table-hover table-striped text-center align-middle shadow-lg rounded">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let internship of internships">
+            <td>{{ internship.id }}</td>
+            <td class="text-truncate" style="max-width: 150px;">{{ internship.title }}</td>
+            <td class="text-truncate" style="max-width: 200px;">{{ internship.description }}</td>
+            <td>{{ internship.startDate }}</td>
+            <td>{{ internship.endDate }}</td>
+            <td>
+              <span class="badge px-3 py-2" [ngClass]="{
+                'bg-primary': internship.status === 'IN_PROGRESS',
+                'bg-success': internship.status === 'COMPLETED',
+                'bg-danger': internship.status === 'CANCELED'
+              }">
+                {{ internship.status.replace('_', ' ') }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" 
+                      [attr.data-bs-target]="'#updateInternshipModal' + internship.id"
+                      (click)="selectInternship(internship)">
+                <i class="bi bi-pencil"></i> Update
+              </button>
+              <button class="btn btn-danger btn-sm" (click)="deleteInternship(internship.id!)">
+                <i class="bi bi-trash"></i> Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-      <div class="table-responsive" style="max-width: 300%;">
-        <table class="table table-bordered table-hover table-striped text-center align-middle shadow-lg rounded">
-          <thead class="table-dark">
-            <tr>
-              <th>ID</th>
-              <th>Title</th>
-              <th>Description</th>
-              <th>Start Date</th>
-              <th>End Date</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let internship of internships">
-              <td>{{ internship.id }}</td>
-              <td class="text-truncate" style="max-width: 150px;">{{ internship.title }}</td>
-              <td class="text-truncate" style="max-width: 200px;">{{ internship.description }}</td>
-              <td>{{ internship.startDate }}</td>
-              <td>{{ internship.endDate }}</td>
-              <td>
-                <span class="badge px-3 py-2" [ngClass]="{
-              'bg-primary': internship.status === 'IN_PROGRESS',
-              'bg-success': internship.status === 'COMPLETED',
-              'bg-danger': internship.status === 'CANCELED'
-            }">
-                  {{ internship.status.replace('_', ' ') }}
-                </span>
-              </td>
-              <td>
-                <button class="btn btn-danger btn-sm" (click)="deleteInternship(internship.id!)">
-                  <i class="bi bi-trash"></i> Delete
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+  <!-- Message if no internships are found -->
+  <div *ngIf="internships.length === 0" class="alert alert-warning text-center mt-3">
+    No internships found.
+  </div>
+
+  <!-- Update Internship Modal -->
+  <ng-container *ngFor="let internship of internships">
+    <div class="modal fade" [id]="'updateInternshipModal' + internship.id" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateModalLabel">Update Internship</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form #updateForm="ngForm" (ngSubmit)="updateForm.valid && updateInternship()">
+              <div class="form-group">
+                <label class="text-black font-w500">Title</label>
+                <input [(ngModel)]="selectedInternship.title" name="title" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="text-black font-w500">Description</label>
+                <input [(ngModel)]="selectedInternship.description" name="description" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="text-black font-w500">Start Date</label>
+                <div class="cal-icon">
+                  <input type="date" [(ngModel)]="selectedInternship.startDate" name="startDate" class="form-control" required>
+                  <i class="far fa-calendar-alt"></i>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="text-black font-w500">End Date</label>
+                <div class="cal-icon">
+                  <input type="date" [(ngModel)]="selectedInternship.endDate" name="endDate" class="form-control" required>
+                  <i class="far fa-calendar-alt"></i>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="text-black font-w500">Status</label>
+                <select [(ngModel)]="selectedInternship.status" name="status" class="form-control" required>
+                  <option *ngFor="let status of statuses" [value]="status">{{ status.replace('_', ' ') }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary" [disabled]="!updateForm.valid" data-bs-dismiss="modal">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
-
-    <!-- Message si aucun stage n'est trouvé -->
-    <div *ngIf="internships.length === 0" class="alert alert-warning text-center mt-3">
-      No internships found.
-    </div>
-
-  </div>
+  </ng-container>
+</div>

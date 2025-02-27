@@ -14,6 +14,8 @@ export class InternshipListComponent implements OnInit {
   internships: Internship[] = [];
   internshipOffers: InternshipOffer[] = [];
   internshipRequests: InternshipRequest[] = [];
+  selectedInternship: Internship = {} as Internship; // Holds the internship being updated
+  statuses = ['IN_PROGRESS', 'COMPLETED', 'CANCELED']; // Define statuses for the dropdown
 
   constructor(
     private internshipService: InternshipService,
@@ -68,7 +70,6 @@ export class InternshipListComponent implements OnInit {
       },
       error => {
         console.error('Error deleting internship:', error);
-        // Optionally, display an error message to the user
         alert('Failed to delete internship. Please try again or contact support.');
       }
     );
@@ -92,6 +93,25 @@ export class InternshipListComponent implements OnInit {
       },
       error => {
         console.error('Error deleting internship request:', error);
+      }
+    );
+  }
+
+  // Select the internship to update
+  selectInternship(internship: Internship): void {
+    this.selectedInternship = { ...internship }; // Create a copy to avoid direct mutation
+  }
+
+  // Update the internship
+  updateInternship(): void {
+    this.internshipService.updateInternship(this.selectedInternship).subscribe(
+      () => {
+        this.loadInternships(); // Refresh the list after update
+        console.log('Internship updated successfully');
+      },
+      error => {
+        console.error('Error updating internship:', error);
+        alert('Failed to update internship. Please try again or contact support.');
       }
     );
   }

@@ -18,11 +18,14 @@ const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordComponent }, // Add reset-password route
   { path: 'home', component: HomeComponent }, // Add home route // Add dashboard route
   { path: 'customize-profile', component: CustomizeProfileComponent }, // Add this route
+  { path: 'profile', component: ProfileComponent}, // Protect profile route
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'access-denied', component: AccessDeniedComponent }, // Add access-denied route
   { path: 'auth/callback', component: AuthCallbackComponent },
   { path: '**', redirectTo: '/login' }
 ];
+
+
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

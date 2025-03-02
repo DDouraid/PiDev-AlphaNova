@@ -1,11 +1,5 @@
+<!-- frontend/src/app/components/register/register.component.html -->
 <div class="register-wrapper">
-  <div class="image-panel">
-    <div class="image-slider">
-      <img src="assets/internship-1.jpg" alt="Internship Image 1" class="slide active" />
-      <img src="assets/internship-2.jpg" alt="Internship Image 2" class="slide" />
-      <img src="assets/internship-3.jpg" alt="Internship Image 3" class="slide" />
-    </div>
-  </div>
   <div class="register-container">
     <div class="card">
       <div class="card-header border-0">
@@ -13,79 +7,109 @@
       </div>
       <div class="card-body text-center">
         <form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="register-form">
-          <div class="input-group">
-            <label for="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              [(ngModel)]="signupRequest.username"
-              name="username"
-              required
-              minlength="4"
-              placeholder="Enter your username (min 4 characters)"
-              class="input-field"
-              #username="ngModel"
-              [class.is-invalid]="username.invalid && (username.touched || registerForm.submitted)"
-            />
-            <div *ngIf="username.invalid && (username.touched || registerForm.submitted)" class="invalid-feedback">
-              <div *ngIf="username.errors?.['required']">Username is required.</div>
-              <div *ngIf="username.errors?.['minlength']">Username must be at least 4 characters long.</div>
+          <!-- Avatar Section Moved Inside Form -->
+          <div class="avatar-section">
+            <div class="avatar-wrapper">
+              <div *ngIf="avatarPreview" class="avatar-preview">
+                <img [src]="avatarPreview" alt="Avatar Preview" />
+              </div>
+              <!-- <img src="assets/avatar.png" alt="Avatar" class="avatar" /> -->
+              <div class="speech-bubble">
+                <p class="welcome-text">Welcome to AlphaNova</p>
+              </div>
             </div>
           </div>
-          <div class="input-group">
-            <label for="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              [(ngModel)]="signupRequest.email"
-              name="email"
-              required
-              email
-              placeholder="Enter your email"
-              class="input-field"
-              #email="ngModel"
-              [class.is-invalid]="email.invalid && (email.touched || registerForm.submitted)"
-            />
-            <div *ngIf="email.invalid && (email.touched || registerForm.submitted)" class="invalid-feedback">
-              <div *ngIf="email.errors?.['required']">Email is required.</div>
-              <div *ngIf="email.errors?.['email']">Please enter a valid email address.</div>
+          <div class="form-row">
+            <div class="input-group">
+              <label for="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                [(ngModel)]="signupRequest.username"
+                name="username"
+                required
+                minlength="4"
+                placeholder="Enter your username (min 4 characters)"
+                class="input-field"
+                #username="ngModel"
+                [class.is-invalid]="username.invalid && (username.touched || registerForm.submitted)"
+              />
+              <div *ngIf="username.invalid && (username.touched || registerForm.submitted)" class="invalid-feedback">
+                <div *ngIf="username.errors?.['required']">Username is required.</div>
+                <div *ngIf="username.errors?.['minlength']">Username must be at least 4 characters long.</div>
+              </div>
+            </div>
+            <div class="input-group">
+              <label for="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                [(ngModel)]="signupRequest.email"
+                name="email"
+                required
+                email
+                placeholder="Enter your email"
+                class="input-field"
+                #email="ngModel"
+                [class.is-invalid]="email.invalid && (email.touched || registerForm.submitted)"
+              />
+              <div *ngIf="email.invalid && (email.touched || registerForm.submitted)" class="invalid-feedback">
+                <div *ngIf="email.errors?.['required']">Email is required.</div>
+                <div *ngIf="email.errors?.['email']">Please enter a valid email address.</div>
+              </div>
             </div>
           </div>
-          <div class="input-group">
-            <label for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              [(ngModel)]="signupRequest.password"
-              name="password"
-              required
-              minlength="6"
-              placeholder="Enter your password"
-              class="input-field"
-              #password="ngModel"
-              [class.is-invalid]="password.invalid && (password.touched || registerForm.submitted)"
-            />
-            <div *ngIf="password.invalid && (password.touched || registerForm.submitted)" class="invalid-feedback">
-              <div *ngIf="password.errors?.['required']">Password is required.</div>
-              <div *ngIf="password.errors?.['minlength']">Password must be at least 6 characters long.</div>
+          <div class="form-row">
+            <div class="input-group">
+              <label for="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                [(ngModel)]="signupRequest.password"
+                name="password"
+                required
+                minlength="6"
+                placeholder="Enter your password"
+                class="input-field"
+                #password="ngModel"
+                [class.is-invalid]="password.invalid && (password.touched || registerForm.submitted)"
+              />
+              <div *ngIf="password.invalid && (password.touched || registerForm.submitted)" class="invalid-feedback">
+                <div *ngIf="password.errors?.['required']">Password is required.</div>
+                <div *ngIf="password.errors?.['minlength']">Password must be at least 6 characters long.</div>
+              </div>
+            </div>
+            <div class="input-group">
+              <label for="role">Roles</label>
+              <input
+                type="text"
+                id="role"
+                [(ngModel)]="signupRequest.role"
+                (input)="onRoleInput($event)"
+                name="role"
+                required
+                placeholder="e.g., student, admin"
+                class="input-field"
+                #role="ngModel"
+                [class.is-invalid]="role.invalid && (role.touched || registerForm.submitted)"
+              />
+              <div *ngIf="role.invalid && (role.touched || registerForm.submitted)" class="invalid-feedback">
+                <div *ngIf="role.errors?.['required']">Roles are required.</div>
+              </div>
             </div>
           </div>
-          <div class="input-group">
-            <label for="role">Roles (comma-separated, e.g., student, admin)</label>
-            <input
-              type="text"
-              id="role"
-              [(ngModel)]="signupRequest.role"
-              (input)="onRoleInput($event)"
-              name="role"
-              required
-              placeholder="e.g., student, admin"
-              class="input-field"
-              #role="ngModel"
-              [class.is-invalid]="role.invalid && (role.touched || registerForm.submitted)"
-            />
-            <div *ngIf="role.invalid && (role.touched || registerForm.submitted)" class="invalid-feedback">
-              <div *ngIf="role.errors?.['required']">Roles are required.</div>
+          <!-- Avatar Upload Field -->
+          <div class="form-row">
+            <div class="input-group">
+              <label for="avatar">Upload Avatar (Optional)</label>
+              <input
+                type="file"
+                id="avatar"
+                (change)="onAvatarSelected($event)"
+                accept="image/*"
+                class="input-field"
+              />
+
             </div>
           </div>
           <button type="submit" class="register-button" [disabled]="isLoading || registerForm.invalid">
@@ -103,11 +127,15 @@
           <button class="social-button github" (click)="registerWithGitHub()">
             <i class="fab fa-github"></i> Register with GitHub
           </button>
+          <a routerLink="/login" class="back-to-login">Already have an account? Sign In</a>
         </div>
         <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
         <p *ngIf="redirectMessage" class="redirect-message">{{ redirectMessage }}</p>
         <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
       </div>
     </div>
+  </div>
+  <div class="footer-bar">
+    <p>© {{ currentYear }} Esprit University. All Rights Reserved.</p>
   </div>
 </div>

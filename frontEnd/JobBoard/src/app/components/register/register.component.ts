@@ -1,3 +1,4 @@
+// frontend/src/app/components/register/register.component.ts
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SignupRequest } from 'src/models/signup-request';
 import { AuthService } from 'src/services/auth.service';
@@ -15,40 +16,39 @@ export class RegisterComponent implements OnInit {
   successMessage = '';
   redirectMessage = '';
   isLoading = false;
-  currentSlide = 0;
   countdown = 5;
+  currentYear = new Date().getFullYear();
+  selectedAvatar: File | null = null; // To store the selected avatar file
+  avatarPreview: string | null = null; // To store the preview URL
 
   @ViewChild('registerForm') registerForm!: NgForm;
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  ngOnInit(): void {
-    this.startSlider();
-  }
+  ngOnInit(): void {}
 
-  startSlider() {
-    setInterval(() => {
-      this.currentSlide = (this.currentSlide + 1) % 3; // Assuming 3 images
-      const slides = document.querySelectorAll('.slide');
-      slides.forEach((slide: Element, index) => {
-        slide.classList.remove('active');
-        if (index === this.currentSlide) {
-          slide.classList.add('active');
-        }
-      });
-    }, 5000);
+  onAvatarSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.selectedAvatar = file;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.avatarPreview = e.target.result; // Set preview URL
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   onSubmit() {
     if (this.registerForm.invalid) {
-      this.registerForm.form.markAllAsTouched(); // Highlight all invalid fields
+      this.registerForm.form.markAllAsTouched();
       this.errorMessage = 'Please fix the form errors before submitting.';
       this.isLoading = false;
       return;
     }
 
     this.isLoading = true;
-    this.authService.register(this.signupRequest).subscribe({
+    this.authService.registerWithAvatar(this.signupRequest, this.selectedAvatar).subscribe({
       next: (response) => {
         this.successMessage = response.message;
         this.errorMessage = '';
@@ -74,9 +74,9 @@ export class RegisterComponent implements OnInit {
         this.router.navigate(['/login']);
         this.redirectMessage = '';
         this.successMessage = '';
-        this.countdown = 5; // Reset countdown
+        this.countdown = 5;
       }
-    }, 1000); // Update every second
+    }, 1000);
   }
 
   onRoleInput(event: Event) {

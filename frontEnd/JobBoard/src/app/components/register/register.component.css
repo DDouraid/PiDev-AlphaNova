@@ -1,90 +1,132 @@
+/* frontend/src/app/components/register/register.component.css */
 .register-wrapper {
   display: flex;
   min-height: 100vh;
-  background: #f0f2f5; /* Light gray background */
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   font-family: 'Roboto', sans-serif;
   justify-content: center;
   align-items: center;
   overflow: hidden;
 }
 
-/* Image panel on the left (using sidebar space, exactly like login) */
-.image-panel {
-  width: 500px; /* Same width as login */
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  background: #f0f2f5; /* Match background for now, can be styled differently */
-  z-index: 5;
-  overflow: hidden;
-}
-
-/* Image slider (exactly like login) */
-.image-slider {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.slide {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0;
-  transition: opacity 0.5s ease-in-out;
-  object-fit: cover;
-}
-
-/* Apply red transparency as a background overlay for all slides (exactly like login) */
-.slide::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 77, 77, 0.5); /* Semi-transparent red (#ff4d4d with 50% opacity) */
-  z-index: 1;
-}
-
-.slide.active {
-  opacity: 1;
-  z-index: 2; /* Ensure the active slide stays on top of the overlay */
-}
-
-/* Register container */
+/* Register container - centered */
 .register-container {
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 40px;
-  margin-left: 500px; /* Offset for image panel, matching login */
 }
 
-/* Card styling (larger, like profile and login) */
+/* Avatar section - centered inside the form */
+.avatar-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.avatar-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ff4d4d; /* Add a subtle border */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+  animation: wave 2s infinite ease-in-out;
+}
+
+.speech-bubble {
+  position: absolute;
+  top: -50px;
+  background: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+  animation: fadeIn 1s ease forwards;
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 10px;
+  border-style: solid;
+  border-color: #fff transparent transparent transparent;
+}
+
+/* Typing animation for welcome text */
+.welcome-text {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid #ff4d4d;
+  animation: typing 2s steps(20, end) forwards, blink 0.5s step-end infinite;
+}
+
+/* Typing animation */
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* Blinking cursor animation */
+@keyframes blink {
+  from, to { border-color: transparent; }
+  50% { border-color: #ff4d4d; }
+}
+
+/* Animation for avatar (wave effect) */
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+
+/* Fade-in animation for speech bubble */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Card styling - enhanced for professionalism */
 .card {
   background: #ffffff;
-  border-radius: 12px;
-  padding: 50px;
+  border-radius: 16px; /* Softer corners */
+  padding: 60px; /* More spacious padding */
   width: 100%;
-  max-width: 500px; /* Larger width */
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-  border-top: 6px solid #ff4d4d; /* Red border at the top */
+  max-width: 800px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Deeper shadow for depth */
+  border: 1px solid #e0e0e0; /* Subtle border */
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px); /* Slight lift on hover */
 }
 
 .card-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 40px; /* Increased spacing */
 }
 
 .fs-20 {
-  font-size: 2rem; /* Larger title */
+  font-size: 2rem;
   color: #333;
   font-weight: 700;
+  letter-spacing: 0.5px; /* Better typography */
 }
 
 .card-body {
@@ -94,77 +136,90 @@
 .register-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 30px; /* More spacious gap */
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: space-between;
 }
 
 .input-group {
+  flex: 1;
+  min-width: 250px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Align labels and inputs to the left */
+  align-items: flex-start;
 }
 
 label {
-  color: #ff4d4d; /* Red labels */
-  font-size: 1.1rem; /* Larger labels */
-  font-weight: 500;
-  margin-bottom: 8px;
+  color: #ff4d4d;
+  font-size: 1.1rem;
+  font-weight: 600; /* Bolder labels */
+  margin-bottom: 10px; /* Increased spacing */
   text-align: left;
   width: 100%;
+  letter-spacing: 0.5px; /* Better typography */
 }
 
 .input-field {
-  padding: 14px; /* Larger padding */
-  border: 2px solid #b0bec5; /* Slightly thicker border */
-  border-radius: 6px; /* Larger radius */
-  font-size: 1.2rem; /* Larger text */
+  padding: 14px 20px;
+  border: 2px solid #b0bec5;
+  border-radius: 8px; /* Softer corners */
+  font-size: 1.2rem;
   color: #333;
-  background: #f0f8ff; /* Light blue background for inputs */
-  width: 100%; /* Full width */
+  background: #f9fafb; /* Slightly darker background for contrast */
+  width: 100%;
   transition: all 0.3s ease;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle inset shadow */
 }
 
 .input-field:focus {
-  border-color: #ff4d4d; /* Red border on focus */
-  box-shadow: 0 0 8px rgba(255, 77, 77, 0.4); /* Enhanced shadow */
+  border-color: #ff4d4d;
+  box-shadow: 0 0 8px rgba(255, 77, 77, 0.4);
   outline: none;
 }
 
 .input-field.is-invalid {
-  border-color: #e74c3c; /* Red border for invalid state */
-  background-color: #fff0f0; /* Light red background for invalid input */
+  border-color: #e74c3c;
+  background-color: #fff0f0;
 }
 
 .invalid-feedback {
-  font-size: 0.875rem; /* Smaller text for feedback */
-  color: #e74c3c; /* Red error text */
-  margin-top: 0.25rem;
-  font-style: italic; /* Slightly italic for emphasis */
+  font-size: 0.875rem;
+  color: #e74c3c;
+  margin-top: 0.5rem; /* Increased spacing */
+  font-style: italic;
 }
 
 .register-button {
-  padding: 16px; /* Larger padding */
-  background: #ff4d4d; /* Red button */
+  padding: 16px;
+  background: #ff4d4d;
   border: none;
-  border-radius: 6px; /* Larger radius */
+  border-radius: 8px; /* Softer corners */
   color: #ffffff;
-  font-size: 1.2rem; /* Larger text */
+  font-size: 1.2rem;
   font-weight: 600;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.3s ease;
-  width: 100%; /* Full width */
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(255, 77, 77, 0.3); /* Button shadow */
 }
 
 .register-button:disabled {
   background: #90a4ae;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .spinner {
   display: inline-block;
-  width: 24px; /* Larger spinner */
-  height: 24px; /* Larger spinner */
-  border: 4px solid rgba(255, 255, 255, 0.3); /* Thicker border */
+  width: 24px;
+  height: 24px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   border-top-color: #ffffff;
   animation: spin 1s ease-in-out infinite;
@@ -175,15 +230,15 @@ label {
 }
 
 .register-button:hover:not(:disabled) {
-  background: #e41b1b; /* Darker red */
-  box-shadow: 0 4px 8px rgba(255, 77, 77, 0.4); /* Enhanced shadow */
+  background: #e41b1b;
+  box-shadow: 0 6px 15px rgba(255, 77, 77, 0.4);
 }
 
 .divider {
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 1.5rem 0;
+  margin: 2rem 0; /* Increased spacing */
 }
 
 .divider span {
@@ -191,6 +246,7 @@ label {
   font-size: 1rem;
   padding: 0 15px;
   background: #ffffff;
+  font-weight: 500;
 }
 
 .divider::before,
@@ -209,7 +265,7 @@ label {
 .social-button {
   padding: 0.875rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: 500;
   color: #ffffff;
@@ -219,53 +275,201 @@ label {
   justify-content: center;
   gap: 0.75rem;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 .google {
-  background: #4285f4; /* Google blue */
+  background: #4285f4;
 }
 
 .google:hover {
   background: #3267d6;
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
 }
 
 .github {
-  background: #333; /* GitHub black */
+  background: #333;
 }
 
 .github:hover {
   background: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(51, 51, 51, 0.3);
 }
 
 .social-button i {
   font-size: 1.25rem;
 }
 
+.back-to-login {
+  display: block;
+  margin-top: 20px;
+  color: #ff4d4d;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.back-to-login:hover {
+  color: #e41b1b;
+}
+
 .success-message {
   text-align: center;
   color: #2ecc71;
-  font-size: 1rem; /* Larger text */
-  margin-top: 20px; /* Increased margin */
+  font-size: 1rem;
+  margin-top: 20px;
   animation: fadeIn 0.5s ease;
+  background: #e7f9e7;
+  padding: 10px 15px;
+  border-radius: 8px;
 }
 
 .error-message {
   text-align: center;
   color: #e74c3c;
-  font-size: 1rem; /* Larger text */
-  margin-top: 20px; /* Increased margin */
+  font-size: 1rem;
+  margin-top: 20px;
   animation: fadeIn 0.5s ease;
+  background: #fce7e7;
+  padding: 10px 15px;
+  border-radius: 8px;
 }
 
 .redirect-message {
   text-align: center;
-  color: #4caf50; /* Green for redirection message */
-  font-size: 0.9rem; /* Smaller text */
-  margin-top: 10px; /* Reduced margin */
+  color: #4caf50;
+  font-size: 0.9rem;
+  margin-top: 10px;
   animation: fadeIn 0.5s ease;
+  background: #e7f9e7;
+  padding: 10px 15px;
+  border-radius: 8px;
+}
+
+.footer-bar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  padding: 10px 0;
+}
+
+.footer-bar p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
 }
 
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .register-wrapper {
+    flex-direction: column;
+  }
+
+  .register-container {
+    padding: 40px 15px;
+  }
+
+  .avatar-section {
+    margin-bottom: 20px;
+  }
+
+  .avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .speech-bubble {
+    top: -40px;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+
+  .speech-bubble::after {
+    border-width: 8px;
+  }
+
+  .card {
+    padding: 30px;
+    max-width: 100%;
+  }
+
+  .fs-20 {
+    font-size: 1.5rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .input-group {
+    min-width: 100%;
+  }
+
+  .input-field {
+    padding: 12px;
+    font-size: 1rem;
+  }
+
+  .register-button {
+    padding: 14px;
+    font-size: 1rem;
+  }
+}
+
+/* Avatar Preview */
+.avatar-preview {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.avatar-preview img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ff4d4d;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.input-field[type="file"] {
+  padding: 10px;
+  border: 2px dashed #b0bec5;
+  background: #f9fafb;
+  cursor: pointer;
+}
+
+.input-field[type="file"]::-webkit-file-upload-button {
+  visibility: hidden;
+}
+
+.input-field[type="file"]::before {
+  content: 'Choose Avatar';
+  display: inline-block;
+  background: #ff4d4d;
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 60px;
+  width: 100%;
+  max-width: 800px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e0e0e0;
+  border-top: 6px solid;
+  border-image: linear-gradient(90deg, #ff4d4d, #e41b1b) 1;
+  transition: transform 0.3s ease;
 }

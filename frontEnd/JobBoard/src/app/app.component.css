@@ -1,8 +1,4 @@
-.app-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
+
 .auth-header {
   padding: 20px;
   background: #fff;

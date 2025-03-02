@@ -154,8 +154,10 @@ public class AuthController {
 		));
 	}
 
-	@PostMapping("/signup")
-	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+	@PostMapping(value = "/signup", consumes = {"multipart/form-data"})
+	public ResponseEntity<?> registerUser(
+			@Valid @RequestPart("signupRequest") SignupRequest signUpRequest,
+			@RequestPart(value = "avatar", required = false) MultipartFile avatar) {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity
 					.badRequest()
@@ -209,6 +211,34 @@ public class AuthController {
 		}
 
 		user.setRoles(roles);
+
+		// Handle avatar upload if provided
+		if (avatar != null && !avatar.isEmpty()) {
+			try {
+				String uploadDir = "uploads/users/";
+				Path uploadPath = Paths.get(uploadDir);
+				if (!Files.exists(uploadPath)) {
+					Files.createDirectories(uploadPath);
+					System.out.println("Created upload directory: " + uploadPath);
+				}
+
+				String originalFilename = avatar.getOriginalFilename();
+				String fileExtension = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
+				String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
+				Path filePath = uploadPath.resolve(uniqueFilename);
+
+				Files.copy(avatar.getInputStream(), filePath);
+				System.out.println("Avatar image saved to: " + filePath);
+
+				// Set the avatar path in the user entity
+				user.setProfileImage(uploadDir + uniqueFilename);
+			} catch (Exception e) {
+				System.err.println("Error uploading avatar image: " + e.getMessage());
+				e.printStackTrace();
+				return ResponseEntity.badRequest().body(new MessageResponse("Error uploading avatar image: " + e.getMessage()));
+			}
+		}
+
 		userRepository.save(user);
 
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
@@ -344,7 +374,6 @@ public class AuthController {
 		}
 	}
 
-	// New endpoint to request OTP
 	@PostMapping("/request-otp")
 	public ResponseEntity<?> requestOtp(@RequestBody ResetPasswordRequest request) {
 		String email = request.getEmail();
@@ -355,10 +384,8 @@ public class AuthController {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email not found."));
 		}
 
-		// Generate OTP
 		String otp = otpService.generateOtp(email);
 
-		// Send OTP via email
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setTo(email);
 		message.setSubject("Password Reset OTP");
@@ -373,19 +400,16 @@ public class AuthController {
 		}
 	}
 
-	// New endpoint to reset password with OTP
 	@PostMapping("/reset-password")
 	public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
 		String email = request.getEmail();
 		String otp = request.getOtp();
 		String newPassword = request.getNewPassword();
 
-		// Verify OTP
 		if (!otpService.verifyOtp(email, otp)) {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Invalid or expired OTP."));
 		}
 
-		// Find user by email
 		User user = userRepository.findByEmail(email)
 				.orElse(null);
 
@@ -393,11 +417,9 @@ public class AuthController {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email not found."));
 		}
 
-		// Update password
 		user.setPassword(encoder.encode(newPassword));
 		userRepository.save(user);
 
-		// Clear OTP
 		otpService.clearOtp(email);
 
 		return ResponseEntity.ok(new MessageResponse("Password reset successfully!"));
@@ -417,7 +439,6 @@ class UpdateProfileRequest {
 	public void setRoles(List<String> roles) { this.roles = roles; }
 }
 
-// DTO for reset password request
 class ResetPasswordRequest {
 	private String email;
 	private String otp;

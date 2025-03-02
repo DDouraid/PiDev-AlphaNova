@@ -1,5 +1,5 @@
 // frontend/src/app/components/reset-password/reset-password.component.ts
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/services/auth.service';
 import { MessageResponse } from 'src/models/message-response';
 
@@ -8,7 +8,7 @@ import { MessageResponse } from 'src/models/message-response';
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.css']
 })
-export class ResetPasswordComponent {
+export class ResetPasswordComponent implements OnInit {
   step: 'request-otp' | 'reset-password' = 'request-otp';
   email: string = '';
   otp: string = '';
@@ -17,8 +17,27 @@ export class ResetPasswordComponent {
   isLoading: boolean = false;
   successMessage: string = '';
   errorMessage: string = '';
+  currentSlide = 0;
+  currentYear = new Date().getFullYear(); // Add currentYear for footer
 
   constructor(private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.startSlider();
+  }
+
+  startSlider() {
+    setInterval(() => {
+      this.currentSlide = (this.currentSlide + 1) % 3; // Assuming 3 images
+      const slides = document.querySelectorAll('.slide');
+      slides.forEach((slide: Element, index) => {
+        slide.classList.remove('active');
+        if (index === this.currentSlide) {
+          slide.classList.add('active');
+        }
+      });
+    }, 5000);
+  }
 
   onRequestOtp(): void {
     if (!this.email) {

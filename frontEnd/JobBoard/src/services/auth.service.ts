@@ -81,6 +81,27 @@ export class AuthService {
     );
   }
 
+  // New method to register with avatar
+  registerWithAvatar(signupRequest: SignupRequest, avatar: File | null): Observable<MessageResponse> {
+    const formData = new FormData();
+    formData.append('signupRequest', new Blob([JSON.stringify(signupRequest)], { type: 'application/json' }));
+    if (avatar) {
+      formData.append('avatar', avatar);
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.getToken()}`
+    });
+
+    return this.http.post<MessageResponse>(`${this.authApiUrl}/signup`, formData, { headers }).pipe(
+      tap(response => console.log('User registered with avatar:', response)),
+      catchError(err => {
+        console.error('Error registering user with avatar:', err);
+        return throwError(() => new Error('Failed to register user: ' + (err.message || 'Unknown error')));
+      })
+    );
+  }
+
   logout(): void {
     console.log('Logout called, removing token');
     localStorage.removeItem('token');
@@ -352,8 +373,6 @@ export class AuthService {
       })
     );
   }
-
-
 
   requestOtp(request: { email: string }): Observable<MessageResponse> {
     return this.http.post<MessageResponse>(`${this.authApiUrl}/request-otp`, request).pipe(

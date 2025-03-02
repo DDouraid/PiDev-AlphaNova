@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
   isAdmin = false;
   isLoggedIn = false;
   currentPageTitle = 'Home';
-  currentYear: number = new Date().getFullYear(); // Add currentYear for footer
+  currentYear: number = new Date().getFullYear();
 
   constructor(public router: Router, private authService: AuthService) {}
 
@@ -59,6 +59,25 @@ export class AppComponent implements OnInit {
   isAuthRoute(): boolean {
     const currentRoute = this.router.url;
     return currentRoute === '/login' || currentRoute === '/register' || currentRoute === '/reset-password';
+  }
+
+  isLoginRoute(): boolean {
+    const currentRoute = this.router.url;
+    return currentRoute === '/login';
+  }
+
+  isRegisterRoute(): boolean {
+    const currentRoute = this.router.url;
+    return currentRoute === '/register';
+  }
+
+  isResetPasswordRoute(): boolean {
+    const currentRoute = this.router.url;
+    return currentRoute === '/reset-password';
+  }
+
+  isFullPageAuthRoute(): boolean {
+    return this.isLoginRoute() || this.isRegisterRoute() || this.isResetPasswordRoute();
   }
 
   isProfileRoute(): boolean {

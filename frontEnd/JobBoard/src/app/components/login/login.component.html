@@ -1,3 +1,4 @@
+<!-- frontend/src/app/components/login/login.component.html -->
 <div class="university-login-wrapper">
   <div class="image-panel">
     <div class="image-slider">
@@ -49,6 +50,8 @@
             <div *ngIf="password.errors?.['minlength']">Password must be at least 6 characters long.</div>
           </div>
         </div>
+        <!-- Add Forgot Password link -->
+        <a routerLink="/reset-password" class="forgot-password-link"><i class="fas fa-key"></i> Forgot Password ?</a>
         <button type="submit" class="login-button" [disabled]="isLoading || loginForm.invalid">
           <span *ngIf="!isLoading">Sign In</span>
           <span *ngIf="isLoading" class="spinner"></span>
@@ -64,7 +67,6 @@
         <button class="social-button google" (click)="loginWithGoogle()">
           <i class="fab fa-google"></i> Login with Google
         </button>
-        <!-- New Register link/button -->
         <a routerLink="/register" class="register-link">Don't have an account? Register</a>
       </div>
       <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>

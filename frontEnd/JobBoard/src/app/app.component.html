@@ -99,8 +99,8 @@
     </div>
   </div>
 
-  <!-- Sidebar (only for authenticated pages, excluding login/register and profile) -->
-  <div class="deznav" *ngIf="isLoggedIn && !isAuthRoute() && !isProfileRoute()">
+  <!-- Sidebar (only for authenticated pages, excluding login/register) -->
+  <div class="deznav" *ngIf="isLoggedIn && !isAuthRoute()">
     <div class="deznav-scroll">
       <a class="add-project-sidebar btn btn-primary" href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#addProjectSidebar">+ New Project</a>
       <ul class="metismenu" id="menu">
@@ -112,7 +112,7 @@
           <i class="flaticon-monitor"></i>
           <span class="nav-text">Home</span>
         </a></li>
-        <li><a href="#" [routerLink]="['/profile']" [class.active]="router.isActive('/profile', true)">
+        <li><a href="#" [routerLink]="['/profile']">
           <i class="flaticon-user"></i>
           <span class="nav-text">Profile</span>
         </a></li>
@@ -120,30 +120,35 @@
     </div>
   </div>
 
-  <!-- Minimal header for auth routes -->
-  <div class="auth-header" *ngIf="!isLoggedIn || isAuthRoute()">
+  <!-- Minimal header for auth routes, excluding /login, /register, and /reset-password -->
+  <div class="auth-header" *ngIf="isAuthRoute() && !isFullPageAuthRoute()">
     <a href="#" class="brand-logo">
       <i class="logo-abbr fa-brands fa-stumbleupon"></i>
       <h2 class="brand-title">Alpha Nova</h2>
     </a>
   </div>
 
-  <!-- Content body -->
-  <div class="content-body">
+  <!-- Render router-outlet directly for /login, /register, and /reset-password to avoid content-body wrapper -->
+  <div *ngIf="isFullPageAuthRoute()">
+    <router-outlet></router-outlet>
+  </div>
+
+  <!-- Content body for all other routes -->
+  <div class="content-body" *ngIf="!isFullPageAuthRoute()">
     <div class="container-fluid">
       <router-outlet></router-outlet>
     </div>
   </div>
 
-  <!-- Footer (for authenticated pages, excluding login/register) -->
+  <!-- Footer (for authenticated pages, excluding login/register/reset-password) -->
   <div class="footer" *ngIf="isLoggedIn && !isAuthRoute()">
     <div class="copyright">
       <p>Designed <span class="heart"></span> <a href="#">with love</a> {{ currentYear }}</p>
     </div>
   </div>
 
-  <!-- Minimal footer for auth routes -->
-  <div class="auth-footer" *ngIf="!isLoggedIn || isAuthRoute()">
+  <!-- Minimal footer for auth routes, excluding /login, /register, and /reset-password -->
+  <div class="auth-footer" *ngIf="isAuthRoute() && !isFullPageAuthRoute()">
     <div class="copyright">
       <p>© {{ currentYear }} Esprit University. All Rights Reserved.</p>
     </div>

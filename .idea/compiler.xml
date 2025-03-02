@@ -10,11 +10,11 @@
         <module name="Supervisor" />
         <module name="Event" />
         <module name="Gestion_Utilisateurs" />
+        <module name="eureka" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="candidat" target="17" />
-      <module name="eureka" target="17" />
       <module name="gateway" target="17" />
     </bytecodeTargetLevel>
   </component>

@@ -1,3 +1,4 @@
+<!-- frontend/src/app/components/app.component.html -->
 <div id="main-wrapper">
   <!-- Nav header (only for authenticated pages) -->
   <div class="nav-header" *ngIf="isLoggedIn && !isAuthRoute()">
@@ -74,7 +75,8 @@
             </li>
             <li class="nav-item dropdown header-profile">
               <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown">
-                <img src="assets/img/man (1).png" width="20" alt=""/>
+                <img [src]="user.displayImage && user.displayImage.startsWith('data:') ? user.displayImage : (user.displayImage && user.displayImage !== 'assets/img/man (1).png' ? 'http://localhost:8088/' + user.displayImage : 'assets/img/man (1).png')"
+                     width="20" alt=""/>
                 <div class="header-info">
                   <span>{{ user.username || 'Johndoe' }}</span>
                   <small>{{ user.roles.length > 0 ? user.roles[0] : 'User' }}</small>
@@ -97,8 +99,8 @@
     </div>
   </div>
 
-  <!-- Sidebar (only for authenticated pages, excluding login/register) -->
-  <div class="deznav" *ngIf="isLoggedIn && !isAuthRoute()">
+  <!-- Sidebar (only for authenticated pages, excluding login/register and profile) -->
+  <div class="deznav" *ngIf="isLoggedIn && !isAuthRoute() && !isProfileRoute()">
     <div class="deznav-scroll">
       <a class="add-project-sidebar btn btn-primary" href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#addProjectSidebar">+ New Project</a>
       <ul class="metismenu" id="menu">
@@ -118,6 +120,14 @@
     </div>
   </div>
 
+  <!-- Minimal header for auth routes -->
+  <div class="auth-header" *ngIf="!isLoggedIn || isAuthRoute()">
+    <a href="#" class="brand-logo">
+      <i class="logo-abbr fa-brands fa-stumbleupon"></i>
+      <h2 class="brand-title">Alpha Nova</h2>
+    </a>
+  </div>
+
   <!-- Content body -->
   <div class="content-body">
     <div class="container-fluid">
@@ -125,10 +135,17 @@
     </div>
   </div>
 
-  <!-- Footer (only for authenticated pages, excluding login/register) -->
+  <!-- Footer (for authenticated pages, excluding login/register) -->
   <div class="footer" *ngIf="isLoggedIn && !isAuthRoute()">
     <div class="copyright">
-      <p>Designed <span class="heart"></span> <a href="#">with love</a> 2023</p>
+      <p>Designed <span class="heart"></span> <a href="#">with love</a> {{ currentYear }}</p>
+    </div>
+  </div>
+
+  <!-- Minimal footer for auth routes -->
+  <div class="auth-footer" *ngIf="!isLoggedIn || isAuthRoute()">
+    <div class="copyright">
+      <p>© {{ currentYear }} Esprit University. All Rights Reserved.</p>
     </div>
   </div>
 </div>

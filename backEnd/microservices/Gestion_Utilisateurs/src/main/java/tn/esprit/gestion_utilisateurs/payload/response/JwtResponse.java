@@ -9,13 +9,33 @@ public class JwtResponse {
 	private String username;
 	private String email;
 	private List<String> roles;
+	private String profileImage; // Add profileImage field
+	private String cvFile; // Add cvFile field
 
-	public JwtResponse(String accessToken, Long id, String username, String email, List<String> roles) {
+	public JwtResponse(String accessToken, Long id, String username, String email, List<String> roles, String profileImage, String cvFile) {
 		this.token = accessToken;
 		this.id = id;
 		this.username = username;
 		this.email = email;
 		this.roles = roles;
+		this.profileImage = profileImage;
+		this.cvFile = cvFile;
+	}
+
+	public String getProfileImage() {
+		return profileImage;
+	}
+
+	public void setProfileImage(String profileImage) {
+		this.profileImage = profileImage;
+	}
+
+	public String getCvFile() {
+		return cvFile;
+	}
+
+	public void setCvFile(String cvFile) {
+		this.cvFile = cvFile;
 	}
 
 	public String getAccessToken() {

@@ -41,6 +41,13 @@ public class User {
 	@Column(name = "is_blocked", nullable = false, columnDefinition = "boolean default false")
 	private boolean isBlocked = false;
 
+	// Add profileImage field to store the path to the uploaded image
+	@Column(name = "profile_image")
+	private String profileImage; // Path to the image (e.g., "images/users/123-profile.jpg")
+
+	@Column(name = "cv_file")
+	private String cvFile; // Path to the CV file (e.g., "uploads/cvs/123-cv.pdf")
+
 	public User() {
 	}
 
@@ -48,6 +55,24 @@ public class User {
 		this.username = username;
 		this.email = email;
 		this.password = password;
+	}
+
+	// Getter and Setter for cvFile
+	public String getCvFile() {
+		return cvFile;
+	}
+
+	public void setCvFile(String cvFile) {
+		this.cvFile = cvFile;
+	}
+
+	// Getter and Setter for profileImage
+	public String getProfileImage() {
+		return profileImage;
+	}
+
+	public void setProfileImage(String profileImage) {
+		this.profileImage = profileImage;
 	}
 
 	public Long getId() {

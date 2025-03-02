@@ -1,3 +1,4 @@
+// frontend/src/app/components/app.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { JwtResponse } from 'src/models/jwt-response';
@@ -12,11 +13,14 @@ export class AppComponent implements OnInit {
   user = {
     username: '',
     email: '',
-    roles: [] as string[]
+    roles: [] as string[],
+    profileImage: '',
+    displayImage: ''
   };
   isAdmin = false;
   isLoggedIn = false;
   currentPageTitle = 'Home';
+  currentYear: number = new Date().getFullYear(); // Add currentYear for footer
 
   constructor(public router: Router, private authService: AuthService) {}
 
@@ -37,7 +41,11 @@ export class AppComponent implements OnInit {
         this.user.username = response.username;
         this.user.email = response.email;
         this.user.roles = response.roles || [];
+        this.user.profileImage = response.profileImage || '';
+        this.user.displayImage = response.profileImage && response.profileImage.startsWith('uploads/') ? response.profileImage : 'assets/img/man (1).png';
         this.isAdmin = this.user.roles.some(role => role.toUpperCase() === 'ADMIN');
+        console.log('AppComponent - User info loaded:', this.user);
+        console.log('AppComponent - Display image URL:', this.user.displayImage);
       },
       error: (err) => console.error('Error fetching user info:', err)
     });
@@ -50,7 +58,12 @@ export class AppComponent implements OnInit {
 
   isAuthRoute(): boolean {
     const currentRoute = this.router.url;
-    return currentRoute === '/login' || currentRoute === '/register';
+    return currentRoute === '/login' || currentRoute === '/register' || currentRoute === '/reset-password';
+  }
+
+  isProfileRoute(): boolean {
+    const currentRoute = this.router.url;
+    return currentRoute === '/profile';
   }
 
   logout(): void {

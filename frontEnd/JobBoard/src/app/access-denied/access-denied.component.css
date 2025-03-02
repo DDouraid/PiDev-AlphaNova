@@ -1,0 +1,145 @@
+/* frontend/src/app/components/access-denied/access-denied.component.css */
+
+
+.access-denied-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  padding: 40px; /* Reduced from 300px to a more reasonable value */
+  width: 100%; /* Take full width of parent column */
+  max-width: 1200px; /* Limit max width to prevent overflow */
+  min-height: 500px; /* Ensure the card feels spacious vertically */
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.access-denied-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.title {
+  font-size: 48px; /* Increased for prominence */
+  font-weight: 700;
+  color: #dc3545;
+  margin-bottom: 30px; /* Increased spacing */
+  text-transform: uppercase;
+}
+
+.message {
+  font-size: 32px; /* Increased for prominence */
+  color: #333;
+  margin-bottom: 30px; /* Increased spacing */
+  font-style: italic;
+  animation: shake 0.5s infinite;
+}
+
+.emoji {
+  display: inline-block;
+  font-size: 40px; /* Increased for prominence */
+  animation: bounce 1s infinite;
+}
+
+.countdown {
+  font-size: 20px; /* Increased for visibility */
+  color: #666;
+  margin-bottom: 40px; /* Increased spacing */
+}
+
+.home-button {
+  background: #fc5130;
+  color: white;
+  border: none;
+  padding: 15px 30px; /* Increased padding for larger button */
+  border-radius: 25px;
+  font-size: 18px; /* Increased for prominence */
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.home-button:hover {
+  background: #e64428;
+  transform: scale(1.05);
+}
+
+/* Shake animation for the message */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+/* Bounce animation for the emoji */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .access-denied-wrapper {
+    padding: 40px 15px;
+  }
+
+  .access-denied-card {
+    padding: 40px;
+    min-height: 400px; /* Adjusted for smaller screens */
+  }
+
+  .title {
+    font-size: 36px;
+  }
+
+  .message {
+    font-size: 24px;
+  }
+
+  .emoji {
+    font-size: 30px;
+  }
+
+  .countdown {
+    font-size: 16px;
+  }
+
+  .home-button {
+    padding: 12px 25px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .access-denied-card {
+    padding: 30px;
+    min-height: 350px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .message {
+    font-size: 20px;
+  }
+
+  .emoji {
+    font-size: 24px;
+  }
+
+  .countdown {
+    font-size: 14px;
+  }
+
+  .home-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}

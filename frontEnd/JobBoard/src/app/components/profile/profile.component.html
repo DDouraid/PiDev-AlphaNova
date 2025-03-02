@@ -1,17 +1,118 @@
-<div class="row">
-  <div class="col-xl-6 col-xxl-12">
-    <div class="card">
-      <div class="card-header border-0">
-        <h4 class="fs-20 mb-0 text-black">User Profile</h4>
-      </div>
-      <div class="card-body text-center">
-        <div class="profile-photo">
-          <img src="assets/img/man (1).png" width="100" class="img-fluid rounded-circle" alt="Profile Picture">
+<!-- frontend/src/app/components/profile/profile.component.html -->
+<div class="profile-container">
+  <div class="row justify-content-center">
+    <!-- Use col-xl-12 since sidebar is hidden -->
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+      <div class="profile-card">
+        <!-- Header -->
+        <div class="profile-card-header">
+          <h4 class="profile-heading">User Profile</h4>
+          <button class="edit-btn" (click)="toggleEdit()">
+            <i class="fas fa-edit"></i> {{ isEditing ? 'Cancel' : 'Edit Profile' }}
+          </button>
         </div>
-        <h3 class="mt-4 mb-1">{{ profile.username }}</h3>
-        <p class="text-muted">{{ profile.email }}</p>
-        <p class="text-muted">Roles: {{ profile.roles.join(', ') }}</p>
-        <button class="btn btn-primary btn-rounded mt-3 px-5" (click)="logout()">Logout</button>
+
+        <!-- Body -->
+        <div class="profile-card-body">
+          <!-- Display Mode -->
+          <div *ngIf="!isEditing" class="profile-display">
+            <!-- Profile Image -->
+            <div class="profile-image-wrapper">
+              <img [src]="profile.displayImage && profile.displayImage.startsWith('data:') ? profile.displayImage : (profile.displayImage && profile.displayImage !== 'assets/img/man (1).png' ? 'http://localhost:8088/' + profile.displayImage + '?t=' + timestamp : 'assets/img/man (1).png')"
+                   alt="Profile Picture" class="profile-img">
+            </div>
+            <h3 class="profile-username">{{ profile.username }}</h3>
+            <p class="profile-email">{{ profile.email }}</p>
+            <p class="profile-roles">Roles: {{ profile.roles.join(', ') }}</p>
+            <!-- CV Link -->
+            <div *ngIf="profile.cvFile" class="cv-section">
+              <a [href]="'http://localhost:8088/' + profile.cvFile" target="_blank" class="cv-btn">
+                <i class="fas fa-file-download"></i> View/Download CV
+              </a>
+            </div>
+            <div *ngIf="!profile.cvFile" class="cv-section">
+              <p class="no-cv">No CV uploaded yet.</p>
+            </div>
+            <button class="logout-btn" (click)="logout()">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </div>
+
+          <!-- Edit Mode -->
+          <div *ngIf="isEditing" class="profile-edit">
+            <form (ngSubmit)="saveProfile()" class="edit-form row">
+              <div class="form-group col-md-6">
+                <label for="username">Username</label>
+                <input
+                  type="text"
+                  id="username"
+                  [(ngModel)]="editProfile.username"
+                  name="username"
+                  required
+                  class="form-input"
+                  placeholder="Enter your username"
+                />
+              </div>
+              <div class="form-group col-md-6">
+                <label for="email">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  [(ngModel)]="editProfile.email"
+                  name="email"
+                  required
+                  class="form-input"
+                  placeholder="Enter your email"
+                />
+              </div>
+              <div class="form-group col-md-6" *ngIf="isAdmin">
+                <label for="roles">Roles (comma-separated, e.g., student, admin)</label>
+                <input
+                  type="text"
+                  id="roles"
+                  [value]="editProfile.roles.join(', ')"
+                  (input)="onRolesInput($event)"
+                  name="roles"
+                  class="form-input"
+                  placeholder="e.g., student, admin"
+                />
+              </div>
+              <div class="form-group col-md-6">
+                <label for="profileImage">Profile Image</label>
+                <div class="file-upload-wrapper">
+                  <input
+                    type="file"
+                    id="profileImage"
+                    (change)="onImageSelected($event)"
+                    accept="image/*"
+                    class="file-input"
+                  />
+                  <span class="file-label">Choose Image</span>
+                </div>
+              </div>
+              <div class="form-group col-md-6">
+                <label for="cvFile">Upload CV (PDF, Word)</label>
+                <div class="file-upload-wrapper">
+                  <input
+                    type="file"
+                    id="cvFile"
+                    (change)="onCVSelected($event)"
+                    accept=".pdf,.doc,.docx"
+                    class="file-input"
+                  />
+                  <span class="file-label">Choose CV</span>
+                </div>
+              </div>
+              <div class="col-12 text-center">
+                <button type="submit" class="save-btn">Save Changes</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Messages -->
+          <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
+          <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+        </div>
       </div>
     </div>
   </div>

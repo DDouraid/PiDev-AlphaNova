@@ -3,3 +3,27 @@
   flex-direction: column;
   min-height: 100vh;
 }
+.auth-header {
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.auth-header .brand-logo {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.auth-header .logo-abbr {
+  font-size: 24px;
+  margin-right: 10px;
+  color: #fc5130;
+}
+
+.auth-header .brand-title {
+  font-size: 24px;
+  color: #333;
+  margin: 0;
+}

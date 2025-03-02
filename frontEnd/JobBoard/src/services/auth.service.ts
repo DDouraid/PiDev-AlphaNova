@@ -1,3 +1,4 @@
+// frontend/src/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
@@ -58,14 +59,13 @@ export class AuthService {
     );
   }
 
-  // Enhanced method to get is_blocked status from token
   getIsBlocked(): boolean {
     const token = this.getToken();
     if (token && this.validateToken(token)) {
       const payload = this.parseJwt(token);
-      return payload?.isBlocked === 1 || payload?.is_blocked === 1 || false; // Adjust key based on your token structure
+      return payload?.isBlocked === 1 || payload?.is_blocked === 1 || false;
     }
-    return false; // Default to not blocked if token is invalid or missing
+    return false;
   }
 
   register(signupRequest: SignupRequest): Observable<MessageResponse> {
@@ -219,6 +219,67 @@ export class AuthService {
     );
   }
 
+  updateUserProfile(updateProfileRequest: { username?: string; email?: string; roles?: string[] }): Observable<MessageResponse> {
+    const token = this.getToken();
+    if (!token || !this.validateToken(token)) {
+      console.error('Invalid or missing token for update profile request:', token);
+      return throwError(() => new Error('Invalid or missing token'));
+    }
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    console.log('Updating profile with data:', updateProfileRequest);
+    return this.http.put<MessageResponse>(`${this.authApiUrl}/profile`, updateProfileRequest, { headers }).pipe(
+      tap(response => console.log('Profile update response:', response)),
+      catchError(err => {
+        console.error('Error updating profile:', err);
+        return throwError(() => new Error('Failed to update profile: ' + (err.message || 'Unknown error')));
+      })
+    );
+  }
+
+  uploadProfileImage(image: File): Observable<MessageResponse> {
+    const token = this.getToken();
+    if (!token || !this.validateToken(token)) {
+      console.error('Invalid or missing token for image upload request:', token);
+      return throwError(() => new Error('Invalid or missing token'));
+    }
+    const formData = new FormData();
+    formData.append('image', image);
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    console.log('Uploading profile image:', image.name);
+    return this.http.post<MessageResponse>(`${this.authApiUrl}/profile/image`, formData, { headers }).pipe(
+      tap(response => console.log('Image upload response:', response)),
+      catchError(err => {
+        console.error('Error uploading image:', err);
+        return throwError(() => new Error('Failed to upload image: ' + (err.message || 'Unknown error')));
+      })
+    );
+  }
+
+  uploadCV(cv: File): Observable<MessageResponse> {
+    const token = this.getToken();
+    if (!token || !this.validateToken(token)) {
+      console.error('Invalid or missing token for CV upload request:', token);
+      return throwError(() => new Error('Invalid or missing token'));
+    }
+    const formData = new FormData();
+    formData.append('cv', cv);
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    console.log('Uploading CV:', cv.name);
+    return this.http.post<MessageResponse>(`${this.authApiUrl}/profile/cv`, formData, { headers }).pipe(
+      tap(response => console.log('CV upload response:', response)),
+      catchError(err => {
+        console.error('Error uploading CV:', err);
+        return throwError(() => new Error('Failed to upload CV: ' + (err.message || 'Unknown error')));
+      })
+    );
+  }
+
   updateUser(userId: number, userData: { username: string; email: string; roles: string[] }): Observable<MessageResponse> {
     const token = this.getToken();
     if (!token || !this.validateToken(token)) {
@@ -288,6 +349,28 @@ export class AuthService {
       catchError(err => {
         console.error('Error fetching stats:', err);
         return throwError(() => new Error('Failed to fetch stats'));
+      })
+    );
+  }
+
+
+
+  requestOtp(request: { email: string }): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(`${this.authApiUrl}/request-otp`, request).pipe(
+      tap(response => console.log('Request OTP response:', response)),
+      catchError(err => {
+        console.error('Error requesting OTP:', err);
+        return throwError(() => new Error(err.error?.message || 'Failed to request OTP'));
+      })
+    );
+  }
+
+  resetPassword(request: { email: string; otp: string; newPassword: string }): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(`${this.authApiUrl}/reset-password`, request).pipe(
+      tap(response => console.log('Reset password response:', response)),
+      catchError(err => {
+        console.error('Error resetting password:', err);
+        return throwError(() => new Error(err.error?.message || 'Failed to reset password'));
       })
     );
   }

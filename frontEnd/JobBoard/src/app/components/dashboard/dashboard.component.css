@@ -1,114 +1,64 @@
-h2 {
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-p {
-  font-size: 16px;
-  color: #555;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.btn-primary {
-  padding: 10px 20px;
-  background-color: #007bff;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  display: block;
-  margin: 0 auto;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-h2 {
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-p {
-  font-size: 16px;
-  color: #555;
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-.btn-primary {
-  padding: 10px 20px;
-  background-color: #007bff;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  display: block;
-  margin: 0 auto;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-
-h2 {
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-p {
-  font-size: 16px;
-  color: #555;
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-.btn-primary {
-  padding: 10px 20px;
-  background-color: #007bff;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  display: block;
-  margin: 20px auto;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-.card {
-  margin-bottom: 20px;
-}
-
-.card-body {
-  padding: 15px;
-}
-
-.fs-20 {
-  font-size: 20px;
-  font-weight: bold;
-  color: #333;
-}
-
+/* frontend/src/app/components/dashboard/dashboard.component.css */
 .table-responsive {
-  max-height: 400px;
-  overflow-y: auto;
+  margin-top: 20px;
 }
 
 .table th, .table td {
   vertical-align: middle;
-  text-align: center;
+}
+
+.btn-sm {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-sm:hover {
+  transform: scale(1.05);
+}
+
+/* Ensure consistency with other buttons in the app */
+.btn-secondary {
+  background-color: #6c757d; /* Gray for "Block" */
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #5a6268;
+}
+
+.btn-success {
+  background-color: #28a745; /* Green for "Unblock" */
+  border-color: #28a745;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+  border-color: #d39e00;
+}
+
+.text-danger {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .btn-sm {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+
+  .fs-20 {
+    font-size: 16px;
+  }
 }

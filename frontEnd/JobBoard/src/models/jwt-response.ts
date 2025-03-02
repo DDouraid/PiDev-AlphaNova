@@ -5,4 +5,6 @@ export interface JwtResponse {
   username: string;
   email: string;
   roles: string[];
+  profileImage: string; // Add profileImage field (optional, as it might be null initially)
+  cvFile?: string; // Add cvFile field (optional, as it might be null initially)
 }

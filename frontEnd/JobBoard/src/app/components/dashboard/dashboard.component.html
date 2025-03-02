@@ -1,3 +1,4 @@
+<!-- frontend/src/app/components/dashboard/dashboard.component.html -->
 <h2>Welcome to the Dashboard, {{ user.username || 'User' }}!</h2>
 <p>You have successfully logged in.</p>
 <p>Email: {{ user.email || 'N/A' }}</p>
@@ -69,7 +70,11 @@
                 <td>{{ regUser.isBlocked ? 'Yes' : 'No' }}</td>
                 <td>
                   <button class="btn btn-sm btn-warning me-2" (click)="editUserStart(regUser)" data-bs-toggle="modal" data-bs-target="#editUserModal">Edit</button>
-                  <button class="btn btn-sm btn-secondary" (click)="blockUser(regUser.id)" [class.btn-danger]="regUser.isBlocked">
+                  <button
+                    class="btn btn-sm"
+                    [class.btn-secondary]="!regUser.isBlocked"
+                    [class.btn-success]="regUser.isBlocked"
+                    (click)="blockUser(regUser.id)">
                     {{ regUser.isBlocked ? 'Unblock' : 'Block' }}
                   </button>
                 </td>
@@ -80,13 +85,11 @@
             </tbody>
           </table>
         </div>
-        <p *ngIf="errorMessage" class="text-danger">{{ errorMessage }}</p> <!-- Display error message -->
-        <button class="btn btn-secondary mt-2" (click)="loadRegisteredUsers()">Refresh Manually</button> <!-- Debug button -->
+        <p *ngIf="errorMessage" class="text-danger">{{ errorMessage }}</p>
       </div>
     </div>
   </div>
 </div>
-<button class="btn btn-primary" (click)="logout()">Logout</button>
 
 <!-- Create User Modal -->
 <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">

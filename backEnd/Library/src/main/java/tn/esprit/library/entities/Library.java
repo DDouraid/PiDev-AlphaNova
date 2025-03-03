@@ -14,35 +14,31 @@ public class Library {
     private String name;
 
     @Column(nullable = false)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private LibraryType type;
 
     @Column(nullable = false)
     private int level;
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
-
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
-    public String getType() {
+    public LibraryType getType() {
         return type;
     }
-
-    public void setType(String type) {
+    public void setType(LibraryType type) {
         this.type = type;
     }
-
     public int getLevel() {
         return level;
     }

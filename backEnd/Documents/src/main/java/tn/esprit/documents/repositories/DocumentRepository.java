@@ -2,7 +2,7 @@
 package tn.esprit.documents.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import tn.esprit.documents.entities.Document;
+import tn.esprit.documents.entities.DbDocument;
 
-public interface DocumentRepository extends JpaRepository<Document, Long> {
+public interface DocumentRepository extends JpaRepository<DbDocument, Long> {
 }

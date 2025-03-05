@@ -1,6 +1,0 @@
-tn\esprit\documents\services\DocumentService.class
-tn\esprit\documents\controllers\DocumentController.class
-tn\esprit\documents\DocumentsApplication.class
-tn\esprit\documents\repositories\DocumentRepository.class
-tn\esprit\documents\entities\DocumentType.class
-tn\esprit\documents\entities\Document.class

@@ -1,20 +1,29 @@
 package tn.esprit.documents.services;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Image;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.properties.HorizontalAlignment;
+import com.itextpdf.layout.properties.TextAlignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
-import tn.esprit.documents.entities.Document;
+import tn.esprit.documents.entities.DbDocument;
+import tn.esprit.documents.entities.DocumentType;
 import tn.esprit.documents.repositories.DocumentRepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +36,6 @@ public class DocumentService {
     @Value("${document.storage.path}")
     private String storagePath;
 
-    @Value("classpath:templates/template.pdf")
-    private Resource templateResource; // Charger depuis le classpath
-
     private final DocumentRepository documentRepository;
     private final ResourceLoader resourceLoader;
 
@@ -38,23 +44,23 @@ public class DocumentService {
         this.resourceLoader = resourceLoader;
     }
 
-    public List<Document> getAllDocuments() {
+    public List<DbDocument> getAllDocuments() {
         return documentRepository.findAll();
     }
 
-    public Document getDocumentById(Long id) {
+    public DbDocument getDocumentById(Long id) {
         return documentRepository.findById(id).orElse(null);
     }
 
-    public Document createDocument(Document document) {
+    public DbDocument createDocument(DbDocument document) {
         return documentRepository.save(document);
     }
 
-    public Document updateDocument(Long id, Document documentDetails) {
-        Document document = getDocumentById(id);
+    public DbDocument updateDocument(Long id, DbDocument documentDetails) {
+        DbDocument document = getDocumentById(id);
         if (document != null) {
             document.setName(documentDetails.getName());
-            document.setUrl(documentDetails.getUrl());
+            document.setType(documentDetails.getType());
             return documentRepository.save(document);
         }
         return null;
@@ -64,129 +70,143 @@ public class DocumentService {
         documentRepository.deleteById(id);
     }
 
-    public Document createDocumentWithPdf(String name, String content) throws IOException {
-        PDDocument pdfDocument = new PDDocument();
-        PDPage page = new PDPage();
-        pdfDocument.addPage(page);
-
-        try (PDPageContentStream contentStream = new PDPageContentStream(pdfDocument, page)) {
-            contentStream.beginText();
-            contentStream.setFont(PDType1Font.HELVETICA, 12);
-            contentStream.newLineAtOffset(100, 700);
-            contentStream.showText(content);
-            contentStream.endText();
-        }
-
-        String pdfFilePath = Paths.get(storagePath, name + ".pdf").toString();
-        pdfDocument.save(pdfFilePath);
-        pdfDocument.close();
-
-        Document document = new Document();
-        document.setName(name);
-        document.setUrl(pdfFilePath);
-        return documentRepository.save(document);
-    }
-
-    public Document generatePdfWithTemplate(Map<String, String> formData, String name) throws IOException {
+    public DbDocument generatePdfWithTemplate(Map<String, String> formData, String name) throws IOException {
         logger.info("Début de la génération du PDF avec template pour: " + name);
 
-        // Vérifier si le fichier template existe dans le classpath
-        if (!templateResource.exists()) {
-            logger.error("Le fichier template n'existe pas dans le classpath: " + templateResource.getFilename());
-            throw new IOException("Template file not found in classpath: " + templateResource.getFilename());
+        String pdfFilePath = Paths.get(storagePath, name + ".pdf").toString();
+        File storageDir = new File(storagePath);
+        if (!storageDir.exists()) {
+            if (!storageDir.mkdirs()) {
+                logger.warn("Échec de la création du répertoire de stockage: " + storagePath);
+            }
         }
 
-        // Charger le template depuis le classpath
-        try (PDDocument templateDoc = PDDocument.load(templateResource.getInputStream())) {
-            logger.info("Template chargé avec succès depuis le classpath");
-            PDDocument newDoc = new PDDocument();
-            PDPage newPage = new PDPage();
-            newDoc.addPage(newPage);
+        try (PdfWriter writer = new PdfWriter(pdfFilePath);
+             PdfDocument pdfDoc = new PdfDocument(writer);
+             Document document = new Document(pdfDoc)) {
 
-            try (PDPageContentStream contentStream = new PDPageContentStream(newDoc, newPage)) {
-                contentStream.setLeading(14.5f);
-                contentStream.beginText();
-                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 14);
-                contentStream.newLineAtOffset(100, 750);
-                contentStream.showText("HOMORIS UNITED UNIVBRSITIES");
-                contentStream.newLine();
+            // Définir les marges (ajouter une marge en tête de document)
+            document.setMargins(72, 72, 36, 72); // 72 points = 1 inch
 
-                contentStream.showText("ATTESTATION DE STAGE");
-                contentStream.newLine();
-                contentStream.newLine();
-
-                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
-                contentStream.showText("Nous soussignés, ");
-                contentStream.setFont(PDType1Font.HELVETICA, 12);
-                contentStream.showText(formData.getOrDefault("companyName", "[Nom de l'entreprise]") + ", certifions que :");
-                contentStream.newLine();
-
-                contentStream.setFont(PDType1Font.HELVETICA, 12);
-                contentStream.showText(formData.getOrDefault("internName", "[Nom et Prénom du stagiaire]"));
-                contentStream.newLine();
-
-                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
-                contentStream.showText("a effectué un stage au sein de notre entreprise du ");
-                contentStream.setFont(PDType1Font.HELVETICA, 12);
-                contentStream.showText(formData.getOrDefault("startDate", "[Date de début]") + " au " +
-                        formData.getOrDefault("endDate", "[Date de fin]") + ". Durant cette période, il/elle a occupé le poste de ");
-                contentStream.setFont(PDType1Font.HELVETICA, 12);
-                contentStream.showText(formData.getOrDefault("jobTitle", "[Titre du poste]") + " au sein de " +
-                        formData.getOrDefault("department", "[Département/Service]") + ", où il/elle a eu pour missions principales :");
-                contentStream.newLine();
-                contentStream.newLine();
-
-                contentStream.showText("- " + formData.getOrDefault("mission1", "[mission 1]"));
-                contentStream.newLine();
-                contentStream.showText("- " + formData.getOrDefault("mission2", "[mission 2]"));
-                contentStream.newLine();
-                contentStream.showText("- " + formData.getOrDefault("mission3", "[mission 3]"));
-                contentStream.newLine();
-                contentStream.newLine();
-
-                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
-                contentStream.showText("Nous attestons que ");
-                contentStream.setFont(PDType1Font.HELVETICA, 12);
-                contentStream.showText(formData.getOrDefault("internName", "[Nom du stagiaire]") + " a fait preuve de " +
-                        formData.getOrDefault("qualities", "[qualités professionnelles : rigueur, autonomie, etc.]") + ", et a su s'intégrer efficacement à notre équipe.");
-                contentStream.newLine();
-                contentStream.newLine();
-
-                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
-                contentStream.showText("Fait à ");
-                contentStream.setFont(PDType1Font.HELVETICA, 12);
-                contentStream.showText(formData.getOrDefault("location", "[Lieu]") + ", le " +
-                        formData.getOrDefault("date", "[Date]") + ".");
-                contentStream.newLine();
-                contentStream.newLine();
-
-                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
-                contentStream.showText("Signature et Cachet de l'entreprise");
-                contentStream.endText();
-            } catch (Exception e) {
-                logger.error("Erreur lors de l'écriture du contenu dans le PDF: ", e);
-                throw new IOException("Erreur lors de la génération du contenu: " + e.getMessage());
+            // Charger et ajouter le logo
+            Resource logoResource = resourceLoader.getResource("classpath:static/images/logo.png");
+            if (logoResource.exists()) {
+                byte[] logoBytes = Files.readAllBytes(logoResource.getFile().toPath());
+                ImageData imageData = ImageDataFactory.create(logoBytes);
+                Image logo = new Image(imageData);
+                logo.scaleToFit(200, 75);
+                logo.setHorizontalAlignment(HorizontalAlignment.CENTER); // Centrer le logo
+                document.add(logo);
+            } else {
+                logger.warn("Logo non trouvé, génération sans logo.");
             }
 
-            // Sauvegarder le PDF
-            String pdfFilePath = Paths.get(storagePath, name + ".pdf").toString();
-            File storageDir = new File(storagePath);
-            if (!storageDir.exists()) {
-                logger.info("Création du répertoire de stockage: " + storagePath);
-                storageDir.mkdirs();
-            }
-            newDoc.save(pdfFilePath);
-            newDoc.close();
+            PdfFont font = PdfFontFactory.createFont("Times-Roman");
+            PdfFont boldFont = PdfFontFactory.createFont("Times-Bold");
+
+            Paragraph title = new Paragraph("ATTESTATION DE STAGE")
+                    .setFont(boldFont)
+                    .setFontSize(16)
+                    .setTextAlignment(TextAlignment.CENTER);
+            document.add(title);
+
+            // Espacement
+            document.add(new Paragraph("\n"));
+
+            // Corps du texte avec formatage
+            Paragraph companyPara = new Paragraph("Nous soussignés, " +
+                    formData.getOrDefault("companyName", "[Nom de l'entreprise]") +
+                    " certifions que :")
+                    .setFont(font)
+                    .setFontSize(12);
+            document.add(companyPara);
+
+            // Espacement
+            document.add(new Paragraph("\n"));
+
+            Paragraph internPara = new Paragraph(formData.getOrDefault("internName", "[Nom et Prénom du stagiaire]"))
+                    .setFont(boldFont)
+                    .setFontSize(12)
+                    .setTextAlignment(TextAlignment.CENTER); // Centrer le nom du stagiaire
+            document.add(internPara);
+
+            // Espacement
+            document.add(new Paragraph("\n"));
+
+            Paragraph periodPara = new Paragraph("a effectué un stage au sein de notre entreprise du " +
+                    formData.getOrDefault("startDate", "[Date de début]") + " au " +
+                    formData.getOrDefault("endDate", "[Date de fin]") +
+                    ". Durant cette période, il/elle a occupé le poste de " +
+                    formData.getOrDefault("jobTitle", "[Titre du poste]") +
+                    " au sein de " +
+                    formData.getOrDefault("department", "[Département/Service]") +
+                    ", où il/elle a eu pour missions principales :")
+                    .setFont(font)
+                    .setFontSize(12);
+            document.add(periodPara);
+
+            // Liste des missions avec indentation
+            Paragraph mission1 = new Paragraph("- " + formData.getOrDefault("mission1", "[mission 1]"))
+                    .setFont(font)
+                    .setFontSize(12)
+                    .setMarginLeft(20);
+            document.add(mission1);
+
+            Paragraph mission2 = new Paragraph("- " + formData.getOrDefault("mission2", "[mission 2]"))
+                    .setFont(font)
+                    .setFontSize(12)
+                    .setMarginLeft(20);
+            document.add(mission2);
+
+            Paragraph mission3 = new Paragraph("- " + formData.getOrDefault("mission3", "[mission 3]"))
+                    .setFont(font)
+                    .setFontSize(12)
+                    .setMarginLeft(20);
+            document.add(mission3);
+
+            // Espacement
+            document.add(new Paragraph("\n"));
+
+            Paragraph qualitiesPara = new Paragraph("Nous attestons que " +
+                    formData.getOrDefault("internName", "[Nom du stagiaire]") +
+                    " a fait preuve de " +
+                    formData.getOrDefault("qualities", "[qualités]") +
+                    " et a su s'intégrer efficacement à notre équipe.")
+                    .setFont(font)
+                    .setFontSize(12);
+            document.add(qualitiesPara);
+
+            Paragraph locationPara = new Paragraph("Fait à " +
+                    formData.getOrDefault("location", "[Lieu]") +
+                    ", le " +
+                    formData.getOrDefault("date", "[Date]") + ".")
+                    .setFont(font)
+                    .setFontSize(12);
+            document.add(locationPara);
+
+            // Espacement
+            document.add(new Paragraph("\n"));
+
+            // Signature en gras alignée à droite en bas de page
+            Paragraph signaturePara = new Paragraph("Signature et Cachet de l'entreprise")
+                    .setFont(boldFont)
+                    .setFontSize(12)
+                    .setTextAlignment(TextAlignment.RIGHT);
+            document.add(signaturePara);
+
             logger.info("PDF généré avec succès: " + pdfFilePath);
-
-            // Enregistrer dans la base de données
-            Document document = new Document();
-            document.setName(name);
-            document.setUrl(pdfFilePath);
-            return documentRepository.save(document);
         } catch (IOException e) {
             logger.error("Erreur lors de la génération du PDF: ", e);
             throw e;
         }
+
+        DbDocument docEntity = new DbDocument();
+        docEntity.setName(name);
+        docEntity.setType(DocumentType.AGREEMENT);
+        return documentRepository.save(docEntity);
+    }
+
+    public String getFilePath(String name) {
+        return Paths.get(storagePath, name + ".pdf").toString();
     }
 }

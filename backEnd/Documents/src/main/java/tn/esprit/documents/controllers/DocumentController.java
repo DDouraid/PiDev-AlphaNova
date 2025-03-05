@@ -5,8 +5,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import tn.esprit.documents.entities.Document;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import tn.esprit.documents.entities.DbDocument;
 import tn.esprit.documents.services.DocumentService;
 
 import java.io.IOException;
@@ -17,31 +25,42 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/documents")
-@CrossOrigin(origins = "http://localhost:4200") // Allows requests from Angular frontend
+@CrossOrigin(origins = "http://localhost:4200")
 public class DocumentController {
 
+    private final DocumentService documentService;
+
+    // Injection par constructeur (recommandé)
     @Autowired
-    private DocumentService documentService;
+    public DocumentController(DocumentService documentService) {
+        this.documentService = documentService;
+    }
 
     @GetMapping
-    public List<Document> getAllDocuments() {
+    public List<DbDocument> getAllDocuments() {
         return documentService.getAllDocuments();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Document> getDocumentById(@PathVariable Long id) {
-        Document document = documentService.getDocumentById(id);
+    public ResponseEntity<DbDocument> getDocumentById(@PathVariable Long id) {
+        DbDocument document = documentService.getDocumentById(id);
+        if (document == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
         return ResponseEntity.ok(document);
     }
 
     @PostMapping
-    public Document createDocument(@RequestBody Document document) {
+    public DbDocument createDocument(@RequestBody DbDocument document) {
         return documentService.createDocument(document);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Document> updateDocument(@PathVariable Long id, @RequestBody Document documentDetails) {
-        Document updatedDocument = documentService.updateDocument(id, documentDetails);
+    public ResponseEntity<DbDocument> updateDocument(@PathVariable Long id, @RequestBody DbDocument documentDetails) {
+        DbDocument updatedDocument = documentService.updateDocument(id, documentDetails);
+        if (updatedDocument == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
         return ResponseEntity.ok(updatedDocument);
     }
 
@@ -51,19 +70,27 @@ public class DocumentController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/generate-pdf")
-    public ResponseEntity<Document> generateAndSavePdf(@RequestParam String content, @RequestParam String name) {
+    @PostMapping("/generate-pdf-template")
+    public ResponseEntity<DbDocument> generatePdfWithTemplate(@RequestBody Map<String, String> formData) {
         try {
-            Document document = documentService.createDocumentWithPdf(name, content);
+            String name = formData.get("fileName");
+            if (name == null || name.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(null); // Retourne null avec HttpStatus.BAD_REQUEST
+            }
+            DbDocument document = documentService.generatePdfWithTemplate(formData, name);
             return ResponseEntity.ok(document);
         } catch (IOException e) {
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(null); // Retourne null avec HttpStatus.INTERNAL_SERVER_ERROR
         }
     }
 
     @GetMapping("/download/{id}")
     public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id) {
-        Document document = documentService.getDocumentById(id);
+        DbDocument document = documentService.getDocumentById(id);
         if (document == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -73,22 +100,12 @@ public class DocumentController {
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("attachment", document.getName() + ".pdf");
         try {
-            byte[] fileContent = Files.readAllBytes(Paths.get(document.getUrl()));
+            byte[] fileContent = Files.readAllBytes(Paths.get(documentService.getFilePath(document.getName())));
             return ResponseEntity.ok().headers(headers).body(fileContent);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(("{\"message\": \"Error reading file: " + e.getMessage() + "\"}").getBytes());
-        }
-    }
-    @PostMapping("/generate-pdf-template")
-    public ResponseEntity<Document> generatePdfWithTemplate(@RequestBody Map<String, String> formData) {
-        try {
-            String name = formData.get("fileName");
-            Document document = documentService.generatePdfWithTemplate(formData, name);
-            return ResponseEntity.ok(document);
-        } catch (IOException e) {
-            return ResponseEntity.status(500).build();
         }
     }
 }

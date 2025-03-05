@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/documents")
@@ -78,6 +79,16 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(("{\"message\": \"Error reading file: " + e.getMessage() + "\"}").getBytes());
+        }
+    }
+    @PostMapping("/generate-pdf-template")
+    public ResponseEntity<Document> generatePdfWithTemplate(@RequestBody Map<String, String> formData) {
+        try {
+            String name = formData.get("fileName");
+            Document document = documentService.generatePdfWithTemplate(formData, name);
+            return ResponseEntity.ok(document);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).build();
         }
     }
 }

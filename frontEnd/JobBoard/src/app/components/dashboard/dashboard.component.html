@@ -46,18 +46,58 @@
     <div class="card">
       <div class="card-header">
         <h4 class="card-title">Registered Users</h4>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">Add User</button>
+        <div class="d-flex justify-content-between align-items-center">
+          <!-- Search Bar -->
+          <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search by username or email..." [(ngModel)]="searchQuery" (input)="onSearchChange()">
+          </div>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">Add User</button>
+        </div>
       </div>
       <div class="card-body">
-        <div class="table-responsive">
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" *ngIf="isLoading">
+          <span class="spinner"></span>
+        </div>
+
+        <!-- Error Message -->
+        <p *ngIf="errorMessage && !isLoading" class="text-danger">{{ errorMessage }}</p>
+
+        <!-- Table -->
+        <div class="table-responsive" *ngIf="!isLoading">
           <table class="table table-striped">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Roles</th>
-                <th>Blocked</th>
+                <th class="sortable" (click)="sortTable('id')">
+                  ID
+                  <span class="sort-icon" *ngIf="sortColumn === 'id'">
+                    {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                  </span>
+                </th>
+                <th class="sortable" (click)="sortTable('username')">
+                  Username
+                  <span class="sort-icon" *ngIf="sortColumn === 'username'">
+                    {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                  </span>
+                </th>
+                <th class="sortable" (click)="sortTable('email')">
+                  Email
+                  <span class="sort-icon" *ngIf="sortColumn === 'email'">
+                    {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                  </span>
+                </th>
+                <th class="sortable" (click)="sortTable('roles')">
+                  Roles
+                  <span class="sort-icon" *ngIf="sortColumn === 'roles'">
+                    {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                  </span>
+                </th>
+                <th class="sortable" (click)="sortTable('isBlocked')">
+                  Blocked
+                  <span class="sort-icon" *ngIf="sortColumn === 'isBlocked'">
+                    {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                  </span>
+                </th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -79,13 +119,31 @@
                   </button>
                 </td>
               </tr>
-              <tr *ngIf="registeredUsers.length === 0">
+              <tr *ngIf="registeredUsers.length === 0 && !isLoading">
                 <td colspan="6" class="text-center">No users found</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p *ngIf="errorMessage" class="text-danger">{{ errorMessage }}</p>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-controls" *ngIf="totalPages > 1 && !isLoading">
+          <button class="pagination-btn" (click)="previousPage()" [disabled]="currentPage === 0">
+            Previous
+          </button>
+          <button *ngFor="let page of pageNumbers"
+                  class="pagination-btn"
+                  [class.active]="page === currentPage"
+                  (click)="goToPage(page)">
+            {{ page + 1 }}
+          </button>
+          <button class="pagination-btn" (click)="nextPage()" [disabled]="isLastPage">
+            Next
+          </button>
+          <span class="pagination-info">
+            Page {{ currentPage + 1 }} of {{ totalPages }} ({{ totalElements }} users)
+          </span>
+        </div>
       </div>
     </div>
   </div>

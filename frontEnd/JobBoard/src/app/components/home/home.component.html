@@ -1,5 +1,28 @@
-<h2>Welcome Home, {{ user.username || 'User' }}!</h2>
-<p>This is the home page for non-admin users.</p>
-<p>Email: {{ user.email || 'N/A' }}</p>
-<p>Roles: {{ user.roles.length > 0 ? user.roles.join(', ') : 'None' }}</p>
-<button class="btn btn-primary" (click)="logout()">Logout</button>
+<!-- frontend/src/app/components/home/home.component.html -->
+<div class="container mt-4">
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <!-- Show spinner while loading -->
+    <div class="loading-spinner">
+      <span class="spinner"></span>
+    </div>
+    <!-- Show admin message if user is admin -->
+    <p *ngIf="adminMessage" class="admin-message">{{ adminMessage }}</p>
+  </div>
+
+  <!-- Error Message -->
+  <p *ngIf="errorMessage && !isLoading" class="text-danger">{{ errorMessage }}</p>
+
+  <!-- User Info (for non-admin users) -->
+  <div *ngIf="!isLoading && !errorMessage && !isAdmin">
+    <h2>Welcome Home, {{ user.username || 'User' }}!</h2>
+    <p>This is the home page for non-admin users.</p>
+    <p>Email: {{ user.email || 'N/A' }}</p>
+    <p>Roles: {{ user.roles.length > 0 ? user.roles.join(', ') : 'None' }}</p>
+    <!-- Suggestion Message -->
+    <p class="suggestion-message" (click)="goToCustomizeProfile()" role="button" tabindex="0" (keypress)="goToCustomizeProfile()">
+      {{ suggestionMessage }}
+    </p>
+    <button class="btn btn-primary" (click)="logout()">Logout</button>
+  </div>
+</div>

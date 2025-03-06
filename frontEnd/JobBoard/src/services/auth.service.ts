@@ -221,24 +221,26 @@ export class AuthService {
     return roles.includes(role.toUpperCase());
   }
 
-  getRegisteredUsers(): Observable<{ isBlocked: boolean; id: number; username: string; email: string; roles: string[] }[]> {
-    const token = this.getToken();
-    if (!token || !this.validateToken(token)) {
-      console.error('Cannot fetch users: Invalid or missing token:', token);
-      return throwError(() => new Error('Invalid or missing token'));
-    }
-    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-    return this.http.get<{ isBlocked: boolean; id: number; username: string; email: string; roles: string[] }[]>(`${this.dashboardApiUrl}/users?t=${new Date().getTime()}`, { headers }).pipe(
-      tap(users => {
-        console.log('Registered users response:', users);
-        users.forEach(user => console.log(`User ${user.username} isBlocked: ${user.isBlocked}`));
-      }),
-      catchError(err => {
-        console.error('Error fetching users:', err);
-        return throwError(() => new Error('Failed to fetch users'));
-      })
-    );
+  // In AuthService (update the existing getRegisteredUsers method)
+getRegisteredUsers(page: number = 0, size: number = 5, search: string = ''): Observable<PaginatedUserResponse> {
+  const token = this.getToken();
+  if (!token || !this.validateToken(token)) {
+    console.error('Cannot fetch users: Invalid or missing token:', token);
+    return throwError(() => new Error('Invalid or missing token'));
   }
+  const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+  const url = `${this.authApiUrl}/users?page=${page}&size=${size}&search=${encodeURIComponent(search)}&t=${new Date().getTime()}`;
+  return this.http.get<PaginatedUserResponse>(url, { headers }).pipe(
+    tap(response => {
+      console.log('Paginated users response:', response);
+      response.users.forEach(user => console.log(`User ${user.username} isBlocked: ${user.isBlocked}`));
+    }),
+    catchError(err => {
+      console.error('Error fetching users:', err);
+      return throwError(() => new Error('Failed to fetch users'));
+    })
+  );
+}
 
   updateUserProfile(updateProfileRequest: { username?: string; email?: string; roles?: string[] }): Observable<MessageResponse> {
     const token = this.getToken();
@@ -393,4 +395,13 @@ export class AuthService {
       })
     );
   }
+}
+
+export interface PaginatedUserResponse {
+  users: { isBlocked: boolean; id: number; username: string; email: string; roles: string[] }[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
 }

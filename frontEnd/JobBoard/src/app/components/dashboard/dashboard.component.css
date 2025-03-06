@@ -46,9 +46,120 @@
   border-color: #d39e00;
 }
 
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
 .text-danger {
   margin-top: 10px;
   font-size: 14px;
+  color: #e74c3c;
+  background: #fce7e7;
+  padding: 10px 15px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  text-align: center;
+  padding: 20px;
+}
+
+.loading-spinner .spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 4px solid rgba(255, 77, 77, 0.3);
+  border-radius: 50%;
+  border-top-color: #ff4d4d;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pagination-btn {
+  padding: 8px 15px;
+  background: #ff4d4d;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pagination-btn:disabled {
+  background: #90a4ae;
+  cursor: not-allowed;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #e41b1b;
+  box-shadow: 0 2px 8px rgba(255, 77, 77, 0.3);
+}
+
+.pagination-btn.active {
+  background: #e41b1b;
+  font-weight: 700;
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Search Bar */
+.search-bar {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.search-input {
+  padding: 10px 15px;
+  width: 100%;
+  max-width: 400px;
+  border: 2px solid #b0bec5;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #ff4d4d;
+  box-shadow: 0 0 8px rgba(255, 77, 77, 0.4);
+  outline: none;
+}
+
+/* Sortable Table Headers */
+.sortable {
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+}
+
+.sort-icon {
+  margin-left: 5px;
+  font-size: 0.8rem;
+  color: #ff4d4d;
 }
 
 /* Responsive Adjustments */
@@ -60,5 +171,19 @@
 
   .fs-20 {
     font-size: 16px;
+  }
+
+  .pagination-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  .pagination-info {
+    font-size: 0.8rem;
+  }
+
+  .search-input {
+    max-width: 300px;
+    font-size: 0.9rem;
   }
 }

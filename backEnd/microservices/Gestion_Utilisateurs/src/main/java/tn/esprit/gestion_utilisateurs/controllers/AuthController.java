@@ -1,10 +1,16 @@
 // backend/src/main/java/tn/esprit/gestion_utilisateurs/controllers/AuthController.java
 package tn.esprit.gestion_utilisateurs.controllers;
 
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,6 +36,7 @@ import tn.esprit.gestion_utilisateurs.security.services.OtpService;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -93,18 +100,55 @@ public class AuthController {
 	}
 
 	@GetMapping("/users")
-	public ResponseEntity<List<UserDTO>> getAllUsers() {
-		List<UserDTO> users = userRepository.findAll().stream()
+	public ResponseEntity<PaginatedUserResponse> getAllUsers(
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<User> userPage = userRepository.findAll(pageable);
+		List<UserDTO> users = userPage.getContent().stream()
 				.map(user -> new UserDTO(
 						user.getId(),
 						user.getUsername(),
 						user.getEmail(),
 						user.getRoles().stream().map(Role::getName).map(UserRole::name).collect(Collectors.toList()),
 						user.getProfileImage(),
-						user.getCvFile()
+						user.getCvFile(),
+						user.isBlocked()
 				))
 				.collect(Collectors.toList());
-		return ResponseEntity.ok(users);
+		return ResponseEntity.ok(new PaginatedUserResponse(
+				users,
+				userPage.getNumber(),
+				userPage.getSize(),
+				userPage.getTotalElements(),
+				userPage.getTotalPages(),
+				userPage.isLast()
+		));
+	}
+
+	public static class PaginatedUserResponse {
+		private List<UserDTO> users;
+		private int page;
+		private int size;
+		private long totalElements;
+		private int totalPages;
+		private boolean last;
+
+		public PaginatedUserResponse(List<UserDTO> users, int page, int size, long totalElements, int totalPages, boolean last) {
+			this.users = users;
+			this.page = page;
+			this.size = size;
+			this.totalElements = totalElements;
+			this.totalPages = totalPages;
+			this.last = last;
+		}
+
+		public List<UserDTO> getUsers() { return users; }
+		public int getPage() { return page; }
+		public int getSize() { return size; }
+		public long getTotalElements() { return totalElements; }
+		public int getTotalPages() { return totalPages; }
+		public boolean isLast() { return last; }
 	}
 
 	public static class UserDTO {
@@ -114,14 +158,16 @@ public class AuthController {
 		private List<String> roles;
 		private String profileImage;
 		private String cvFile;
+		private boolean isBlocked;
 
-		public UserDTO(Long id, String username, String email, List<String> roles, String profileImage, String cvFile) {
+		public UserDTO(Long id, String username, String email, List<String> roles, String profileImage, String cvFile, boolean isBlocked) {
 			this.id = id;
 			this.username = username;
 			this.email = email;
 			this.roles = roles;
 			this.profileImage = profileImage;
 			this.cvFile = cvFile;
+			this.isBlocked = isBlocked;
 		}
 
 		public Long getId() { return id; }
@@ -130,6 +176,7 @@ public class AuthController {
 		public List<String> getRoles() { return roles; }
 		public String getProfileImage() { return profileImage; }
 		public String getCvFile() { return cvFile; }
+		public boolean getIsBlocked() { return isBlocked; }
 	}
 
 	@GetMapping("/me")
@@ -212,7 +259,6 @@ public class AuthController {
 
 		user.setRoles(roles);
 
-		// Handle avatar upload if provided
 		if (avatar != null && !avatar.isEmpty()) {
 			try {
 				String uploadDir = "uploads/users/";
@@ -230,7 +276,6 @@ public class AuthController {
 				Files.copy(avatar.getInputStream(), filePath);
 				System.out.println("Avatar image saved to: " + filePath);
 
-				// Set the avatar path in the user entity
 				user.setProfileImage(uploadDir + uniqueFilename);
 			} catch (Exception e) {
 				System.err.println("Error uploading avatar image: " + e.getMessage());
@@ -377,8 +422,7 @@ public class AuthController {
 	@PostMapping("/request-otp")
 	public ResponseEntity<?> requestOtp(@RequestBody ResetPasswordRequest request) {
 		String email = request.getEmail();
-		User user = userRepository.findByEmail(email)
-				.orElse(null);
+		User user = userRepository.findByEmail(email).orElse(null);
 
 		if (user == null) {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email not found."));
@@ -386,20 +430,88 @@ public class AuthController {
 
 		String otp = otpService.generateOtp(email);
 
-		SimpleMailMessage message = new SimpleMailMessage();
-		message.setTo(email);
-		message.setSubject("Password Reset OTP");
-		message.setText("Your OTP for password reset is: " + otp + "\nThis OTP is valid for 5 minutes.");
 		try {
+			// Create a MimeMessage for HTML email
+			MimeMessage message = mailSender.createMimeMessage();
+			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+			helper.setTo(email);
+			helper.setSubject("Password Reset OTP - AlphaNova");
+
+			// HTML email content with inline CSS (using a separate string to avoid formatting issues)
+			String htmlTemplate = """
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Password Reset OTP</title>
+            </head>
+            <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+                <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px;">
+                    <tr>
+                        <td align="center">
+                            <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                                <!-- Header -->
+                                <tr>
+                                    <td style="background-color: #007bff; border-top-left-radius: 8px; border-top-right-radius: 8px; text-align: center; padding: 20px;">
+                                        <h1 style="color: #ffffff; margin: 0; font-size: 24px;">AlphaNova</h1>
+                                        <p style="color: #e6f0ff; margin: 5px 0 0; font-size: 14px;">Your Trusted Platform</p>
+                                    </td>
+                                </tr>
+                                <!-- Body -->
+                                <tr>
+                                    <td style="padding: 30px; text-align: center;">
+                                        <h2 style="color: #333333; font-size: 20px; margin: 0 0 10px;">Password Reset OTP</h2>
+                                        <p style="color: #666666; font-size: 16px; margin: 0 0 20px;">
+                                            You have requested to reset your password. Please use the OTP below to proceed.
+                                        </p>
+                                        <div style="background-color: #f8f9fa; border: 2px dashed #007bff; border-radius: 6px; padding: 15px; display: inline-block; margin-bottom: 20px;">
+                                            <p style="color: #007bff; font-size: 24px; font-weight: bold; margin: 0; letter-spacing: 2px;">{OTP}</p>
+                                        </div>
+                                        <p style="color: #666666; font-size: 14px; margin: 0 0 20px;">
+                                            This OTP is valid for <strong>5 minutes</strong>. Do not share this code with anyone.
+                                        </p>
+                                        <p style="color: #666666; font-size: 14px; margin: 0;">
+                                            If you did not request a password reset, please ignore this email or contact support.
+                                        </p>
+                                    </td>
+                                </tr>
+                                <!-- Footer -->
+                                <tr>
+                                    <td style="background-color: #f8f9fa; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; text-align: center; padding: 15px;">
+                                        <p style="color: #666666; font-size: 12px; margin: 0;">
+                                            © {YEAR} AlphaNova. All rights reserved.
+                                        </p>
+                                        <p style="color: #666666; font-size: 12px; margin: 5px 0 0;">
+                                            Need help? <a href="mailto:support@alphanova.com" style="color: #007bff; text-decoration: none;">Contact Support</a>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            </html>
+            """;
+
+			// Replace placeholders with actual values
+			String htmlContent = htmlTemplate
+					.replace("{OTP}", otp)
+					.replace("{YEAR}", String.valueOf(LocalDateTime.now().getYear()));
+
+			helper.setText(htmlContent, true); // Set HTML content (true indicates HTML)
+
+			// Send the email
 			mailSender.send(message);
 			System.out.println("OTP sent to " + email + ": " + otp);
 			return ResponseEntity.ok(new MessageResponse("OTP sent to your email."));
-		} catch (Exception e) {
+		} catch (MessagingException e) {
 			System.err.println("Error sending OTP email: " + e.getMessage());
 			return ResponseEntity.badRequest().body(new MessageResponse("Error sending OTP: " + e.getMessage()));
 		}
 	}
-
 	@PostMapping("/reset-password")
 	public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
 		String email = request.getEmail();

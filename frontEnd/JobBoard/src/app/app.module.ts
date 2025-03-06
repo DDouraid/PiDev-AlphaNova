@@ -8,11 +8,12 @@ import { RegisterComponent } from './components/register/register.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { HomeComponent } from './components/home/home.component';
 import { ProfileComponent } from './components/profile/profile.component';
-import { CustomizeProfileComponent } from './components/profile/customize-profile/customize-profile.component'; // Add DashboardComponent
+import { CustomizeProfileComponent } from './components/profile/customize-profile/customize-profile.component';
 import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
 import { AppRoutingModule } from './app-routing.module';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { AccessDeniedComponent } from './access-denied/access-denied.component';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 
 @NgModule({
   declarations: [
@@ -25,14 +26,15 @@ import { AccessDeniedComponent } from './access-denied/access-denied.component';
     AuthCallbackComponent,
     CustomizeProfileComponent,
     ResetPasswordComponent,
-    AccessDeniedComponent // Add this
+    AccessDeniedComponent
   ],
   imports: [
-    ReactiveFormsModule,
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule,
+    NgxDatatableModule
   ],
   providers: [],
   bootstrap: [AppComponent]

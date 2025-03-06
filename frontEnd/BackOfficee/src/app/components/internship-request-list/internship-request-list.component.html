@@ -1,30 +1,43 @@
 <div class="content-body">
   <h2 class="text-center my-4">Internship Requests</h2>
 
-  <div class="container d-flex justify-content-center">
-    <div class="table-responsive" style="max-width: 300%;">
-      <table class="table table-bordered table-hover table-striped text-center align-middle shadow-lg rounded">
-        <thead class="table-dark">
+  <div class="container-fluid">
+    <div class="table-responsive">
+      <table class="table custom-table table-hover table-bordered text-center align-middle shadow-sm rounded">
+        <thead class="table-header">
           <tr>
-            <th>ID</th>
             <th>Title</th>
             <th>Description</th>
+            <th>CV</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let request of internshipRequests">
-            <td>{{ request.id }}</td>
-            <td class="text-truncate" style="max-width: 150px;">{{ request.title }}</td>
-            <td class="text-truncate" style="max-width: 200px;">{{ request.description }}</td>
-            <td>
+            <td class="text-truncate" style="max-width: 300px; width: 300px;">{{ request.title }}</td>
+            <td class="text-truncate" style="max-width: 400px; width: 400px;">{{ request.description }}</td>
+            <td style="width: 150px;">
+              <a
+                *ngIf="request.cvPath"
+                href="javascript:void(0)"
+                (click)="downloadCv(request.cvPath)"
+                class="cv-link"
+                title="Download CV"
+              >
+                <i class="bi bi-download me-1"></i> Download CV
+              </a>
+              <span *ngIf="!request.cvPath" class="text-muted">No CV</span>
+            </td>
+            <td style="width: 150px;">
               <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal"
                       [attr.data-bs-target]="'#updateInternshipRequestModal' + request.id"
-                      (click)="selectInternshipRequest(request)">
-                <i class="bi bi-pencil"></i> Update
+                      (click)="selectInternshipRequest(request)"
+                      title="Update">
+                <i class="bi bi-pencil"></i>
               </button>
-              <button class="btn btn-danger btn-sm" (click)="deleteInternshipRequest(request.id!)">
-                <i class="bi bi-trash"></i> Delete
+              <button class="btn btn-danger btn-sm" (click)="deleteInternshipRequest(request.id!)"
+                      title="Delete">
+                <i class="bi bi-trash"></i>
               </button>
             </td>
           </tr>

@@ -1,0 +1,31 @@
+.mode-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .mode-toggle .btn {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .mode-toggle .btn.active {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .search-area .dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ced4da;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .search-area .dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .search-area .dropdown-item:hover {
+    background-color: #f8f9fa;
+  }

@@ -1,12 +1,18 @@
 <div class="content-body">
   <h2 class="text-center my-4">Internship Offers</h2>
 
-  <div class="container d-flex justify-content-center">
-    <div class="table-responsive" style="max-width: 300%;">
-      <table class="table table-bordered table-hover table-striped text-center align-middle shadow-lg rounded">
-        <thead class="table-dark">
+  <!-- Add Internship Offer Button -->
+  <div class="container mb-4 text-center">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addInternshipOfferModal">
+      <i class="bi bi-plus-circle me-2"></i>Add Internship Offer
+    </button>
+  </div>
+
+  <div class="container-fluid">
+    <div class="table-responsive">
+      <table class="table custom-table table-hover table-bordered text-center align-middle shadow-sm rounded">
+        <thead class="table-header">
           <tr>
-            <th>ID</th>
             <th>Title</th>
             <th>Description</th>
             <th>Actions</th>
@@ -14,17 +20,24 @@
         </thead>
         <tbody>
           <tr *ngFor="let offer of internshipOffers">
-            <td>{{ offer.id }}</td>
-            <td class="text-truncate" style="max-width: 150px;">{{ offer.title }}</td>
-            <td class="text-truncate" style="max-width: 200px;">{{ offer.description }}</td>
-            <td>
+            <td class="text-truncate" style="max-width: 300px; width: 300px;">{{ offer.title }}</td>
+            <td class="text-truncate" style="max-width: 400px; width: 400px;">{{ offer.description }}</td>
+            <td style="width: 200px;">
               <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal"
                       [attr.data-bs-target]="'#updateInternshipOfferModal' + offer.id"
-                      (click)="selectInternshipOffer(offer)">
-                <i class="bi bi-pencil"></i> Update
+                      (click)="selectInternshipOffer(offer)"
+                      title="Update">
+                <i class="bi bi-pencil"></i>
               </button>
-              <button class="btn btn-danger btn-sm" (click)="deleteInternshipOffer(offer.id!)">
-                <i class="bi bi-trash"></i> Delete
+              <button class="btn btn-danger btn-sm me-2" (click)="deleteInternshipOffer(offer.id!)"
+                      title="Delete">
+                <i class="bi bi-trash"></i>
+              </button>
+              <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                      [attr.data-bs-target]="'#viewRequestsModal' + offer.id"
+                      (click)="viewRequestsForOffer(offer)"
+                      title="View Applicants">
+                <i class="bi bi-eye"></i>
               </button>
             </td>
           </tr>
@@ -65,5 +78,151 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal for Viewing Applicants -->
+    <div class="modal fade" [id]="'viewRequestsModal' + offer.id" tabindex="-1" aria-labelledby="viewRequestsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="viewRequestsModalLabel">Applicants for {{ offer.title }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div *ngIf="requestsForOffer.length === 0" class="alert alert-info text-center">
+              No applicants found for this offer.
+            </div>
+            <div *ngIf="requestsForOffer.length > 0" class="table-responsive">
+              <table class="table table-bordered table-hover table-striped text-center align-middle">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Email</th>
+                    <th>CV</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let request of requestsForOffer">
+                    <td class="text-truncate" style="max-width: 200px;">{{ request.title }}</td>
+                    <td class="text-truncate" style="max-width: 300px;">{{ request.description }}</td>
+                    <td>{{ request.email || 'N/A' }}</td>
+                    <td>
+                      <a
+                        *ngIf="request.cvPath"
+                        href="javascript:void(0)"
+                        (click)="downloadCv(request.cvPath)"
+                        class="cv-link"
+                        title="Download CV"
+                      >
+                        <span *ngIf="downloadingCv[request.cvPath]" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        <i *ngIf="!downloadingCv[request.cvPath]" class="bi bi-download me-1"></i>
+                        {{ downloadingCv[request.cvPath] ? 'Downloading...' : (request.cvPath.split('_').slice(1).join('_')) }}
+                      </a>
+                      <span *ngIf="!request.cvPath" class="text-muted">No CV</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </ng-container>
+
+  <!-- Modal for adding a new internship offer -->
+  <div class="modal fade" id="addInternshipOfferModal" tabindex="-1" aria-labelledby="addInternshipOfferModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addInternshipOfferModalLabel">Add Internship Offer</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form #offerForm="ngForm" (ngSubmit)="offerForm.valid && onSubmitOffer(offerForm)" name="offerForm">
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Title <span class="text-danger">*</span></label>
+              <input
+                [(ngModel)]="internshipOffer.title"
+                name="offerTitle"
+                class="form-control"
+                required
+                #offerTitle="ngModel"
+                [class.is-invalid]="offerTitle.invalid && (offerTitle.dirty || offerTitle.touched)"
+              />
+              <div *ngIf="offerTitle.invalid && (offerTitle.dirty || offerTitle.touched)" class="invalid-feedback">
+                Title is required.
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Description <span class="text-danger">*</span></label>
+              <textarea
+                [(ngModel)]="internshipOffer.description"
+                name="offerDescription"
+                class="form-control"
+                required
+                #offerDescription="ngModel"
+                [class.is-invalid]="offerDescription.invalid && (offerDescription.dirty || offerDescription.touched)"
+              ></textarea>
+              <div *ngIf="offerDescription.invalid && (offerDescription.dirty || offerDescription.touched)" class="invalid-feedback">
+                Description is required.
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Company <span class="text-danger">*</span></label>
+              <input
+                [(ngModel)]="internshipOffer.company"
+                name="company"
+                class="form-control"
+                required
+                #company="ngModel"
+                [class.is-invalid]="company.invalid && (company.dirty || company.touched)"
+              />
+              <div *ngIf="company.invalid && (company.dirty || company.touched)" class="invalid-feedback">
+                Company is required.
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Location <span class="text-danger">*</span></label>
+              <input
+                [(ngModel)]="internshipOffer.location"
+                name="location"
+                class="form-control"
+                required
+                #location="ngModel"
+                [class.is-invalid]="location.invalid && (location.dirty || location.touched)"
+              />
+              <div *ngIf="location.invalid && (location.dirty || location.touched)" class="invalid-feedback">
+                Location is required.
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Date Posted <span class="text-danger">*</span></label>
+              <div class="cal-icon">
+                <input
+                  type="date"
+                  [(ngModel)]="internshipOffer.datePosted"
+                  name="datePosted"
+                  class="form-control"
+                  required
+                  #datePosted="ngModel"
+                  [class.is-invalid]="datePosted.invalid && (datePosted.dirty || datePosted.touched)"
+                />
+                <i class="far fa-calendar-alt"></i>
+              </div>
+              <div *ngIf="datePosted.invalid && (datePosted.dirty || datePosted.touched)" class="invalid-feedback">
+                Date Posted is required.
+              </div>
+            </div>
+            <div class="form-group text-end">
+              <button type="submit" class="btn btn-primary" [disabled]="!offerForm.valid || isSubmittingOffer">
+                <span *ngIf="isSubmittingOffer" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                {{ isSubmittingOffer ? 'Saving...' : 'Save Offer' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,30 +1,71 @@
 <div class="content-body d-flex justify-content-center align-items-center min-vh-100">
-    <div class="container-fluid">
-      <div class="row justify-content-center">
-        <div class="col-xl-6 col-xxl-6 col-lg-8 col-md-10 col-sm-12">
-          <div class="card card-bd">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Add Internship Offer</h5>
-              </div>
-              <div class="modal-body">
-                <form #offerForm="ngForm" (ngSubmit)="onSubmitOffer(offerForm)" name="offerForm">
-                  <div class="form-group">
-                    <label class="text-black font-w500">Title</label>
-                    <input [(ngModel)]="internshipOffer.title" name="offerTitle" class="form-control" required>
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-xl-6 col-xxl-6 col-lg-8 col-md-10 col-sm-12">
+        <div class="card card-bd">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Add Internship Offer</h5>
+            </div>
+            <div class="modal-body">
+              <form #offerForm="ngForm" (ngSubmit)="onSubmitOffer(offerForm)" name="offerForm">
+                <div class="form-group mb-3">
+                  <label class="text-black font-w500">Title</label>
+                  <input
+                    [(ngModel)]="internshipOffer.title"
+                    name="offerTitle"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group mb-3">
+                  <label class="text-black font-w500">Description</label>
+                  <textarea
+                    [(ngModel)]="internshipOffer.description"
+                    name="offerDescription"
+                    class="form-control"
+                    required
+                  ></textarea>
+                </div>
+                <div class="form-group mb-3">
+                  <label class="text-black font-w500">Company</label>
+                  <input
+                    [(ngModel)]="internshipOffer.company"
+                    name="company"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group mb-3">
+                  <label class="text-black font-w500">Location</label>
+                  <input
+                    [(ngModel)]="internshipOffer.location"
+                    name="location"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group mb-3">
+                  <label class="text-black font-w500">Date Posted</label>
+                  <div class="cal-icon">
+                    <input
+                      type="date"
+                      [(ngModel)]="internshipOffer.datePosted"
+                      name="datePosted"
+                      class="form-control"
+                      required
+                    />
+                    <i class="far fa-calendar-alt"></i>
                   </div>
-                  <div class="form-group">
-                    <label class="text-black font-w500">Description</label>
-                    <input [(ngModel)]="internshipOffer.description" name="offerDescription" class="form-control" required>
-                  </div>
-                  <div class="form-group">
-                    <button type="submit" class="btn btn-primary" [disabled]="!offerForm.valid">Save Offer</button>
-                  </div>
-                </form>
-              </div>
+                </div>
+                <div class="form-group">
+                  <button type="submit" class="btn btn-primary" [disabled]="!offerForm.valid">Save Offer</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>

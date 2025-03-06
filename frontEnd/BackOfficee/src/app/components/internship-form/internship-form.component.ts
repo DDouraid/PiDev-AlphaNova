@@ -1,74 +1,48 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { InternshipService } from '../../services/internship.service';
 import { Internship, InternStatus } from '../../models/internship';
-import { InternshipOfferService } from '../../services/internship-offer.service';
-import { InternshipOffer } from '../../models/internship-offer';
-import { InternshipRequestService } from '../../services/internship-request.service';
-import { InternshipRequest } from '../../models/internship-request';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-internship-form',
-  templateUrl: './internship-form.component.html'
+  templateUrl: './internship-form.component.html',
+  styleUrls: ['./internship-form.component.css']
 })
-export class InternshipFormComponent {
+export class InternshipFormComponent implements OnInit {
   internship: Internship = {
     title: '',
     description: '',
     startDate: '',
     endDate: '',
     status: InternStatus.IN_PROGRESS
-    // internshipOffer and internshipRequest are optional and left undefined
-  };
-
-  internshipOffer: InternshipOffer = {
-    title: '',
-    description: ''
-    // internships array left undefined unless populated
-  };
-
-  internshipRequest: InternshipRequest = {
-    title: '',
-    description: ''
   };
 
   statuses = Object.values(InternStatus);
+  isSubmittingInternship = false;
 
-  constructor(
-    private internshipService: InternshipService,
-    private internshipOfferService: InternshipOfferService,
-    private internshipRequestService: InternshipRequestService
-  ) {}
+  constructor(private internshipService: InternshipService) {}
 
-  onSubmitInternship(): void {
-    console.log('Submitting internship:', this.internship);
+  ngOnInit(): void {}
+
+  onSubmitInternship(form: NgForm): void {
+    if (!form.valid) return;
+
+    this.isSubmittingInternship = true;
     this.internshipService.createInternship(this.internship).subscribe({
       next: (response) => {
         console.log('Internship saved:', response);
+        this.isSubmittingInternship = false;
+        form.resetForm();
         this.internship = { title: '', description: '', startDate: '', endDate: '', status: InternStatus.IN_PROGRESS };
+        // Show success alert
+        window.alert('Internship created successfully!');
       },
-      error: (err) => console.error('Error creating internship:', err)
-    });
-  }
-
-  onSubmitOffer(): void {
-    console.log('Submitting offer:', this.internshipOffer);
-    this.internshipOfferService.createInternshipOffer(this.internshipOffer).subscribe({
-      next: (response) => {
-        console.log('Offer saved:', response);
-        this.internshipOffer = { title: '', description: '' };
-      },
-      error: (err) => console.error('Error creating offer:', err)
-    });
-  }
-
-  onSubmitRequest(): void {
-    console.log('Submitting request:', this.internshipRequest);
-    this.internshipRequestService.createInternshipRequest(this.internshipRequest).subscribe({
-      next: (response) => {
-        console.log('Request saved:', response);
-        this.internshipRequest = { title: '', description: '' };
-      },
-      error: (err) => console.error('Error creating request:', err)
+      error: (err) => {
+        console.error('Error creating internship:', err);
+        this.isSubmittingInternship = false;
+        // Show error alert
+        window.alert('Failed to create internship. Please try again.');
+      }
     });
   }
 }

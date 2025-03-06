@@ -1,6 +1,8 @@
 package tn.esprit.application.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -14,6 +16,13 @@ public class InternshipOffer {
     private String title;
     private String description;
 
+    private String company; // Added for company name
+    private String location; // Added for location
+
+    @Column(name = "date_Posted")
+    private LocalDate datePosted;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "internshipOffer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Internship> internships;
 
@@ -40,6 +49,30 @@ public class InternshipOffer {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public LocalDate getDatePosted() {
+        return datePosted;
+    }
+
+    public void setDatePosted(LocalDate datePosted) {
+        this.datePosted = datePosted;
     }
 
     public List<Internship> getInternships() {

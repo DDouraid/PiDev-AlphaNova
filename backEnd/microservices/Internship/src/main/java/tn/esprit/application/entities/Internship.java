@@ -1,8 +1,8 @@
 package tn.esprit.application.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "internship")
@@ -24,17 +24,15 @@ public class Internship {
     @Enumerated(EnumType.STRING)
     private InternStatus status;
 
-
-
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "internship_offer_id", nullable = true)
     private InternshipOffer internshipOffer;
 
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "internship_request_id", nullable = true)
     private InternshipRequest internshipRequest;
-
-
 
     public Internship() {}
 
@@ -96,10 +94,6 @@ public class Internship {
         this.status = status;
     }
 
-
-
-
-
     public InternshipOffer getInternshipOffer() {
         return internshipOffer;
     }
@@ -115,7 +109,4 @@ public class Internship {
     public void setInternshipRequest(InternshipRequest internshipRequest) {
         this.internshipRequest = internshipRequest;
     }
-
-
-
 }

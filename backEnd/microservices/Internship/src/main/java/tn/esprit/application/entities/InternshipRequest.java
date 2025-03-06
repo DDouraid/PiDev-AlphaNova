@@ -12,6 +12,9 @@ public class InternshipRequest {
 
     private String title;
     private String description;
+    private String cvPath; // Field to store the file path
+    private String email;   // New field to store the user's email
+    private Long offerId;
 
     @OneToOne(mappedBy = "internshipRequest", cascade = CascadeType.ALL, orphanRemoval = true)
     private Internship internship;
@@ -39,6 +42,30 @@ public class InternshipRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCvPath() {
+        return cvPath;
+    }
+
+    public void setCvPath(String cvPath) {
+        this.cvPath = cvPath;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Long getOfferId() {
+        return offerId;
+    }
+
+    public void setOfferId(Long offerId) {
+        this.offerId = offerId;
     }
 
     public Internship getInternship() {

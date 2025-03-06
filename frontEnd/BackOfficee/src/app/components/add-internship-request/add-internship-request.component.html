@@ -1,30 +1,89 @@
 <div class="content-body d-flex justify-content-center align-items-center min-vh-100">
-    <div class="container-fluid">
-      <div class="row justify-content-center">
-        <div class="col-xl-6 col-xxl-6 col-lg-8 col-md-10 col-sm-12">
-          <div class="card card-bd">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Add Internship Request</h5>
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-xl-6 col-xxl-6 col-lg-8 col-md-10 col-sm-12">
+        <div class="card shadow-sm rounded">
+          <div class="card-header">
+            <h5 class="card-title">Ajouter une candidature spontanée</h5>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="requestForm" (ngSubmit)="onSubmitRequest()">
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Select Offer <span class="text-danger">*</span></label>
+                <select
+                  formControlName="offerId"
+                  class="form-control"
+                  [class.is-invalid]="requestForm.get('offerId')?.invalid && (requestForm.get('offerId')?.dirty || requestForm.get('offerId')?.touched)"
+                >
+                  <option value="" disabled>Select an offer...</option>
+                  <option *ngFor="let offer of internshipOffers" [value]="offer.id">
+                    {{ offer.title }} ({{ offer.company }} - {{ offer.location }})
+                  </option>
+                </select>
+                <div *ngIf="requestForm.get('offerId')?.invalid && (requestForm.get('offerId')?.dirty || requestForm.get('offerId')?.touched)" class="invalid-feedback">
+                  Please select an offer.
+                </div>
               </div>
-              <div class="modal-body">
-                <form #requestForm="ngForm" (ngSubmit)="onSubmitRequest(requestForm)" name="requestForm">
-                  <div class="form-group">
-                    <label class="text-black font-w500">Title</label>
-                    <input [(ngModel)]="internshipRequest.title" name="requestTitle" class="form-control" required>
-                  </div>
-                  <div class="form-group">
-                    <label class="text-black font-w500">Description</label>
-                    <input [(ngModel)]="internshipRequest.description" name="requestDescription" class="form-control" required>
-                  </div>
-                  <div class="form-group">
-                    <button type="submit" class="btn btn-primary" [disabled]="!requestForm.valid">Save Request</button>
-                  </div>
-                </form>
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Title <span class="text-danger">*</span></label>
+                <input
+                  formControlName="title"
+                  class="form-control"
+                  [class.is-invalid]="requestForm.get('title')?.invalid && (requestForm.get('title')?.dirty || requestForm.get('title')?.touched)"
+                />
+                <div *ngIf="requestForm.get('title')?.invalid && (requestForm.get('title')?.dirty || requestForm.get('title')?.touched)" class="invalid-feedback">
+                  Title is required.
+                </div>
               </div>
-            </div>
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Description <span class="text-danger">*</span></label>
+                <textarea
+                  formControlName="description"
+                  class="form-control"
+                  rows="4"
+                  [class.is-invalid]="requestForm.get('description')?.invalid && (requestForm.get('description')?.dirty || requestForm.get('description')?.touched)"
+                ></textarea>
+                <div *ngIf="requestForm.get('description')?.invalid && (requestForm.get('description')?.dirty || requestForm.get('description')?.touched)" class="invalid-feedback">
+                  Description is required.
+                </div>
+              </div>
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Email Address <span class="text-danger">*</span></label>
+                <input
+                  type="email"
+                  formControlName="email"
+                  class="form-control"
+                  [class.is-invalid]="requestForm.get('email')?.invalid && (requestForm.get('email')?.dirty || requestForm.get('email')?.touched)"
+                />
+                <div *ngIf="requestForm.get('email')?.invalid && (requestForm.get('email')?.dirty || requestForm.get('email')?.touched)" class="invalid-feedback">
+                  <div *ngIf="requestForm.get('email')?.errors?.['required']">Email is required.</div>
+                  <div *ngIf="requestForm.get('email')?.errors?.['email']">Please enter a valid email address.</div>
+                </div>
+              </div>
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Upload CV <span class="text-danger">*</span></label>
+                <input
+                  type="file"
+                  class="form-control"
+                  accept=".pdf,.doc,.docx"
+                  (change)="onFileSelected($event)"
+                  [class.is-invalid]="requestForm.get('cv')?.invalid && (requestForm.get('cv')?.dirty || requestForm.get('cv')?.touched)"
+                />
+                <div *ngIf="requestForm.get('cv')?.invalid && (requestForm.get('cv')?.dirty || requestForm.get('cv')?.touched)" class="invalid-feedback">
+                  Please upload a CV (PDF, DOC, or DOCX).
+                </div>
+                <small class="form-text text-muted">Accepted formats: PDF, DOC, DOCX. Max size: 5MB.</small>
+              </div>
+              <div class="form-group text-end">
+                <button type="submit" class="btn btn-primary" [disabled]="requestForm.invalid || isSubmitting">
+                  <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  {{ isSubmitting ? 'Saving...' : 'Save Request' }}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>

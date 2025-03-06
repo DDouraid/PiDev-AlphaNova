@@ -10,10 +10,12 @@ import { InternshipOfferService } from './services/internship-offer.service';
 import { InternshipRequestService } from './services/internship-request.service';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AppRoutingModule } from './app-routing.module';
+import { ToastrModule } from 'ngx-toastr';
 import { AddInternshipOfferComponent } from './components/add-internship-offer/add-internship-offer.component';
 import { AddInternshipRequestComponent } from './components/add-internship-request/add-internship-request.component';
 import { InternshipOfferListComponent } from './components/internship-offer-list/internship-offer-list.component';
 import { InternshipRequestListComponent } from './components/internship-request-list/internship-request-list.component';
+import { UserInternshipOfferListComponent } from './components/user-internship-offer-list/user-internship-offer-list.component';
 
 @NgModule({
   declarations: [
@@ -24,14 +26,21 @@ import { InternshipRequestListComponent } from './components/internship-request-
     AddInternshipOfferComponent,
     AddInternshipRequestComponent,
     InternshipOfferListComponent,
-    InternshipRequestListComponent
+    InternshipRequestListComponent,
+    UserInternshipOfferListComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
-    FormsModule,
+    FormsModule, // Keep for other components using template-driven forms
     ReactiveFormsModule,
-    AppRoutingModule // Ensure this is last to apply routing correctly
+    AppRoutingModule,
+    ToastrModule.forRoot({
+      positionClass: 'toast-top-right',
+      timeOut: 3000,
+      closeButton: true,
+      progressBar: true,
+    })
   ],
   providers: [
     InternshipService,

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { InternshipOfferService } from '../../services/internship-offer.service'; // Adjust path as needed
-import { InternshipOffer } from '../../models/internship-offer'; // Adjust path as needed
-import { NgForm } from '@angular/forms'; // Import NgForm for form handling
+import { InternshipOfferService } from '../../services/internship-offer.service';
+import { InternshipOffer } from '../../models/internship-offer';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-add-internship-offer',
@@ -9,26 +9,32 @@ import { NgForm } from '@angular/forms'; // Import NgForm for form handling
   styleUrls: ['./add-internship-offer.component.css']
 })
 export class AddInternshipOfferComponent {
-  // Model for the internship offer
   internshipOffer: InternshipOffer = {
     title: '',
-    description: ''
-    // internships array left undefined unless populated
+    description: '',
+    company: '',
+    location: '',
+    datePosted: ''
   };
 
   constructor(private internshipOfferService: InternshipOfferService) {}
 
-  // Submission handler for internship offer
   onSubmitOffer(form: NgForm): void {
     if (form.valid) {
       console.log('Submitting offer:', this.internshipOffer);
       this.internshipOfferService.createInternshipOffer(this.internshipOffer).subscribe({
         next: (response) => {
           console.log('Offer saved:', response);
-          this.internshipOffer = { title: '', description: '' }; // Reset form fields
-          form.resetForm(); // Reset the form state
+          this.internshipOffer = { title: '', description: '', company: '', location: '', datePosted: '' };
+          form.resetForm();
+          // Show success alert
+          window.alert('Internship offer created successfully!');
         },
-        error: (err) => console.error('Error creating offer:', err)
+        error: (err) => {
+          console.error('Error creating offer:', err);
+          // Show error alert
+          window.alert('Failed to create internship offer. Please try again.');
+        }
       });
     }
   }

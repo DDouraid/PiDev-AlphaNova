@@ -7,7 +7,7 @@ import { Internship } from '../models/internship';
   providedIn: 'root'
 })
 export class InternshipService {
-  private baseUrl = '/api'; // Relative path for proxy
+  private baseUrl = '/api'; 
   constructor(private http: HttpClient) {}
 
   getAllInternships(): Observable<Internship[]> {

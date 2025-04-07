@@ -9,32 +9,18 @@
           <div class="card-body">
             <form [formGroup]="requestForm" (ngSubmit)="onSubmitRequest()">
               <div class="form-group mb-3">
-                <label class="text-black font-w500">Select Offer <span class="text-danger">*</span></label>
+                <label class="text-black font-w500">Select Offer (Optional)</label>
                 <select
                   formControlName="offerId"
                   class="form-control"
-                  [class.is-invalid]="requestForm.get('offerId')?.invalid && (requestForm.get('offerId')?.dirty || requestForm.get('offerId')?.touched)"
                 >
                   <option value="" disabled>Select an offer...</option>
                   <option *ngFor="let offer of internshipOffers" [value]="offer.id">
                     {{ offer.title }} ({{ offer.company }} - {{ offer.location }})
                   </option>
                 </select>
-                <div *ngIf="requestForm.get('offerId')?.invalid && (requestForm.get('offerId')?.dirty || requestForm.get('offerId')?.touched)" class="invalid-feedback">
-                  Please select an offer.
-                </div>
               </div>
-              <div class="form-group mb-3">
-                <label class="text-black font-w500">Title <span class="text-danger">*</span></label>
-                <input
-                  formControlName="title"
-                  class="form-control"
-                  [class.is-invalid]="requestForm.get('title')?.invalid && (requestForm.get('title')?.dirty || requestForm.get('title')?.touched)"
-                />
-                <div *ngIf="requestForm.get('title')?.invalid && (requestForm.get('title')?.dirty || requestForm.get('title')?.touched)" class="invalid-feedback">
-                  Title is required.
-                </div>
-              </div>
+              
               <div class="form-group mb-3">
                 <label class="text-black font-w500">Description <span class="text-danger">*</span></label>
                 <textarea

@@ -7,6 +7,7 @@ import { AddInternshipRequestComponent } from './components/add-internship-reque
 import { InternshipOfferListComponent } from './components/internship-offer-list/internship-offer-list.component';
 import { InternshipRequestListComponent } from './components/internship-request-list/internship-request-list.component';
 import { UserInternshipOfferListComponent } from './components/user-internship-offer-list/user-internship-offer-list.component';
+import { OfferDetailsComponent } from './components/offer-details/offer-details.component';
 
 const routes: Routes = [
   { path: 'ListeInternship', component: InternshipListComponent }, 
@@ -17,6 +18,7 @@ const routes: Routes = [
   { path: 'listrequests', component: InternshipRequestListComponent }, // New route for requests list
   { path: '', redirectTo: '/ListeInternship', pathMatch: 'full' }, // Optional: Default route
   { path: 'user/listeoffers', component: UserInternshipOfferListComponent }, // For the user version
+  { path: 'offer-details', component: OfferDetailsComponent }, // Add the new route
 ];
 
 @NgModule({

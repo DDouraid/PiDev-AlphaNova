@@ -82,15 +82,24 @@ public class InternshipRequestRest {
             @PathVariable Long offerId,
             @RequestParam("title") String title,
             @RequestParam("description") String description,
+            @RequestParam("email") String email,
+            @RequestParam("type") String type,
             @RequestParam(value = "cv", required = false) MultipartFile cv) {
         try {
             System.out.println("Received Internship Request: " + title + " for Offer ID: " + offerId);
             System.out.println("CV received: " + (cv != null ? cv.getOriginalFilename() : "No CV uploaded"));
+            System.out.println("Type: " + type);
+
+            // Validate the type
+            if (!type.equals("normal") && !type.equals("spontaneous")) {
+                throw new IllegalArgumentException("Invalid type. Must be 'normal' or 'spontaneous'.");
+            }
 
             InternshipRequest request = new InternshipRequest();
             request.setTitle(title);
             request.setDescription(description);
-            request.setOfferId(offerId);
+            request.setEmail(email);
+            request.setType(type); // Set the type from the request
 
             if (cv != null && !cv.isEmpty()) {
                 System.out.println("CV is not null and not empty. Original filename: " + cv.getOriginalFilename());
@@ -125,14 +134,24 @@ public class InternshipRequestRest {
     public ResponseEntity<InternshipRequest> createInternshipRequest(
             @RequestParam("title") String title,
             @RequestParam("description") String description,
+            @RequestParam("email") String email,
+            @RequestParam("type") String type,
             @RequestParam(value = "cv", required = false) MultipartFile cv) {
         try {
             System.out.println("Received Internship Request: " + title);
             System.out.println("CV received: " + (cv != null ? cv.getOriginalFilename() : "No CV uploaded"));
+            System.out.println("Type: " + type);
+
+            // Validate the type
+            if (!type.equals("normal") && !type.equals("spontaneous")) {
+                throw new IllegalArgumentException("Invalid type. Must be 'normal' or 'spontaneous'.");
+            }
 
             InternshipRequest request = new InternshipRequest();
             request.setTitle(title);
             request.setDescription(description);
+            request.setEmail(email);
+            request.setType(type); // Set the type from the request
 
             if (cv != null && !cv.isEmpty()) {
                 System.out.println("CV is not null and not empty. Original filename: " + cv.getOriginalFilename());
@@ -168,13 +187,22 @@ public class InternshipRequestRest {
             @PathVariable Long id,
             @RequestParam("title") String title,
             @RequestParam("description") String description,
+            @RequestParam("email") String email,
+            @RequestParam("type") String type,
             @RequestParam(value = "cv", required = false) MultipartFile cv) {
         try {
+            // Validate the type
+            if (!type.equals("normal") && !type.equals("spontaneous")) {
+                throw new IllegalArgumentException("Invalid type. Must be 'normal' or 'spontaneous'.");
+            }
+
             InternshipRequest existingRequest = internshipRequestService.findById(id)
                     .orElseThrow(() -> new RuntimeException("Internship request not found"));
 
             existingRequest.setTitle(title);
             existingRequest.setDescription(description);
+            existingRequest.setEmail(email);
+            existingRequest.setType(type); // Update the type field
 
             if (cv != null && !cv.isEmpty()) {
                 validateFile(cv);

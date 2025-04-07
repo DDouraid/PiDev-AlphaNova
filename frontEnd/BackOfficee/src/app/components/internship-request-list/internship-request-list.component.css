@@ -117,3 +117,56 @@
     max-width: 100%;
     overflow-x: auto;
   }
+  .content-body {
+    min-height: calc(100vh - 100px);
+    padding: 20px;
+    background-color: #f5f7fb;
+  }
+  
+  .table-header {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .custom-table {
+    background-color: white;
+  }
+  
+  .type-filter {
+    width: 200px;
+  }
+  
+  .clear-filters-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #dc3545;
+  }
+  
+  .clear-filters-btn:hover {
+    color: #a71d2a;
+  }
+  
+  .pagination-container .page-link {
+    color: #007bff;
+  }
+  
+  .pagination-container .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+  }
+  
+  .pagination-container .page-item.disabled .page-link {
+    color: #6c757d;
+  }
+  
+  .cv-link {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .cv-link:hover {
+    text-decoration: underline;
+  }

@@ -29,4 +29,13 @@ export class InternshipService {
   deleteInternship(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/internships/${id}`);
   }
+
+  // New method to update status and end date
+  updateStatusAndEndDate(id: number, status: string, endDate: string | null): Observable<Internship> {
+    const params: any = { status };
+    if (endDate) {
+      params.endDate = endDate; // Already in yyyy-MM-dd format
+    }
+    return this.http.put<Internship>(`${this.baseUrl}/internships/${id}/status-end-date`, null, { params });
+  }
 }

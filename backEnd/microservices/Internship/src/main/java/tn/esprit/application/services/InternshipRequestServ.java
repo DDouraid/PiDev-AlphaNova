@@ -54,7 +54,6 @@ public class InternshipRequestServ {
         }
     }
 
-    // New method to find requests by offerId
     public List<InternshipRequest> findByOfferId(Long offerId) {
         try {
             List<InternshipRequest> requests = internshipRequestRepository.findByOfferId(offerId);
@@ -80,10 +79,11 @@ public class InternshipRequestServ {
 
             // Set the offerId on the request
             internshipRequest.setOfferId(offerId);
+            // Note: We are NOT setting the type here; it should already be set by the frontend
 
             // Save the internship request
             InternshipRequest savedRequest = internshipRequestRepository.save(internshipRequest);
-            System.out.println("Saved internship request with ID: " + savedRequest.getId() + ", cvPath: " + savedRequest.getCvPath());
+            System.out.println("Saved internship request with ID: " + savedRequest.getId() + ", cvPath: " + savedRequest.getCvPath() + ", type: " + savedRequest.getType());
 
             // Create a new internship record linking the request and offer
             Internship internship = new Internship();
@@ -112,8 +112,9 @@ public class InternshipRequestServ {
 
     public InternshipRequest save(InternshipRequest internshipRequest) {
         try {
+            // Note: We are NOT setting the type here; it should already be set by the frontend
             InternshipRequest savedRequest = internshipRequestRepository.save(internshipRequest);
-            System.out.println("Saved internship request with ID: " + savedRequest.getId() + ", cvPath: " + savedRequest.getCvPath());
+            System.out.println("Saved internship request with ID: " + savedRequest.getId() + ", cvPath: " + savedRequest.getCvPath() + ", type: " + savedRequest.getType());
             return savedRequest;
         } catch (Exception e) {
             System.err.println("Error saving internship request: " + e.getMessage());
@@ -133,9 +134,11 @@ public class InternshipRequestServ {
             existingRequest.setTitle(updatedRequest.getTitle());
             existingRequest.setDescription(updatedRequest.getDescription());
             existingRequest.setCvPath(updatedRequest.getCvPath());
+            existingRequest.setEmail(updatedRequest.getEmail());
+            existingRequest.setType(updatedRequest.getType()); // Update the type field
 
             InternshipRequest savedRequest = internshipRequestRepository.save(existingRequest);
-            System.out.println("Updated internship request with ID: " + savedRequest.getId() + ", cvPath: " + savedRequest.getCvPath());
+            System.out.println("Updated internship request with ID: " + savedRequest.getId() + ", cvPath: " + savedRequest.getCvPath() + ", type: " + savedRequest.getType());
             return savedRequest;
         } catch (Exception e) {
             System.err.println("Error updating internship request with ID " + updatedRequest.getId() + ": " + e.getMessage());

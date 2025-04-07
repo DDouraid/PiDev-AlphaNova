@@ -1,0 +1,108 @@
+/* Card Styling */
+.card {
+    border: none;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-header {
+    background-color: transparent;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 20px;
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #f28c38; /* Orange to match theme */
+    margin-bottom: 0;
+  }
+  
+  .card-body {
+    padding: 20px;
+  }
+  
+  /* Form Styling */
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-label, .text-black.font-w500 {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  
+  .form-control {
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    font-size: 14px;
+    padding: 10px;
+  }
+  
+  .form-control:focus {
+    border-color: #007bff; /* Blue to match theme */
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+  
+  .form-control.is-invalid {
+    border-color: #dc3545;
+  }
+  
+  .invalid-feedback {
+    font-size: 0.85rem;
+    color: #dc3545;
+  }
+  
+  textarea.form-control {
+    resize: vertical; /* Allow vertical resizing only */
+    min-height: 100px;
+  }
+  
+  /* Button Styling */
+  .btn-primary {
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff; /* Blue to match theme */
+    border-color: #007bff;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+  }
+  
+  .btn-primary:disabled {
+    background-color: #b0c4de;
+    border-color: #b0c4de;
+    cursor: not-allowed;
+  }
+  
+  .text-danger {
+    color: #dc3545;
+  }
+  
+  /* Center the form vertically and horizontally */
+  .content-body {
+    padding: 20px;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 576px) {
+    .card {
+      margin: 0 10px;
+    }
+  
+    .card-title {
+      font-size: 1.25rem;
+    }
+  
+    .btn-primary {
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+  }

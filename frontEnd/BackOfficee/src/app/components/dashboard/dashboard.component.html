@@ -22,31 +22,7 @@
             </div>
           </div>
           <ul class="navbar-nav header-right">
-            <li class="nav-item">
-              <div class="input-group search-area d-lg-inline-flex d-none position-relative">
-                <div class="input-group-append">
-                  <span class="input-group-text"><a href="javascript:void(0)"><i
-                        class="flaticon-381-search-2"></i></a></span>
-                </div>
-                <input type="text" class="form-control" placeholder="Search here..." [(ngModel)]="searchQuery"
-                  (input)="onSearch()" (blur)="clearSearch()">
-                <!-- Search Results Dropdown -->
-                <div class="dropdown-menu show w-100" *ngIf="searchResults.length > 0 || isSearching"
-                  style="position: absolute; top: 100%; left: 0; z-index: 1000;">
-                  <div class="dropdown-item text-center" *ngIf="isSearching">
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Searching...
-                  </div>
-                  <div class="dropdown-item" *ngIf="!isSearching && searchResults.length === 0">
-                    No results found.
-                  </div>
-                  <a *ngFor="let result of searchResults" class="dropdown-item" href="javascript:void(0)"
-                    (click)="navigateToResult(result)">
-                    <strong>{{ result.type }}:</strong> {{ result.data.title }} ({{ result.data.description | slice:0:50
-                    }}...)
-                  </a>
-                </div>
-              </div>
-            </li>
+            
 
             <li class="nav-item dropdown header-profile">
               <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown">
@@ -97,13 +73,7 @@
     <div class="deznav-scroll">
       <ul class="metismenu" id="menu">
         <!-- Dashboard (unchanged) -->
-        <li>
-          <a href="#">
-            <i class="flaticon-layout"></i>
-            <span class="nav-text">Dashboard</span>
-          </a>
-        </li>
-
+        
         <!-- Admin Menu (unchanged) -->
         <li>
           <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
@@ -113,17 +83,17 @@
           <ul aria-expanded="false">
             <li>
               <a routerLink="/ListeInternship">
-                <span class="nav-text">List of Internships</span>
+                <span class="nav-text">Liste des stages</span>
               </a>
             </li>
             <li>
               <a routerLink="/listeoffers">
-                <span class="nav-text">List of Offers</span>
+                <span class="nav-text">Liste des offres</span>
               </a>
             </li>
             <li>
               <a routerLink="/listrequests">
-                <span class="nav-text">List of Requests</span>
+                <span class="nav-text">Liste des Candidatures </span>
               </a>
             </li>
           </ul>

@@ -13,8 +13,11 @@ public class InternshipRequest {
     private String title;
     private String description;
     private String cvPath; // Field to store the file path
-    private String email;   // New field to store the user's email
+    private String email;   // Field to store the user's email
     private Long offerId;
+
+    @Column(name = "type", nullable = false)
+    private String type;    // New field to store the request type ("spontaneous" or "normal")
 
     @OneToOne(mappedBy = "internshipRequest", cascade = CascadeType.ALL, orphanRemoval = true)
     private Internship internship;
@@ -66,6 +69,14 @@ public class InternshipRequest {
 
     public void setOfferId(Long offerId) {
         this.offerId = offerId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Internship getInternship() {

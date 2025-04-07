@@ -24,8 +24,7 @@ export class AddInternshipRequestComponent implements OnInit {
     private router: Router
   ) {
     this.requestForm = this.fb.group({
-      offerId: [null, Validators.required],
-      title: ['', Validators.required],
+      offerId: [null], // Optional for spontaneous applications
       description: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       cv: [null, Validators.required]
@@ -81,11 +80,22 @@ export class AddInternshipRequestComponent implements OnInit {
     if (this.requestForm.valid && this.cvFile) {
       this.isSubmitting = true;
       const formValue = this.requestForm.value;
+
+      // Determine the title based on whether an offer is selected
+      let title: string;
+      const selectedOffer = this.internshipOffers.find(offer => offer.id === Number(formValue.offerId));
+      if (selectedOffer) {
+        title = `Application for ${selectedOffer.title}`;
+      } else {
+        title = 'Spontaneous Application';
+      }
+
       const internshipRequest: InternshipRequest = {
-        title: formValue.title,
+        title: title, // Set the title dynamically
         description: formValue.description,
         email: formValue.email,
-        cv: this.cvFile
+        cv: this.cvFile,
+        type: 'spontaneous' // Set type to spontaneous
       };
       console.log('Submitting request:', internshipRequest, 'for offerId:', formValue.offerId);
       console.log('CV to upload:', this.cvFile ? this.cvFile.name : 'No CV');

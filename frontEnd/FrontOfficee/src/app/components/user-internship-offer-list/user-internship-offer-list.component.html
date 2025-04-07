@@ -1,0 +1,134 @@
+<div class="content-body">
+    <h2 class="text-center my-4">Internship Offers ({{ filteredOffers.length }})</h2>
+  
+    <!-- Search and Filter Inputs -->
+    <div class="container mb-4">
+      <div class="row justify-content-center align-items-center">
+        <div class="col-md-6 col-sm-12 mb-2 mb-md-0">
+          <div class="search-bar-container">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" class="form-control search-input" placeholder="search here..." 
+                   [(ngModel)]="searchQuery" (input)="onSearch()">
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-12 d-flex align-items-center">
+          <select class="form-control location-filter me-2" [(ngModel)]="selectedLocation" (change)="onLocationChange()">
+            <option *ngFor="let location of locations" [value]="location">{{ location }}</option>
+          </select>
+          <button class="clear-filters-btn" (click)="clearFilters()" title="Clear Filters">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Message if no internship offers are found -->
+    <div *ngIf="filteredOffers.length === 0" class="alert alert-warning text-center mt-3">
+      No internship offers found.
+    </div>
+  
+    <!-- List of offers -->
+    <div class="container">
+      <div class="offer-list">
+        <div *ngFor="let offer of paginatedOffers" class="offer-item border p-3 mb-3 rounded">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h5 class="offer-title mb-1">{{ offer.title }}</h5>
+              <p class="offer-description mb-2">{{ offer.description | slice:0:100 }}{{ offer.description.length > 100 ? '...' : '' }}</p>
+              <div class="d-flex align-items-center mb-1">
+                <i class="bi bi-building me-2"></i>
+                <span class="offer-company">{{ offer.company || 'Unknown Company' }}</span>
+              </div>
+              <div class="d-flex align-items-center">
+                <i class="bi bi-geo-alt me-2"></i>
+                <span class="offer-location">{{ offer.location || 'Unknown Location' }}</span>
+              </div>
+              <div class="d-flex align-items-center">
+                <i class="bi bi-calendar me-2"></i>
+                <span class="offer-date">{{ offer.datePosted ? (offer.datePosted | date:'dd/MM/yyyy') : 'Unknown Date' }}</span>
+              </div>
+            </div>
+            <div class="text-end">
+              <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewOfferDetailsModal"
+                      (click)="viewDetails(offer)">
+                Voir Plus
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Pagination Controls -->
+      <div class="pagination-container d-flex justify-content-center mt-4" *ngIf="filteredOffers.length > 0">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage - 1)">Previous</a>
+            </li>
+            <li class="page-item" *ngFor="let page of getPages()" [class.active]="page === currentPage">
+              <a class="page-link" href="javascript:void(0)" (click)="goToPage(page)">{{ page }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage + 1)">Next</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  
+    <!-- Modal for viewing offer details -->
+    <div class="modal fade" id="viewOfferDetailsModal" tabindex="-1" aria-labelledby="viewOfferDetailsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="viewOfferDetailsModalLabel">Internship Offer Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" *ngIf="selectedOffer">
+            <p><strong>Title:</strong> {{ selectedOffer.title }}</p>
+            <p><strong>Description:</strong> {{ selectedOffer.description }}</p>
+            <p><strong>Company:</strong> {{ selectedOffer.company || 'Unknown Company' }}</p>
+            <p><strong>Location:</strong> {{ selectedOffer.location || 'Unknown Location' }}</p>
+            <p><strong>Date Posted:</strong> {{ selectedOffer.datePosted ? (selectedOffer.datePosted | date:'dd/MM/yyyy') : 'Unknown Date' }}</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#applyOfferModal">Postuler</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Modal for applying to the offer -->
+    <div class="modal fade" id="applyOfferModal" tabindex="-1" aria-labelledby="applyOfferModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="applyOfferModalLabel">Apply for Internship Offer</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form #applyForm="ngForm" (ngSubmit)="submitApplication()">
+              <div class="form-group mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" [(ngModel)]="applicationForm.email" required>
+                <div *ngIf="applyForm.controls['email']?.invalid && applyForm.controls['email']?.touched" class="text-danger">
+                  Please enter a valid email address.
+                </div>
+              </div>
+              <div class="form-group mb-3">
+                <label for="cv" class="form-label">Upload CV</label>
+                <input type="file" class="form-control" id="cv" name="cv" (change)="onFileSelected($event)" accept=".pdf,.doc,.docx" required>
+                <div *ngIf="applyForm.controls['cv']?.invalid && applyForm.controls['cv']?.touched" class="text-danger">
+                  Please upload your CV.
+                </div>
+              </div>
+              <div class="form-group text-end">
+                <button type="submit" class="btn btn-primary" [disabled]="applyForm.invalid">Enregistrer</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

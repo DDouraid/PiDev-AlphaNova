@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; // Add this
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
@@ -16,6 +17,8 @@ import { AddInternshipRequestComponent } from './components/add-internship-reque
 import { InternshipOfferListComponent } from './components/internship-offer-list/internship-offer-list.component';
 import { InternshipRequestListComponent } from './components/internship-request-list/internship-request-list.component';
 import { UserInternshipOfferListComponent } from './components/user-internship-offer-list/user-internship-offer-list.component';
+import { NotificationComponent } from './components/notification/notification.component';
+import { OfferDetailsComponent } from './components/offer-details/offer-details.component';
 
 @NgModule({
   declarations: [
@@ -27,12 +30,15 @@ import { UserInternshipOfferListComponent } from './components/user-internship-o
     AddInternshipRequestComponent,
     InternshipOfferListComponent,
     InternshipRequestListComponent,
-    UserInternshipOfferListComponent
+    UserInternshipOfferListComponent,
+    NotificationComponent,
+    OfferDetailsComponent
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule, // Required for ngx-toastr animations
     HttpClientModule,
-    FormsModule, // Keep for other components using template-driven forms
+    FormsModule,
     ReactiveFormsModule,
     AppRoutingModule,
     ToastrModule.forRoot({
@@ -40,6 +46,7 @@ import { UserInternshipOfferListComponent } from './components/user-internship-o
       timeOut: 3000,
       closeButton: true,
       progressBar: true,
+      preventDuplicates: true // Optional: prevents duplicate toasts
     })
   ],
   providers: [

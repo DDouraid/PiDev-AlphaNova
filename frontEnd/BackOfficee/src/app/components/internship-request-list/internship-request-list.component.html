@@ -1,21 +1,45 @@
 <div class="content-body">
-  <h2 class="text-center my-4">Internship Requests</h2>
+  <h2 class="text-center my-4">Candidature ({{ filteredRequests.length }})</h2>
 
-  <div class="container-fluid">
+  <!-- Filter Inputs -->
+  <div class="container mb-4">
+    <div class="row justify-content-center align-items-center">
+      <div class="col-md-3 col-sm-12 d-flex align-items-center">
+        <select class="form-control type-filter me-2" [(ngModel)]="selectedType" (change)="onTypeChange()">
+          <option *ngFor="let type of types" [value]="type">{{ type === 'All' ? 'All Types' : type }}</option>
+        </select>
+        <button class="clear-filters-btn" (click)="clearFilters()" title="Clear Filters">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message if no internship requests are found -->
+  <div *ngIf="filteredRequests.length === 0" class="alert alert-warning text-center mt-3">
+    No internship requests found.
+  </div>
+
+  <!-- List of requests -->
+  <div class="container" *ngIf="filteredRequests.length > 0">
     <div class="table-responsive">
       <table class="table custom-table table-hover table-bordered text-center align-middle shadow-sm rounded">
         <thead class="table-header">
           <tr>
             <th>Title</th>
             <th>Description</th>
+            <th>Email</th>
             <th>CV</th>
+            <th>Type</th>
             <th>Actions</th>
+            <th>Accept/Reject</th> <!-- New column -->
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let request of internshipRequests">
+          <tr *ngFor="let request of paginatedRequests">
             <td class="text-truncate" style="max-width: 300px; width: 300px;">{{ request.title }}</td>
             <td class="text-truncate" style="max-width: 400px; width: 400px;">{{ request.description }}</td>
+            <td>{{ request.email || 'N/A' }}</td>
             <td style="width: 150px;">
               <a
                 *ngIf="request.cvPath"
@@ -28,6 +52,7 @@
               </a>
               <span *ngIf="!request.cvPath" class="text-muted">No CV</span>
             </td>
+            <td>{{ request.type }}</td>
             <td style="width: 150px;">
               <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal"
                       [attr.data-bs-target]="'#updateInternshipRequestModal' + request.id"
@@ -40,15 +65,39 @@
                 <i class="bi bi-trash"></i>
               </button>
             </td>
+            <td style="width: 150px;">
+              <button class="btn btn-success btn-sm me-2" data-bs-toggle="modal"
+                      [attr.data-bs-target]="'#acceptInternshipRequestModal' + request.id"
+                      (click)="selectInternshipRequestForAccept(request)"
+                      title="Accept">
+                <i class="bi bi-check-circle"></i>
+              </button>
+              <button class="btn btn-danger btn-sm" (click)="rejectInternshipRequest(request)"
+                      title="Reject">
+                <i class="bi bi-x-circle"></i>
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
-  </div>
 
-  <!-- Message if no internship requests are found -->
-  <div *ngIf="internshipRequests.length === 0" class="alert alert-warning text-center mt-3">
-    No internship requests found.
+    <!-- Pagination Controls -->
+    <div class="pagination-container d-flex justify-content-center mt-4">
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage - 1)">Previous</a>
+          </li>
+          <li class="page-item" *ngFor="let page of getPages()" [class.active]="page === currentPage">
+            <a class="page-link" href="javascript:void(0)" (click)="goToPage(page)">{{ page }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage + 1)">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
   </div>
 
   <!-- Update Internship Request Modal -->
@@ -72,6 +121,45 @@
               </div>
               <div class="form-group">
                 <button type="submit" class="btn btn-primary" [disabled]="!updateRequestForm.valid" data-bs-dismiss="modal">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accept Internship Request Modal -->
+    <div class="modal fade" [id]="'acceptInternshipRequestModal' + request.id" tabindex="-1" aria-labelledby="acceptRequestModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="acceptRequestModalLabel">Accept Internship Request</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form #acceptRequestForm="ngForm" (ngSubmit)="acceptRequestForm.valid && acceptInternshipRequest()">
+              <div class="form-group">
+                <label class="text-black font-w500">Title</label>
+                <input [(ngModel)]="selectedInternshipRequestForAccept.title" name="acceptTitle" class="form-control" disabled>
+              </div>
+              <div class="form-group">
+                <label class="text-black font-w500">Description</label>
+                <input [(ngModel)]="selectedInternshipRequestForAccept.description" name="acceptDescription" class="form-control" disabled>
+              </div>
+              <div class="form-group">
+                <label class="text-black font-w500">Start Date</label>
+                <input [(ngModel)]="acceptForm.startDate" name="startDate" class="form-control" type="date" required disabled>
+              </div>
+              <div class="form-group">
+                <label class="text-black font-w500">End Date</label>
+                <input [(ngModel)]="acceptForm.endDate" name="endDate" class="form-control" type="date" required>
+              </div>
+              <div class="form-group">
+                <label class="text-black font-w500">Status</label>
+                <input [(ngModel)]="acceptForm.status" name="status" class="form-control" value="IN_PROGRESS" disabled>
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary" [disabled]="!acceptRequestForm.valid" data-bs-dismiss="modal">Save Changes</button>
               </div>
             </form>
           </div>

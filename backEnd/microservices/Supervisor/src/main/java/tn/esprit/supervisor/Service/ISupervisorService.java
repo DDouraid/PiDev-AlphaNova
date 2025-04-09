@@ -1,7 +1,9 @@
 package tn.esprit.supervisor.Service;
 
+import com.google.zxing.WriterException;
 import tn.esprit.supervisor.Entity.Supervisor;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ISupervisorService  {

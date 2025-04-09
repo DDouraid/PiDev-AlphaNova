@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/backEnd/microservices/candidat/pom.xml" />
         <option value="$PROJECT_DIR$/backEnd/microservices/Supervisor/pom.xml" />
         <option value="$PROJECT_DIR$/backEnd/microservices/Event/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/Notification/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

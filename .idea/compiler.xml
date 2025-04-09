@@ -11,6 +11,7 @@
         <module name="Event" />
         <module name="eureka" />
         <module name="gateway" />
+        <module name="Notification" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -20,6 +21,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="Event" options="-parameters" />
+      <module name="Notification" options="-parameters" />
       <module name="Supervisor" options="-parameters" />
       <module name="candidat" options="-parameters" />
       <module name="eureka" options="-parameters" />

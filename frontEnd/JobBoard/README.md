@@ -1,27 +1,82 @@
-# JobBoard
+<<<<<<< HEAD
+# AlphaNova 🚀📋
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.15.
+## Intelligent Internship Platform 💼🌐
 
-## Development server
+### Project Overview 🔍
+An intelligent application designed to revolutionize internship management at ESPRIT, focusing on seamless and efficient internship processes.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+### Key Features 🌟
+- PFE (End-of-Study Project) Internship Management 📊
+- Summer Internship Processing 🌞
+- Internship Offers Recommendation System 🤝
+- Corporate Networking Platform 🏢
 
-## Code scaffolding
+### Main Objectives 🎯
+- Streamline internship workflow
+- Enhance student-company connections
+- Provide intelligent matching of internship opportunities
+- Facilitate comprehensive internship tracking
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Technologies 💻
+- Backend: SpringBoot
+- Frontend: Angular
+- Machine Learning: Python
 
-## Build
+### Installation 🔧
+```bash
+# Clone the repository
+git clone https://github.com/BoussaidiBadii/PiDev_AlphaNova
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+# Install dependencies
+npm install / mvn install
 
-## Running unit tests
+# Run the application
+npm start / mvn spring-boot:run
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Contributors 👥
+ - Ayoub Gombra (ayoub.gombra@esprit.tn)
+ - Badii Boussaidi (badii.boussaidi@esprit.tn)
+ - Douraid Dridi (douraid.dridi@esprit.tn)
+ - Leila Youssfi (leila.youssfi@esprit.tn)
+ - Malek Gharbi (malek.gharbi@esprit.tn)
+ - Kais berrhouma (Kais.berrehouma@esprit.tn)
+ - Med Amine Rahmouni (Mohamedamine.rahmouni@esprit.tn)
 
-## Running end-to-end tests
+### Contact 📬
+- Project Maintainer: [nadine.mili@esprit.tn]
+- ESPRIT Internship Service 🏫
+=======
+# BackOffice Angular Project
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Clone the Repository
+To get started with the project, first, clone the `Backoffice` branch from the GitHub repository:
 
-## Further help
+```sh
+git clone -b Backoffice https://github.com/BoussaidiBadii/PiDev_AlphaNova.git
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Navigate into the project folder:
+
+```sh
+cd PiDev_AlphaNova
+```
+
+## Install Dependencies
+Ensure you have [Node.js](https://nodejs.org/) installed. Then, install the required dependencies:
+
+```sh
+npm install
+```
+
+## Run the Development Server
+To start the Angular development server, run:
+
+```sh
+ng serve
+```
+
+By default, the app will be available at: [http://localhost:4200](http://localhost:4200)
+>>>>>>> Backoffice
+

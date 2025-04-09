@@ -1,20 +1,14 @@
 package tn.esprit.event.Entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Date;
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
+
 @Entity
 
 public class Event {
@@ -24,9 +18,59 @@ public class Event {
     private Integer idEvent ;
     private String Title;
     private String Description;
+    @Temporal(TemporalType.DATE)
     private Date date ;
     private  String Location;
 
 
+    public Event() {
+    }
 
+    public Event(Integer idEvent, String title, String description, Date date, String location) {
+        this.idEvent = idEvent;
+        Title = title;
+        Description = description;
+        this.date = date;
+        Location = location;
+    }
+
+    public Integer getIdEvent() {
+        return idEvent;
+    }
+
+    public void setIdEvent(Integer idEvent) {
+        this.idEvent = idEvent;
+    }
+
+    public String getTitle() {
+        return Title;
+    }
+
+    public void setTitle(String title) {
+        Title = title;
+    }
+
+    public String getDescription() {
+        return Description;
+    }
+
+    public void setDescription(String description) {
+        Description = description;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public String getLocation() {
+        return Location;
+    }
+
+    public void setLocation(String location) {
+        Location = location;
+    }
 }

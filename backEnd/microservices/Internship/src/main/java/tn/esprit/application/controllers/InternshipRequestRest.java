@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.application.entities.InternshipRequest;
+import tn.esprit.application.entities.RequestStatus;
 import tn.esprit.application.services.InternshipRequestServ;
 
 import java.nio.file.Files;
@@ -28,7 +29,6 @@ public class InternshipRequestRest {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    // Get all internship requests
     @GetMapping
     public ResponseEntity<List<InternshipRequest>> getAllInternshipRequests() {
         try {
@@ -42,7 +42,6 @@ public class InternshipRequestRest {
         }
     }
 
-    // Get internship request by ID
     @GetMapping("/{id}")
     public ResponseEntity<InternshipRequest> getInternshipRequestById(@PathVariable Long id) {
         try {
@@ -62,7 +61,6 @@ public class InternshipRequestRest {
         }
     }
 
-    // Get all requests by offer ID
     @GetMapping("/by-offer/{offerId}")
     public ResponseEntity<List<InternshipRequest>> getRequestsByOfferId(@PathVariable Long offerId) {
         try {
@@ -76,7 +74,6 @@ public class InternshipRequestRest {
         }
     }
 
-    // Create an internship request with offerId (multipart form data)
     @PostMapping("/{offerId}")
     public ResponseEntity<InternshipRequest> createInternshipRequestWithOffer(
             @PathVariable Long offerId,
@@ -90,7 +87,6 @@ public class InternshipRequestRest {
             System.out.println("CV received: " + (cv != null ? cv.getOriginalFilename() : "No CV uploaded"));
             System.out.println("Type: " + type);
 
-            // Validate the type
             if (!type.equals("normal") && !type.equals("spontaneous")) {
                 throw new IllegalArgumentException("Invalid type. Must be 'normal' or 'spontaneous'.");
             }
@@ -99,7 +95,7 @@ public class InternshipRequestRest {
             request.setTitle(title);
             request.setDescription(description);
             request.setEmail(email);
-            request.setType(type); // Set the type from the request
+            request.setType(type);
 
             if (cv != null && !cv.isEmpty()) {
                 System.out.println("CV is not null and not empty. Original filename: " + cv.getOriginalFilename());
@@ -129,7 +125,6 @@ public class InternshipRequestRest {
         }
     }
 
-    // Create an internship request without offerId (multipart form data)
     @PostMapping
     public ResponseEntity<InternshipRequest> createInternshipRequest(
             @RequestParam("title") String title,
@@ -142,7 +137,6 @@ public class InternshipRequestRest {
             System.out.println("CV received: " + (cv != null ? cv.getOriginalFilename() : "No CV uploaded"));
             System.out.println("Type: " + type);
 
-            // Validate the type
             if (!type.equals("normal") && !type.equals("spontaneous")) {
                 throw new IllegalArgumentException("Invalid type. Must be 'normal' or 'spontaneous'.");
             }
@@ -151,7 +145,7 @@ public class InternshipRequestRest {
             request.setTitle(title);
             request.setDescription(description);
             request.setEmail(email);
-            request.setType(type); // Set the type from the request
+            request.setType(type);
 
             if (cv != null && !cv.isEmpty()) {
                 System.out.println("CV is not null and not empty. Original filename: " + cv.getOriginalFilename());
@@ -181,7 +175,6 @@ public class InternshipRequestRest {
         }
     }
 
-    // Update an internship request (multipart form data to allow CV updates)
     @PutMapping("/{id}")
     public ResponseEntity<InternshipRequest> updateInternshipRequest(
             @PathVariable Long id,
@@ -189,9 +182,9 @@ public class InternshipRequestRest {
             @RequestParam("description") String description,
             @RequestParam("email") String email,
             @RequestParam("type") String type,
+            @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "cv", required = false) MultipartFile cv) {
         try {
-            // Validate the type
             if (!type.equals("normal") && !type.equals("spontaneous")) {
                 throw new IllegalArgumentException("Invalid type. Must be 'normal' or 'spontaneous'.");
             }
@@ -202,7 +195,10 @@ public class InternshipRequestRest {
             existingRequest.setTitle(title);
             existingRequest.setDescription(description);
             existingRequest.setEmail(email);
-            existingRequest.setType(type); // Update the type field
+            existingRequest.setType(type);
+            if (status != null) {
+                existingRequest.setStatus(RequestStatus.valueOf(status));
+            }
 
             if (cv != null && !cv.isEmpty()) {
                 validateFile(cv);
@@ -231,7 +227,25 @@ public class InternshipRequestRest {
         }
     }
 
-    // Delete an internship request
+    @PutMapping("/{id}/status")
+    public ResponseEntity<InternshipRequest> updateInternshipRequestStatus(
+            @PathVariable Long id,
+            @RequestParam("status") String status) {
+        try {
+            RequestStatus requestStatus = RequestStatus.valueOf(status);
+            InternshipRequest updatedRequest = internshipRequestService.updateStatus(id, requestStatus);
+            System.out.println("Updated status of Internship Request with ID: " + id + " to " + status);
+            return new ResponseEntity<>(updatedRequest, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Invalid status value: " + e.getMessage());
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            System.err.println("Error updating status of internship request: " + e.getMessage());
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInternshipRequest(@PathVariable Long id) {
         try {
@@ -258,7 +272,6 @@ public class InternshipRequestRest {
         }
     }
 
-    // Download CV file
     @GetMapping("/cv/{fileName}")
     public ResponseEntity<Resource> downloadCv(@PathVariable String fileName) {
         try {
@@ -291,7 +304,7 @@ public class InternshipRequestRest {
             )) {
                 throw new IllegalArgumentException("Invalid file type. Only PDF, DOC, and DOCX are allowed.");
             }
-            if (file.getSize() > 5 * 1024 * 1024) { // 5MB
+            if (file.getSize() > 5 * 1024 * 1024) {
                 throw new IllegalArgumentException("File size exceeds 5MB.");
             }
         }

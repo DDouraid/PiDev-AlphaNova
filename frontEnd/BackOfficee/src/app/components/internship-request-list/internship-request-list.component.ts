@@ -12,14 +12,19 @@ export class InternshipRequestListComponent implements OnInit {
   internshipRequests: InternshipRequest[] = [];
   filteredRequests: InternshipRequest[] = [];
   paginatedRequests: InternshipRequest[] = [];
-  selectedInternshipRequest: InternshipRequest = {} as InternshipRequest;
-  selectedInternshipRequestForAccept: InternshipRequest = {} as InternshipRequest;
-  acceptForm: { startDate?: string; endDate?: string; status: string } = { status: 'IN_PROGRESS' };
+  selectedInternshipRequest: InternshipRequest | null = null;
+  selectedInternshipRequestForAccept: InternshipRequest | null = null;
+  acceptForm: { startDate: string; endDate?: string; status: string } = {
+    startDate: new Date().toISOString().split('T')[0],
+    status: 'IN_PROGRESS'
+  };
   types: string[] = ['All', 'spontaneous', 'normal'];
   selectedType: string = 'All';
   currentPage: number = 1;
   pageSize: number = 5;
   totalPages: number = 1;
+  isLoading: boolean = false;
+  downloadingCv: { [key: string]: boolean } = {};
 
   constructor(
     private internshipRequestService: InternshipRequestService,
@@ -31,6 +36,7 @@ export class InternshipRequestListComponent implements OnInit {
   }
 
   loadInternshipRequests(): void {
+    this.isLoading = true;
     this.internshipRequestService.getAllInternshipRequests().subscribe({
       next: (requests) => {
         this.internshipRequests = requests;
@@ -41,6 +47,9 @@ export class InternshipRequestListComponent implements OnInit {
       error: (err) => {
         console.error('Error fetching internship requests:', err);
         window.alert('Failed to load internship requests. Please try again.');
+      },
+      complete: () => {
+        this.isLoading = false;
       }
     });
   }
@@ -48,14 +57,16 @@ export class InternshipRequestListComponent implements OnInit {
   applyFilters(): void {
     this.filteredRequests = this.internshipRequests.filter(request => {
       const matchesType = this.selectedType === 'All' || request.type === this.selectedType;
-      return matchesType;
+      const matchesStatus = request.status === 'PENDING' || !request.status;
+      return matchesType && matchesStatus;
     });
+    this.currentPage = 1;
     this.updatePagination();
   }
 
   updatePagination(): void {
     this.totalPages = Math.ceil(this.filteredRequests.length / this.pageSize);
-    this.currentPage = 1;
+    this.currentPage = Math.min(this.currentPage, this.totalPages || 1);
     this.paginate();
   }
 
@@ -73,7 +84,16 @@ export class InternshipRequestListComponent implements OnInit {
   }
 
   getPages(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    const maxVisiblePages = 5;
+    const half = Math.floor(maxVisiblePages / 2);
+    let startPage = Math.max(1, this.currentPage - half);
+    let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
   }
 
   onTypeChange(): void {
@@ -86,12 +106,17 @@ export class InternshipRequestListComponent implements OnInit {
   }
 
   downloadCv(fileName: string): void {
+    if (!fileName) {
+      window.alert('No CV available to download.');
+      return;
+    }
+    this.downloadingCv[fileName] = true;
     this.internshipRequestService.downloadCv(fileName).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = fileName;
+        a.download = fileName.split('_').slice(1).join('_');
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -101,6 +126,9 @@ export class InternshipRequestListComponent implements OnInit {
       error: (err) => {
         console.error('Error downloading CV:', err);
         window.alert('Failed to download CV. Please try again.');
+      },
+      complete: () => {
+        this.downloadingCv[fileName] = false;
       }
     });
   }
@@ -111,15 +139,42 @@ export class InternshipRequestListComponent implements OnInit {
 
   selectInternshipRequestForAccept(request: InternshipRequest): void {
     this.selectedInternshipRequestForAccept = { ...request };
-    // Set default values for the accept form
     this.acceptForm = {
-      startDate: request.internship?.startDate || new Date().toISOString().split('T')[0], // Use existing start date or current date
-      endDate: '',
+      startDate: request.internship?.startDate || new Date().toISOString().split('T')[0],
+      endDate: request.internship?.endDate || undefined,
       status: 'IN_PROGRESS'
     };
   }
 
+  onFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (!allowedTypes.includes(file.type)) {
+        window.alert('Please upload a PDF, DOC, or DOCX file.');
+        input.value = '';
+        return;
+      }
+      if (file.size > maxSize) {
+        window.alert('File size exceeds 5MB. Please upload a smaller file.');
+        input.value = '';
+        return;
+      }
+      if (this.selectedInternshipRequest) {
+        this.selectedInternshipRequest.cv = file;
+      }
+    }
+  }
+
   updateInternshipRequest(): void {
+    if (!this.selectedInternshipRequest?.id) {
+      window.alert('No internship request selected for update.');
+      return;
+    }
+
+    this.isLoading = true;
     this.internshipRequestService.updateInternshipRequest(this.selectedInternshipRequest).subscribe({
       next: (updatedRequest) => {
         const index = this.internshipRequests.findIndex(r => r.id === updatedRequest.id);
@@ -133,50 +188,60 @@ export class InternshipRequestListComponent implements OnInit {
       error: (err) => {
         console.error('Error updating internship request:', err);
         window.alert('Failed to update internship request. Please try again.');
+      },
+      complete: () => {
+        this.isLoading = false;
+        this.selectedInternshipRequest = null;
       }
     });
   }
 
   acceptInternshipRequest(): void {
-    if (!this.selectedInternshipRequestForAccept.internship?.id) {
+    if (!this.selectedInternshipRequestForAccept?.internship?.id) {
       window.alert('No associated internship found for this request.');
       return;
     }
 
     const internshipId = this.selectedInternshipRequestForAccept.internship.id;
-    const requestId = this.selectedInternshipRequestForAccept.id;
+    const requestId = this.selectedInternshipRequestForAccept.id!;
     const endDate = this.acceptForm.endDate || null;
     const status = 'IN_PROGRESS';
 
-    // First, update the internship status and end date
+    this.isLoading = true;
     this.internshipService.updateStatusAndEndDate(internshipId, status, endDate).subscribe({
       next: (updatedInternship) => {
         console.log('Internship updated:', updatedInternship);
-        // Then, delete the internship request
-        this.internshipRequestService.deleteInternshipRequest(requestId!).subscribe({
-          next: () => {
-            console.log('Internship request deleted:', requestId);
-            window.alert('Internship request accepted and removed successfully!');
-            // Remove the request from the local list
-            this.internshipRequests = this.internshipRequests.filter(r => r.id !== requestId);
-            this.applyFilters();
+        this.internshipRequestService.updateInternshipRequestStatus(requestId, 'ACCEPTED').subscribe({
+          next: (updatedRequest) => {
+            console.log('Internship request status updated to ACCEPTED:', requestId);
+            window.alert('Internship request accepted successfully!');
+            const index = this.internshipRequests.findIndex(r => r.id === requestId);
+            if (index !== -1) {
+              this.internshipRequests[index] = updatedRequest;
+              this.applyFilters();
+            }
           },
           error: (err) => {
-            console.error('Error deleting internship request after acceptance:', err);
-            window.alert('Failed to delete internship request after acceptance. Please try again.');
+            console.error('Error updating internship request status:', err);
+            window.alert('Failed to update internship request status. Please try again.');
+          },
+          complete: () => {
+            this.isLoading = false;
+            this.selectedInternshipRequestForAccept = null;
           }
         });
       },
       error: (err) => {
         console.error('Error accepting internship request:', err);
         window.alert('Failed to accept internship request. Please try again.');
+        this.isLoading = false;
       }
     });
   }
 
   rejectInternshipRequest(request: InternshipRequest): void {
-    if (!request.internship?.id) {
-      window.alert('No associated internship found for this request.');
+    if (!request.internship?.id || !request.id) {
+      window.alert('No associated internship or request ID found for this request.');
       return;
     }
 
@@ -186,28 +251,33 @@ export class InternshipRequestListComponent implements OnInit {
       const requestId = request.id;
       const status = 'CANCELED';
 
-      // First, update the internship status
+      this.isLoading = true;
       this.internshipService.updateStatusAndEndDate(internshipId, status, null).subscribe({
         next: (updatedInternship) => {
           console.log('Internship rejected:', updatedInternship);
-          // Then, delete the internship request
-          this.internshipRequestService.deleteInternshipRequest(requestId!).subscribe({
-            next: () => {
-              console.log('Internship request deleted:', requestId);
-              window.alert('Internship request rejected and removed successfully!');
-              // Remove the request from the local list
-              this.internshipRequests = this.internshipRequests.filter(r => r.id !== requestId);
-              this.applyFilters();
+          this.internshipRequestService.updateInternshipRequestStatus(requestId, 'REJECTED').subscribe({
+            next: (updatedRequest) => {
+              console.log('Internship request status updated to REJECTED:', requestId);
+              window.alert('Internship request rejected successfully!');
+              const index = this.internshipRequests.findIndex(r => r.id === requestId);
+              if (index !== -1) {
+                this.internshipRequests[index] = updatedRequest;
+                this.applyFilters();
+              }
             },
             error: (err) => {
-              console.error('Error deleting internship request after rejection:', err);
-              window.alert('Failed to delete internship request after rejection. Please try again.');
+              console.error('Error updating internship request status:', err);
+              window.alert('Failed to update internship request status. Please try again.');
+            },
+            complete: () => {
+              this.isLoading = false;
             }
           });
         },
         error: (err) => {
           console.error('Error rejecting internship request:', err);
           window.alert('Failed to reject internship request. Please try again.');
+          this.isLoading = false;
         }
       });
     }
@@ -216,6 +286,7 @@ export class InternshipRequestListComponent implements OnInit {
   deleteInternshipRequest(id: number): void {
     const confirmDelete = confirm('Are you sure you want to delete this internship request?');
     if (confirmDelete) {
+      this.isLoading = true;
       this.internshipRequestService.deleteInternshipRequest(id).subscribe({
         next: () => {
           this.internshipRequests = this.internshipRequests.filter(r => r.id !== id);
@@ -226,6 +297,9 @@ export class InternshipRequestListComponent implements OnInit {
         error: (err) => {
           console.error('Error deleting internship request:', err);
           window.alert('Failed to delete internship request. Please try again.');
+        },
+        complete: () => {
+          this.isLoading = false;
         }
       });
     }

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Internship Request Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        h3 {
+            color: #2c3e50;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h3 th:text="${title}"></h3>
+    <p>Dear Applicant,</p>
+    <p th:utext="${message}"></p>
+    <div class="footer">
+        <p>Best regards,<br>The Internship Team</p>
+    </div>
+</div>
+</body>
+</html>

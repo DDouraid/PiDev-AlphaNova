@@ -6,6 +6,7 @@ import tn.esprit.application.entities.Internship;
 import tn.esprit.application.entities.InternshipOffer;
 import tn.esprit.application.entities.InternshipRequest;
 import tn.esprit.application.entities.InternStatus;
+import tn.esprit.application.entities.RequestStatus;
 import tn.esprit.application.repositories.InternshipOfferRepo;
 import tn.esprit.application.repositories.InternshipRepo;
 import tn.esprit.application.repositories.InternshipRequestRepo;
@@ -25,6 +26,9 @@ public class InternshipRequestServ {
 
     @Autowired
     private InternshipOfferRepo internshipOfferRepository;
+
+    @Autowired
+    private EmailSenderService emailSenderService;
 
     public List<InternshipRequest> findAll() {
         try {
@@ -68,7 +72,6 @@ public class InternshipRequestServ {
 
     public InternshipRequest save(InternshipRequest internshipRequest, Long offerId) {
         try {
-            // Validate the internship offer exists
             Optional<InternshipOffer> offerOptional = internshipOfferRepository.findById(offerId);
             if (offerOptional.isEmpty()) {
                 System.out.println("Internship offer with ID " + offerId + " not found");
@@ -77,15 +80,10 @@ public class InternshipRequestServ {
             InternshipOffer offer = offerOptional.get();
             System.out.println("Found internship offer with ID: " + offerId);
 
-            // Set the offerId on the request
             internshipRequest.setOfferId(offerId);
-            // Note: We are NOT setting the type here; it should already be set by the frontend
-
-            // Save the internship request
             InternshipRequest savedRequest = internshipRequestRepository.save(internshipRequest);
             System.out.println("Saved internship request with ID: " + savedRequest.getId() + ", cvPath: " + savedRequest.getCvPath() + ", type: " + savedRequest.getType());
 
-            // Create a new internship record linking the request and offer
             Internship internship = new Internship();
             internship.setTitle("Internship for " + internshipRequest.getTitle());
             internship.setDescription("Created from request ID " + savedRequest.getId() + " for offer ID " + offerId);
@@ -95,13 +93,10 @@ public class InternshipRequestServ {
             internship.setInternshipOffer(offer);
             internship.setInternshipRequest(savedRequest);
 
-            // Save the internship record
             internshipRepository.save(internship);
             System.out.println("Created internship for request ID: " + savedRequest.getId());
 
-            // Update the bidirectional relationship
             savedRequest.setInternship(internship);
-
             return savedRequest;
         } catch (Exception e) {
             System.err.println("Error saving internship request with offerId " + offerId + ": " + e.getMessage());
@@ -112,7 +107,6 @@ public class InternshipRequestServ {
 
     public InternshipRequest save(InternshipRequest internshipRequest) {
         try {
-            // Note: We are NOT setting the type here; it should already be set by the frontend
             InternshipRequest savedRequest = internshipRequestRepository.save(internshipRequest);
             System.out.println("Saved internship request with ID: " + savedRequest.getId() + ", cvPath: " + savedRequest.getCvPath() + ", type: " + savedRequest.getType());
             return savedRequest;
@@ -135,15 +129,63 @@ public class InternshipRequestServ {
             existingRequest.setDescription(updatedRequest.getDescription());
             existingRequest.setCvPath(updatedRequest.getCvPath());
             existingRequest.setEmail(updatedRequest.getEmail());
-            existingRequest.setType(updatedRequest.getType()); // Update the type field
+            existingRequest.setType(updatedRequest.getType());
+            existingRequest.setStatus(updatedRequest.getStatus());
 
             InternshipRequest savedRequest = internshipRequestRepository.save(existingRequest);
-            System.out.println("Updated internship request with ID: " + savedRequest.getId() + ", cvPath: " + savedRequest.getCvPath() + ", type: " + savedRequest.getType());
+            System.out.println("Updated internship request with ID: " + savedRequest.getId() + ", cvPath: " + savedRequest.getCvPath() + ", type: " + savedRequest.getType() + ", status: " + savedRequest.getStatus());
             return savedRequest;
         } catch (Exception e) {
             System.err.println("Error updating internship request with ID " + updatedRequest.getId() + ": " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Failed to update internship request", e);
+        }
+    }
+
+    public InternshipRequest updateStatus(Long id, RequestStatus status) {
+        try {
+            InternshipRequest existingRequest = internshipRequestRepository.findById(id)
+                    .orElseThrow(() -> {
+                        System.out.println("Internship request with ID " + id + " not found");
+                        return new RuntimeException("Internship request with ID " + id + " not found");
+                    });
+
+            existingRequest.setStatus(status);
+            InternshipRequest savedRequest = internshipRequestRepository.save(existingRequest);
+            System.out.println("Updated status of internship request with ID: " + savedRequest.getId() + " to " + status);
+
+            if (status == RequestStatus.ACCEPTED || status == RequestStatus.REJECTED) {
+                String email = savedRequest.getEmail();
+                if (email != null && !email.isEmpty()) {
+                    String subject = status == RequestStatus.ACCEPTED
+                            ? "Internship Request Accepted"
+                            : "Internship Request Rejected";
+                    String title = status == RequestStatus.ACCEPTED
+                            ? "Your Internship Request Has Been Accepted!"
+                            : "Your Internship Request Has Been Rejected";
+                    String message = status == RequestStatus.ACCEPTED
+                            ? "We are pleased to inform you that your internship request titled <strong>" + savedRequest.getTitle() + "</strong> has been accepted.<br>" +
+                            "Start Date: " + savedRequest.getInternship().getStartDate() + "<br>" +
+                            "End Date: " + (savedRequest.getInternship().getEndDate() != null ? savedRequest.getInternship().getEndDate() : "TBD") + "<br>" +
+                            "Please contact us for the next steps."
+                            : "We regret to inform you that your internship request titled <strong>" + savedRequest.getTitle() + "</strong> has been rejected.<br>" +
+                            "Thank you for your interest. We encourage you to apply for other opportunities.";
+                    try {
+                        emailSenderService.sendSimpleEmail(email, subject, title, message);
+                    } catch (Exception e) {
+                        System.err.println("Failed to send email for internship request ID " + id + ": " + e.getMessage());
+                        // Log the error but don't throw an exception, as the status update should still succeed
+                    }
+                } else {
+                    System.out.println("No email address found for internship request ID: " + id);
+                }
+            }
+
+            return savedRequest;
+        } catch (Exception e) {
+            System.err.println("Error updating status of internship request with ID " + id + ": " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to update status of internship request", e);
         }
     }
 

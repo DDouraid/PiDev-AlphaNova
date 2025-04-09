@@ -1,6 +1,7 @@
 package tn.esprit.application.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -16,11 +17,15 @@ public class InternshipOffer {
     private String title;
     private String description;
 
-    private String company; // Added for company name
-    private String location; // Added for location
+    private String company;
+    private String location;
 
     @Column(name = "date_Posted")
     private LocalDate datePosted;
+
+    @Column(name = "duration_in_months")
+    @JsonProperty("duration_in_months") // Ensure JSON field name matches database column
+    private Integer durationInMonths;
 
     @JsonIgnore
     @OneToMany(mappedBy = "internshipOffer", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -73,6 +78,14 @@ public class InternshipOffer {
 
     public void setDatePosted(LocalDate datePosted) {
         this.datePosted = datePosted;
+    }
+
+    public Integer getDurationInMonths() {
+        return durationInMonths;
+    }
+
+    public void setDurationInMonths(Integer durationInMonths) {
+        this.durationInMonths = durationInMonths;
     }
 
     public List<Internship> getInternships() {

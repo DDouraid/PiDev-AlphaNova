@@ -1,66 +1,73 @@
 <div class="content-body">
-    <div class="container mt-5 pt-5">
-      <!-- Back Button -->
-      <div class="mb-4">
-        <a routerLink="/user/listeoffers" class="btn btn-outline-secondary">
-          <i class="bi bi-arrow-left me-2"></i> Back to Offers
-        </a>
+  <div class="container mt-5 pt-5">
+    <!-- Back Button -->
+    <div class="mb-4">
+      <a routerLink="/user/listeoffers" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i> Back to Offers
+      </a>
+    </div>
+
+    <!-- Offer Details Card -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Internship Offer Details</h4>
       </div>
-  
-      <!-- Offer Details Card -->
-      <div class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
-          <h4 class="mb-0">Internship Offer Details</h4>
-        </div>
-        <div class="card-body" *ngIf="offer; else noOffer">
-          <div class="row">
-            <div class="col-md-12">
-              <h5 class="card-title">{{ offer.title }}</h5>
-              <p class="text-muted mb-3">
-                <i class="bi bi-building me-2"></i>{{ offer.company || 'Unknown Company' }}
-                <span class="mx-2">|</span>
-                <i class="bi bi-geo-alt me-2"></i>{{ offer.location || 'Unknown Location' }}
-                <span class="mx-2">|</span>
-                <i class="bi bi-calendar me-2"></i>{{ offer.datePosted ? (offer.datePosted | date:'dd/MM/yyyy') : 'Unknown Date' }}
-              </p>
-              <h6 class="mb-2">Description</h6>
-              <p>{{ offer.description }}</p>
-            </div>
+      <div class="card-body" *ngIf="offer; else noOffer">
+        <div class="row">
+          <div class="col-md-12">
+            <h5 class="card-title">{{ offer.title }}</h5>
+            <p class="text-muted mb-3">
+              <i class="bi bi-building me-2"></i>{{ offer.company || 'Unknown Company' }}
+              <span class="mx-2">|</span>
+              <i class="bi bi-geo-alt me-2"></i>{{ offer.location || 'Unknown Location' }}
+              <span class="mx-2">|</span>
+              <i class="bi bi-calendar me-2"></i>{{ offer.datePosted ? (offer.datePosted | date:'dd/MM/yyyy') : 'UnknownDate' }}
+              <span class="mx-2">|</span>
+              <i class="bi bi-clock me-2"></i>
+              {{ offer.durationInMonths !== null && offer.durationInMonths !== undefined ? offer.durationInMonths + '
+              months' : 'Unknown Duration' }}
+            </p>
+            <h6 class="mb-2">Description</h6>
+            <p>{{ offer.description }}</p>
           </div>
         </div>
-        <ng-template #noOffer>
-          <div class="card-body">
-            <p class="text-danger">No offer details available.</p>
-          </div>
-        </ng-template>
       </div>
-  
-      <!-- Application Form Section -->
-      <div class="card shadow-sm">
-        <div class="card-header bg-dark text-white">
-          <h4 class="mb-0">Apply for This Internship Offer</h4>
-        </div>
+      <ng-template #noOffer>
         <div class="card-body">
-          <form #applyForm="ngForm" (ngSubmit)="submitApplication()">
-            <div class="form-group mb-3">
-              <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
-              <input type="email" class="form-control" id="email" name="email" [(ngModel)]="applicationForm.email" required>
-              <div *ngIf="applyForm.controls['email']?.invalid && applyForm.controls['email']?.touched" class="text-danger">
-                Please enter a valid email address.
-              </div>
-            </div>
-            <div class="form-group mb-3">
-              <label for="cv" class="form-label">Upload CV <span class="text-danger">*</span></label>
-              <input type="file" class="form-control" id="cv" name="cv" (change)="onFileSelected($event)" accept=".pdf,.doc,.docx" required>
-              <div *ngIf="applyForm.controls['cv']?.invalid && applyForm.controls['cv']?.touched" class="text-danger">
-                Please upload your CV.
-              </div>
-            </div>
-            <div class="form-group text-end">
-              <button type="submit" class="btn btn-primary" [disabled]="applyForm.invalid">Submit Application</button>
-            </div>
-          </form>
+          <p class="text-danger">No offer details available.</p>
         </div>
+      </ng-template>
+    </div>
+
+    <!-- Application Form Section -->
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white">
+        <h4 class="mb-0">Apply for This Internship Offer</h4>
+      </div>
+      <div class="card-body">
+        <form #applyForm="ngForm" (ngSubmit)="submitApplication()">
+          <div class="form-group mb-3">
+            <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+            <input type="email" class="form-control" id="email" name="email" [(ngModel)]="applicationForm.email"
+              required>
+            <div *ngIf="applyForm.controls['email']?.invalid && applyForm.controls['email']?.touched"
+              class="text-danger">
+              Please enter a valid email address.
+            </div>
+          </div>
+          <div class="form-group mb-3">
+            <label for="cv" class="form-label">Upload CV <span class="text-danger">*</span></label>
+            <input type="file" class="form-control" id="cv" name="cv" (change)="onFileSelected($event)"
+              accept=".pdf,.doc,.docx" required>
+            <div *ngIf="applyForm.controls['cv']?.invalid && applyForm.controls['cv']?.touched" class="text-danger">
+              Please upload your CV.
+            </div>
+          </div>
+          <div class="form-group text-end">
+            <button type="submit" class="btn btn-primary" [disabled]="applyForm.invalid">Submit Application</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+</div>

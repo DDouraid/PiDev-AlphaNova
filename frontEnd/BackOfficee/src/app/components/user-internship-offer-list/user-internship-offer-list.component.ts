@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router'; // Add Router for navigation
+import { Router } from '@angular/router';
 import { InternshipOfferService } from '../../services/internship-offer.service';
 import { InternshipOffer } from '../../models/internship-offer';
 
@@ -21,7 +21,7 @@ export class UserInternshipOfferListComponent implements OnInit {
 
   constructor(
     private internshipOfferService: InternshipOfferService,
-    private router: Router // Add Router to the constructor
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -33,7 +33,10 @@ export class UserInternshipOfferListComponent implements OnInit {
       data => {
         this.internshipOffers = data.map(offer => ({
           ...offer,
-          datePosted: offer.datePosted ? new Date(offer.datePosted).toISOString() : undefined
+          datePosted: offer.datePosted ? new Date(offer.datePosted).toISOString() : undefined,
+          durationInMonths: offer.durationInMonths !== undefined && offer.durationInMonths !== null
+            ? Number(offer.durationInMonths)
+            : null
         }));
         this.filteredOffers = [...this.internshipOffers];
         this.locations = [...new Set(this.internshipOffers
@@ -61,7 +64,8 @@ export class UserInternshipOfferListComponent implements OnInit {
         offer.title.toLowerCase().includes(query) ||
         offer.description.toLowerCase().includes(query) ||
         (offer.company && offer.company.toLowerCase().includes(query)) ||
-        (offer.location && offer.location.toLowerCase().includes(query))
+        (offer.location && offer.location.toLowerCase().includes(query)) ||
+        (offer.durationInMonths !== null && offer.durationInMonths !== undefined && offer.durationInMonths.toString().includes(query))
       );
     }
 
@@ -124,7 +128,6 @@ export class UserInternshipOfferListComponent implements OnInit {
   }
 
   viewDetails(offer: InternshipOffer): void {
-    // Navigate to the offer-details page with the offer data
     this.router.navigate(['/offer-details'], {
       queryParams: { offer: JSON.stringify(offer) }
     });

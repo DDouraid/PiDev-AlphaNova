@@ -12,12 +12,16 @@ public class InternshipRequest {
 
     private String title;
     private String description;
-    private String cvPath; // Field to store the file path
-    private String email;   // Field to store the user's email
+    private String cvPath;
+    private String email;
     private Long offerId;
 
     @Column(name = "type", nullable = false)
-    private String type;    // New field to store the request type ("spontaneous" or "normal")
+    private String type;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RequestStatus status = RequestStatus.PENDING; // Default to PENDING
 
     @OneToOne(mappedBy = "internshipRequest", cascade = CascadeType.ALL, orphanRemoval = true)
     private Internship internship;
@@ -77,6 +81,14 @@ public class InternshipRequest {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public RequestStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RequestStatus status) {
+        this.status = status;
     }
 
     public Internship getInternship() {

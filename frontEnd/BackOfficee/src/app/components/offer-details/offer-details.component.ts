@@ -21,7 +21,13 @@ export class OfferDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       if (params['offer']) {
-        this.offer = JSON.parse(params['offer']);
+        const parsedOffer = JSON.parse(params['offer']);
+        this.offer = {
+          ...parsedOffer,
+          durationInMonths: parsedOffer.durationInMonths !== undefined && parsedOffer.durationInMonths !== null
+            ? Number(parsedOffer.durationInMonths)
+            : null
+        };
       }
     });
   }
@@ -71,7 +77,7 @@ export class OfferDetailsComponent implements OnInit {
       description: `User applied for the internship offer: ${this.offer.title} (ID: ${this.offer.id})\nEmail: ${this.applicationForm.email}\nCV: ${this.applicationForm.cv.name}`,
       email: this.applicationForm.email,
       cv: this.applicationForm.cv,
-      type: 'normal' // Set type to normal
+      type: 'normal'
     };
 
     this.internshipRequestService.createInternshipRequest(internshipRequest, this.offer.id).subscribe(

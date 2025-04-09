@@ -8,5 +8,6 @@ export interface InternshipRequest {
   cv?: File;
   cvPath?: string;
   type: string;
-  internship?: Internship; // Add reference to the associated Internship
+  status?: string; // Added status field (e.g., "PENDING", "ACCEPTED", "REJECTED")
+  internship?: Internship;
 }

@@ -1,4 +1,4 @@
-import { InternshipRequest } from './internship-request'; // Import the InternshipRequest model
+import { InternshipRequest } from './internship-request';
 
 export interface InternshipOffer {
   id?: number;
@@ -6,6 +6,7 @@ export interface InternshipOffer {
   description: string;
   company?: string;
   location?: string;
-  datePosted?: string; // Consider using Date if you parse dates
-  internshipRequests?: InternshipRequest[]; // Renamed from 'internships' to 'internshipRequests' for clarity
+  datePosted?: string;
+  durationInMonths?: number | null;
+  internshipRequests?: InternshipRequest[];
 }

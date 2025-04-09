@@ -16,6 +16,7 @@ export class AddInternshipRequestComponent implements OnInit {
   cvFile: File | null = null;
   isSubmitting: boolean = false;
   internshipOffers: InternshipOffer[] = [];
+  selectedDuration: number | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -46,6 +47,14 @@ export class AddInternshipRequestComponent implements OnInit {
         window.alert('Failed to load internship offers. Please try again.');
       }
     });
+  }
+
+  updateDuration(): void {
+    const offerId = this.requestForm.get('offerId')?.value;
+    const offerIdNumber = offerId ? Number(offerId) : null;
+    const selectedOffer = this.internshipOffers.find(offer => offer.id != null && offer.id === offerIdNumber);
+    this.selectedDuration = selectedOffer && selectedOffer.durationInMonths !== undefined ? selectedOffer.durationInMonths : null;
+    console.log('Selected duration:', this.selectedDuration);
   }
 
   onFileSelected(event: Event): void {
@@ -83,7 +92,8 @@ export class AddInternshipRequestComponent implements OnInit {
 
       // Determine the title based on whether an offer is selected
       let title: string;
-      const selectedOffer = this.internshipOffers.find(offer => offer.id === Number(formValue.offerId));
+      const offerIdNumber = formValue.offerId ? Number(formValue.offerId) : null;
+      const selectedOffer = this.internshipOffers.find(offer => offer.id != null && offer.id === offerIdNumber);
       if (selectedOffer) {
         title = `Application for ${selectedOffer.title}`;
       } else {
@@ -91,11 +101,11 @@ export class AddInternshipRequestComponent implements OnInit {
       }
 
       const internshipRequest: InternshipRequest = {
-        title: title, // Set the title dynamically
+        title: title,
         description: formValue.description,
         email: formValue.email,
         cv: this.cvFile,
-        type: 'spontaneous' // Set type to spontaneous
+        type: 'spontaneous'
       };
       console.log('Submitting request:', internshipRequest, 'for offerId:', formValue.offerId);
       console.log('CV to upload:', this.cvFile ? this.cvFile.name : 'No CV');
@@ -104,6 +114,7 @@ export class AddInternshipRequestComponent implements OnInit {
           console.log('Request saved:', response);
           this.requestForm.reset();
           this.cvFile = null;
+          this.selectedDuration = null;
           window.alert('Internship request created successfully!');
           this.isSubmitting = false;
           this.router.navigate(['/listrequests']);
@@ -136,6 +147,7 @@ export class AddInternshipRequestComponent implements OnInit {
   resetForm(): void {
     this.requestForm.reset();
     this.cvFile = null;
+    this.selectedDuration = null;
     this.router.navigate(['/listrequests']);
   }
 }

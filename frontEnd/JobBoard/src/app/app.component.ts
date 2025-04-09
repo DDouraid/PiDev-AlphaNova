@@ -3,13 +3,16 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { JwtResponse } from 'src/models/jwt-response';
 import { AuthService } from 'src/services/auth.service';
-
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  title(title: any) {
+    throw new Error('Method not implemented.');
+  }
   user = {
     username: '',
     email: '',
@@ -22,10 +25,11 @@ export class AppComponent implements OnInit {
   currentPageTitle = 'Home';
   currentYear: number = new Date().getFullYear();
 
-  constructor(public router: Router, private authService: AuthService) {}
+  constructor(public router: Router, private authService: AuthService,private sanitizer: DomSanitizer) {}
 
   ngOnInit(): void {
     this.authService.isLoggedIn() ? this.loadUserInfo() : this.updateTitle();
+    console.log('Token at init:', localStorage.getItem('token')); // Debug token
     this.router.events.subscribe(() => {
       this.isLoggedIn = this.authService.isLoggedIn();
       if (this.isLoggedIn) {
@@ -34,7 +38,6 @@ export class AppComponent implements OnInit {
       this.updateTitle();
     });
   }
-
   loadUserInfo(): void {
     this.authService.getCurrentUserFromServer().subscribe({
       next: (response: JwtResponse) => {
@@ -42,14 +45,22 @@ export class AppComponent implements OnInit {
         this.user.email = response.email;
         this.user.roles = response.roles || [];
         this.user.profileImage = response.profileImage || '';
-        this.user.displayImage = response.profileImage && response.profileImage.startsWith('uploads/') ? response.profileImage : 'assets/img/man (1).png';
+        this.user.displayImage = response.profileImage || 'assets/img/man (1).png';
         this.isAdmin = this.user.roles.some(role => role.toUpperCase() === 'ADMIN');
         console.log('AppComponent - User info loaded:', this.user);
-        console.log('AppComponent - Display image URL:', this.user.displayImage);
       },
       error: (err) => console.error('Error fetching user info:', err)
     });
   }
+
+  sanitizeImageUrl(url: string): SafeUrl {
+    return this.sanitizer.bypassSecurityTrustUrl(url);
+  }
+
+  // In AppComponent class
+isStudent(): boolean {
+  return this.user.roles.some(role => role.toUpperCase() === 'STUDENT');
+}
 
   updateTitle(): void {
     const path = this.router.url.split('/')[1] || 'home';

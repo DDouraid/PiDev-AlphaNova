@@ -333,3 +333,12 @@
   color: #e64428;
   text-decoration: underline;
 }
+/* frontend/src/app/components/login/login.component.css */
+.social-button.github {
+  background: #333; /* GitHub's dark gray color */
+  color: white;
+}
+
+.social-button.github:hover {
+  background: #24292e; /* Darker shade for hover */
+}

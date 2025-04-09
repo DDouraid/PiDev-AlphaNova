@@ -91,10 +91,15 @@ export class RegisterComponent implements OnInit {
     console.log('Register with Google clicked');
     window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=YOUR_GOOGLE_CLIENT_ID&redirect_uri=http://localhost:4200/auth/register-callback&scope=email%20profile';
   }
+// frontend/src/app/components/register/register.component.ts
+registerWithGitHub() {
+  this.isLoading = true;
+  const clientId = 'Ov23liyPX428Fh4qo4fW'; // Replace with your GitHub Client ID
+  const redirectUri = 'http://localhost:8088/api/auth/github-callback'; // Backend callback URL
+  const scope = 'user:email'; // Request email and basic user info
+  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}`;
 
-  registerWithGitHub() {
-    this.isLoading = true;
-    console.log('Register with GitHub clicked');
-    window.location.href = 'https://github.com/login/oauth/authorize?client_id=YOUR_GITHUB_CLIENT_ID&redirect_uri=http://localhost:4200/auth/register-callback&scope=user:email';
-  }
+  // Redirect to GitHub
+  window.location.href = githubAuthUrl;
+}
 }

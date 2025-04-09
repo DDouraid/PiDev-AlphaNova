@@ -12,6 +12,16 @@
         <module name="Gestion_Utilisateurs" />
         <module name="eureka" />
       </profile>
+      <profile name="Annotation profile for GestionMatching" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="GestionMatching" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="candidat" target="17" />
@@ -21,6 +31,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="Event" options="-parameters" />
+      <module name="GestionMatching" options="-parameters" />
       <module name="Gestion_Utilisateurs" options="-parameters" />
       <module name="Supervisor" options="-parameters" />
       <module name="candidat" options="-parameters" />

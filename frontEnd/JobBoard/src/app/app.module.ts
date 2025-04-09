@@ -14,6 +14,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { AccessDeniedComponent } from './access-denied/access-denied.component';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { MatchingComponent } from './components/matching/matching.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; // Add this
+import { CommonModule } from '@angular/common';
+
 
 @NgModule({
   declarations: [
@@ -26,15 +30,18 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
     AuthCallbackComponent,
     CustomizeProfileComponent,
     ResetPasswordComponent,
-    AccessDeniedComponent
+    AccessDeniedComponent,
+    MatchingComponent
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule, // Add this
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    NgxDatatableModule
+    NgxDatatableModule,
+    CommonModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

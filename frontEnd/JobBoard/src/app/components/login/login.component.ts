@@ -1,3 +1,4 @@
+// frontend/src/app/components/login/login.component.ts
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/services/auth.service';
@@ -27,7 +28,7 @@ export class LoginComponent implements OnInit {
 
   startSlider() {
     setInterval(() => {
-      this.currentSlide = (this.currentSlide + 1) % 3; // Assuming 3 images
+      this.currentSlide = (this.currentSlide + 1) % 3;
       const slides = document.querySelectorAll('.slide');
       slides.forEach((slide: Element, index) => {
         slide.classList.remove('active');
@@ -40,7 +41,7 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
     if (this.loginForm.invalid) {
-      this.loginForm.form.markAllAsTouched(); // Highlight all invalid fields
+      this.loginForm.form.markAllAsTouched();
       this.errorMessage = 'Please fix the form errors before submitting.';
       this.isLoading = false;
       return;
@@ -53,7 +54,7 @@ export class LoginComponent implements OnInit {
         this.errorMessage = '';
         this.isLoading = false;
         const isBlocked = this.authService.getIsBlocked();
-        if (isBlocked) { // Check if user is blocked (true or 1)
+        if (isBlocked) {
           this.errorMessage = 'Login failed: Your account has been blocked. Contact support for assistance.';
           console.warn('Account blocked detected from token:', isBlocked);
           this.successMessage = '';
@@ -84,15 +85,27 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  loginWithLinkedIn() {
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+loginWithLinkedIn() {
+  this.isLoading = true;
+  console.log('Login with LinkedIn clicked');
+  const clientId = '77ip9kskqvd40o'; // Replace with your Client ID
+  const redirectUri = 'http://localhost:5000/auth/callback';
+  const scope = 'openid profile email';
+  const linkedInAuthUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}`;
+  window.location.href = linkedInAuthUrl;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+  loginWithGitHub() {
     this.isLoading = true;
-    console.log('Login with LinkedIn clicked');
-    window.location.href = 'https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=77ip9kskqvd40o&redirect_uri=http://localhost:4200/auth/callback&scope=r_liteprofile%20r_emailaddress';
+    console.log('Login with GitHub clicked');
+    const clientId = 'Ov23liyPX428Fh4qo4fW'; // Ensure this matches your GitHub app
+    const redirectUri = 'http://localhost:8088/api/auth/github-callback'; // Must match GitHub app settings
+    const scope = 'user:email';
+    const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}`;
+    window.location.href = githubAuthUrl;
   }
 
-  loginWithGoogle() {
-    this.isLoading = true;
-    console.log('Login with Google clicked');
-    window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=YOUR_GOOGLE_CLIENT_ID&redirect_uri=YOUR_REDIRECT_URI&scope=email%20profile';
-  }
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 }

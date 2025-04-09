@@ -60,7 +60,7 @@
                     <li>
                       <div class="timeline-panel">
                         <div class="media me-2">
-                          <img alt="image" width="50" src="assets/img/man (1).png">
+                          <img alt="image" width="50"*ngIf="user.profileImage" [src]="user.profileImage">
                         </div>
                         <div class="media-body">
                           <h6 class="mb-1">Dr sultads Send you Photo</h6>
@@ -99,26 +99,33 @@
     </div>
   </div>
 
-  <!-- Sidebar (only for authenticated pages, excluding login/register) -->
-  <div class="deznav" *ngIf="isLoggedIn && !isAuthRoute()">
-    <div class="deznav-scroll">
-      <a class="add-project-sidebar btn btn-primary" href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#addProjectSidebar">+ New Project</a>
-      <ul class="metismenu" id="menu">
-        <li><a href="#" [routerLink]="['/dashboard']" [class.active]="router.isActive('/dashboard', true)">
-          <i class="flaticon-layout"></i>
-          <span class="nav-text">Dashboard</span>
-        </a></li>
-        <li><a href="#" [routerLink]="['/home']" [class.active]="router.isActive('/home', true)">
-          <i class="flaticon-monitor"></i>
-          <span class="nav-text">Home</span>
-        </a></li>
-        <li><a href="#" [routerLink]="['/profile']">
-          <i class="flaticon-user"></i>
-          <span class="nav-text">Profile</span>
-        </a></li>
-      </ul>
-    </div>
+<!-- Sidebar (only for authenticated pages, excluding login/register) -->
+<div class="deznav" *ngIf="isLoggedIn && !isAuthRoute()">
+  <div class="deznav-scroll">
+    <a class="add-project-sidebar btn btn-primary" href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#addProjectSidebar">+ New Project</a>
+    <ul class="metismenu" id="menu">
+      <li><a href="#" [routerLink]="['/dashboard']" [class.active]="router.isActive('/dashboard', true)">
+        <i class="flaticon-layout"></i>
+        <span class="nav-text">Dashboard</span>
+      </a></li>
+      <li><a href="#" [routerLink]="['/home']" [class.active]="router.isActive('/home', true)">
+        <i class="flaticon-monitor"></i>
+        <span class="nav-text">Home</span>
+      </a></li>
+      <li><a href="#" [routerLink]="['/profile']">
+        <i class="flaticon-user"></i>
+        <span class="nav-text">Profile</span>
+      </a></li>
+      <!-- Add Matching link for students only -->
+      <li *ngIf="isStudent()">
+        <a href="#" [routerLink]="['/matching']" [class.active]="router.isActive('/matching', true)">
+          <i class="fa-solid fa-heart" style="color: #ff0000;"></i>
+          <span class="nav-text">Matching</span>
+        </a>
+      </li>
+    </ul>
   </div>
+</div>
 
   <!-- Minimal header for auth routes, excluding /login, /register, and /reset-password -->
   <div class="auth-header" *ngIf="isAuthRoute() && !isFullPageAuthRoute()">

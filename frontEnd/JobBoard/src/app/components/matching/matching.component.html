@@ -1,0 +1,55 @@
+<div class="matching-container">
+  <!-- Celebration container -->
+  <div class="celebration-container" *ngIf="showCelebration" #celebrationContainer></div>
+
+  <h2 class="title">Explore Your Matches</h2>
+  <div class="matches-wrapper" *ngIf="matches.length > 0; else noMatches">
+    <div class="match-card" *ngFor="let match of matches" [@cardAnimation]="match.offerId">
+      <div class="card-header">
+        <span class="offer-id">Offer #{{ match.offerId }}</span>
+        <span class="match-score">{{ getMatchScore(match.offerId).toFixed(0) }}%</span>
+      </div>
+      <div class="card-body">
+        <div class="avatar-placeholder">
+          <i class="fa fa-user-circle"></i>
+        </div>
+        <h3>{{ match.offerDetails.title || 'Internship Opportunity' }}</h3>
+        <p class="description">
+          {{ match.offerDetails.company || 'Unknown Company' }} - {{ match.offerDetails.location || 'Unknown Location' }}
+        </p>
+        <!-- Map container under location -->
+        <div class="map-container" *ngIf="match.offerDetails.location && match.offerDetails.location !== 'Unknown Location'">
+          <div class="map-label">
+            <i class="fas fa-map-marker-alt"></i> Location Map
+          </div>
+          <div class="map-wrapper">
+            <div [id]="'map-' + match.offerId" class="map"></div>
+            <div class="map-loading" *ngIf="!maps[match.offerId]">
+              <i class="fas fa-spinner fa-spin"></i> Loading map...
+            </div>
+          </div>
+        </div>
+        <p class="description-details">
+          {{ match.offerDetails.description || 'No description available' }}
+        </p>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width]="getMatchScore(match.offerId) + '%'"></div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="btn-action accept" (click)="acceptMatch(match.offerId)">Accept</button>
+        <button class="btn-action reject" (click)="rejectMatch(match.offerId)">Reject</button>
+      </div>
+    </div>
+  </div>
+  <ng-template #noMatches>
+    <div class="no-matches" [@noMatchesAnimation]>
+      <div class="sad-face" [@sadFaceAnimation]>
+        <i class="fa fa-frown"></i>
+        <div class="tear tear-left"></div>
+        <div class="tear tear-right"></div>
+      </div>
+      <p>No matches found yet. Keep swiping!</p>
+    </div>
+  </ng-template>
+</div>

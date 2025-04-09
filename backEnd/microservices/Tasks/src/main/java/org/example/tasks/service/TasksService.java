@@ -1,5 +1,6 @@
 package org.example.tasks.service;
 
+import org.example.tasks.entities.TaskStatistics;
 import org.example.tasks.entities.Tasks;
 import org.example.tasks.repo.TasksRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,5 +37,9 @@ public class TasksService {
                     return tasksRepo.save(existingEvent);
                 })
                 .orElseThrow(() -> new RuntimeException("tasks not found with id: " + tasks.getId()));
+    }
+
+    public TaskStatistics getTaskStatistics() {
+        return tasksRepo.getTaskStatistics();
     }
 }

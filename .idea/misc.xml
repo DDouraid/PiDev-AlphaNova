@@ -4,7 +4,6 @@
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
-        <option value="$PROJECT_DIR$/backEnd/microservices/Gestion_Utilisateurs/pom.xml" />
         <option value="$PROJECT_DIR$/backEnd/microservices/Feedback/pom.xml" />
         <option value="$PROJECT_DIR$/backEnd/microservices/Tasks/pom.xml" />
         <option value="$PROJECT_DIR$/backEnd/eureka/pom.xml" />

@@ -23,7 +23,8 @@ export class ListeTasksComponent implements OnInit {
     description: '',
     startDate: new Date(),
     endDate: new Date(),
-    status: TasksStatus.TO_DO
+    status: TasksStatus.TO_DO,
+    userId: 1 // Default userId for testing (simulating user with ID 1)
   };
   isEditMode: boolean = false;
   addModalInstance: any;
@@ -55,7 +56,6 @@ export class ListeTasksComponent implements OnInit {
         this.inProgressTasks = tasks.filter(task => task.status === TasksStatus.IN_PROGRESS);
         this.doneTasks = tasks.filter(task => task.status === TasksStatus.DONE);
         this.isLoading = false;
-        // Charger les statistiques depuis le backend
         this.loadStatistics();
       },
       (error) => {
@@ -82,37 +82,28 @@ export class ListeTasksComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<Tasks[]>): void {
-  // If the task is dropped in the same container, just reorder the items
-  if (event.previousContainer === event.container) {
-    moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-  } else {
-    // Optimistically update the UI by moving the task to the new container
-    const task = event.previousContainer.data[event.previousIndex];
-    const previousContainerData = [...event.previousContainer.data]; // Backup for rollback
-    const containerData = [...event.container.data]; // Backup for rollback
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      const task = event.previousContainer.data[event.previousIndex];
+      const previousContainerData = [...event.previousContainer.data];
+      const containerData = [...event.container.data];
 
-    // Perform the transfer in the UI
-    transferArrayItem(
-      event.previousContainer.data,
-      event.container.data,
-      event.previousIndex,
-      event.currentIndex
-    );
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
 
-    // Update the task status
-    const newStatus = this.getStatusFromContainer(event.container.id);
-    task.status = newStatus;
+      const newStatus = this.getStatusFromContainer(event.container.id);
+      task.status = newStatus;
 
-    // Trigger change detection to ensure the UI updates
-    this.cdr.detectChanges();
-
-    // Update the task status on the server
-    this.updateTaskStatus(task);
+      this.cdr.detectChanges();
+      this.updateTaskStatus(task);
+    }
+    this.loadStatistics();
   }
-
-  // Update statistics after the drag-and-drop
-  this.loadStatistics();
-}
 
   private updateTaskStatus(task: Tasks): void {
     if (task.id !== undefined) {
@@ -175,7 +166,8 @@ export class ListeTasksComponent implements OnInit {
       task.description.trim() !== '' &&
       task.startDate &&
       task.endDate &&
-      this.isValidDateRange();
+      this.isValidDateRange() &&
+      !!task.userId;
   }
 
   isValidDateRange(): boolean {
@@ -196,7 +188,7 @@ export class ListeTasksComponent implements OnInit {
     }
 
     if (!this.isTaskValid(this.newTask)) {
-      this.errorMessage = 'Veuillez remplir tous les champs correctement.';
+      this.errorMessage = 'Veuillez remplir tous les champs correctement, y compris l\'ID utilisateur.';
       setTimeout(() => this.errorMessage = null, 2000);
       return;
     }
@@ -249,8 +241,8 @@ export class ListeTasksComponent implements OnInit {
       description: '',
       startDate: new Date(),
       endDate: new Date(),
-      status: TasksStatus.TO_DO
+      status: TasksStatus.TO_DO,
+      userId: 1 // Default userId
     };
   }
-
 }

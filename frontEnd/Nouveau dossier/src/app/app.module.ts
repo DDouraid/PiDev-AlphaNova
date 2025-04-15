@@ -12,6 +12,9 @@ import { ListeEventComponent } from './liste-event/liste-event.component';
 import { ListeTasksComponent } from './liste-tasks/liste-tasks.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { UserListComponent } from './user-list/user-list.component';
+import { UserTasksComponent } from './user-tasks/user-tasks.component';
+import { UserFeedbackComponent } from './user-feedback/user-feedback.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +23,10 @@ import { NgxPaginationModule } from 'ngx-pagination';
     DashboardComponent,
     ListFeedbackComponent,
     ListeEventComponent,
-    ListeTasksComponent
+    ListeTasksComponent,
+    UserListComponent,
+    UserTasksComponent,
+    UserFeedbackComponent
   ],
   imports: [
     BrowserModule,

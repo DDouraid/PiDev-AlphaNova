@@ -23,9 +23,9 @@ public class GatewayApplication {
                 .route("Tasks",
                         r -> r.path("/mic1Tasks/**")
                         .uri("lb://Tasks"))
-                .route("Feedback",
-                        r->r.path("/api/email/**")
-                        .uri("lb://Feedback")).
+                .route("User",
+                        r -> r.path("/users/**")
+                                .uri("lb://User")).
                 build();
      }
 

@@ -1,0 +1,241 @@
+:host {
+    display: block;
+    padding: 0; /* Remove padding from the host to avoid extra spacing */
+  }
+  
+  /* Wrapper to account for the sidebar */
+  .main-content {
+    margin-left: 250px; /* Adjust this value based on the actual sidebar width */
+    padding: 20px;
+    box-sizing: border-box;
+    width: calc(100% - 250px); /* Ensure the content fits within the remaining space */
+  }
+  
+  .kanban-container {
+    max-width: 100%; /* Ensure it fits within the available space */
+    margin: 0 auto;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+  
+  /* Header container for the title and Add Task button */
+  .header-container {
+    flex-wrap: wrap; /* Allow wrapping if the button doesn't fit */
+    gap: 10px; /* Add spacing between elements */
+  }
+  
+  .add-task-btn {
+    flex-shrink: 0; /* Prevent the button from shrinking */
+    white-space: nowrap; /* Prevent text wrapping */
+  }
+  
+  .stats-container {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  }
+  
+  .stats-container h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+  
+  .kanban-board {
+    display: flex;
+    gap: 20px; /* Reduced gap for better fit */
+    padding: 15px 0;
+    overflow-x: auto; /* Allow horizontal scrolling on smaller screens */
+    flex-wrap: nowrap; /* Prevent wrapping unless specified in media queries */
+  }
+  
+  .kanban-column {
+    flex: 1;
+    min-width: 250px; /* Reduced min-width for better fit */
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .column-header {
+    padding: 15px;
+    border-radius: 12px 12px 0 0;
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-align: center;
+    margin-bottom: 0;
+  }
+  
+  .task-list {
+    padding: 15px;
+    min-height: 300px;
+    max-height: 65vh;
+    overflow-y: auto;
+  }
+  
+  .task-card {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #007bff;
+    transition: all 0.2s ease;
+  }
+  
+  .task-card.in-progress {
+    border-left-color: #17a2b8;
+  }
+  
+  .task-card.done {
+    border-left-color: #28a745;
+  }
+  
+  .task-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .task-content h5 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .task-content p {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    max-height: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .task-content small {
+    color: #95a5a6;
+    font-size: 0.8rem;
+    display: block;
+  }
+  
+  .task-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  /* Progress bar améliorée */
+  .progress {
+    height: 28px;
+    border-radius: 6px;
+    background-color: #ecf0f1;
+    margin-bottom: 15px;
+  }
+  
+  .progress-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: width 0.6s ease;
+  }
+  
+  .progress-bar.hide-text {
+    font-size: 0;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 1200px) {
+    .main-content {
+      margin-left: 200px; /* Adjust for smaller sidebar width */
+      width: calc(100% - 200px);
+    }
+  }
+  
+  @media (max-width: 992px) {
+    .main-content {
+      margin-left: 0; /* Remove sidebar margin on smaller screens */
+      width: 100%;
+    }
+  
+    .kanban-board {
+      flex-wrap: wrap;
+      overflow-x: hidden;
+    }
+    
+    .kanban-column {
+      min-width: calc(50% - 15px);
+      margin-bottom: 20px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .main-content {
+      padding: 10px;
+    }
+  
+    .kanban-column {
+      min-width: 100%;
+      margin-bottom: 20px;
+    }
+    
+    .stats-container {
+      padding: 15px;
+    }
+  
+    .header-container {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .add-task-btn {
+      width: 100%; /* Make the button full-width on small screens */
+      text-align: center;
+    }
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 20px;
+    color: #95a5a6;
+  }
+  
+  .empty-state i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  
+  .task-description {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  
+  .badges-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .stats-title {
+    color: #2c3e50;
+    border-bottom: 2px solid #f1f1f1;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .task-dates {
+    display: flex;
+    align-items: center;
+  }

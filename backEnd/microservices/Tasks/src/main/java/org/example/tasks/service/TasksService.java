@@ -25,6 +25,10 @@ public class TasksService {
         return tasksRepo.findAll();
     }
 
+    public List<Tasks> getTasksByUserId(Long userId) {
+        return tasksRepo.findByUserId(userId);
+    }
+
     public Tasks updateTasks(Tasks tasks) {
         return tasksRepo.findById(tasks.getId())
                 .map(existingEvent -> {
@@ -34,9 +38,14 @@ public class TasksService {
                     existingEvent.setStartDate(tasks.getStartDate());
                     existingEvent.setEndDate(tasks.getEndDate());
                     existingEvent.setStatus(tasks.getStatus());
+                    existingEvent.setUserId(tasks.getUserId());
                     return tasksRepo.save(existingEvent);
                 })
-                .orElseThrow(() -> new RuntimeException("tasks not found with id: " + tasks.getId()));
+                .orElseThrow(() -> new RuntimeException("Tasks not found with id: " + tasks.getId()));
+    }
+
+    public TaskStatistics getTaskStatisticsByUser(Long userId) {
+        return tasksRepo.getTaskStatisticsByUser(userId);
     }
 
     public TaskStatistics getTaskStatistics() {

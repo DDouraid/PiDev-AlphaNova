@@ -1,0 +1,46 @@
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">
+      <i class="fas fa-users me-2"></i> Liste des Utilisateurs
+    </h2>
+  
+    <!-- Indicateur de chargement -->
+    <div *ngIf="isLoading" class="text-center my-3">
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
+  
+    <!-- Message d'erreur -->
+    <div *ngIf="errorMessage" class="alert alert-danger text-center mt-3">
+      {{ errorMessage }}
+    </div>
+  
+    <!-- Liste des utilisateurs -->
+    <div class="row">
+      <div class="col-md-4 mb-3" *ngFor="let user of users">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-user me-2"></i>{{ user.name }}
+            </h5>
+            <p class="card-text">
+              <i class="fas fa-envelope me-2"></i>{{ user.email }}
+            </p>
+            <div class="d-flex justify-content-between">
+              <button class="btn btn-primary" (click)="viewTasks(user.id)">
+                <i class="fas fa-tasks me-2"></i>Voir les Tâches
+              </button>
+              <button class="btn btn-info" (click)="viewFeedback(user.id)">
+                <i class="fas fa-comment-dots me-2"></i>Voir les Feedbacks
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Message si aucun utilisateur -->
+    <div *ngIf="users.length === 0 && !isLoading" class="alert alert-warning text-center mt-3">
+      Aucun utilisateur trouvé.
+    </div>
+  </div>

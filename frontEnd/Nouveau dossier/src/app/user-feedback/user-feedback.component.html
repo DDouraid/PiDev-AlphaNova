@@ -1,0 +1,210 @@
+<div class="content-body">
+    <div class="container mt-4" style="min-height: 100vh; display: flex; flex-direction: column;">
+      <!-- Alerte de succès -->
+      <div *ngIf="successMessage"
+        class="alert alert-success d-flex align-items-center alert-dismissible fade show shadow animate_animated animate_fadeIn"
+        role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <strong>{{ successMessage }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" (click)="successMessage = null"></button>
+      </div>
+  
+      <!-- Message d'erreur -->
+      <div *ngIf="errorMessage" class="alert alert-danger text-center mt-3 animate_animated animate_fadeIn">
+        {{ errorMessage }}
+      </div>
+  
+      <!-- Titre avec bouton d'ajout -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold" style="color: #2c3e50; animation: fadeIn 1s ease-in;">
+          <i class="fas fa-comment-dots me-2"></i> Feedbacks de l'Utilisateur
+        </h2>
+        <button class="btn btn-primary btn-lg shadow-sm transition-all" data-bs-toggle="modal"
+          data-bs-target="#addFeedbackModal" (click)="prepareNewFeedback()">
+          <i class="fas fa-plus me-2"></i> Ajouter un Feedback
+        </button>
+      </div>
+  
+      <!-- Champ de recherche -->
+      <div class="input-group search-area d-lg-inline-flex d-none mb-4" style="max-width: 400px;">
+        <div class="input-group-append">
+          <span class="input-group-text"><a href="javascript:void(0)"><i class="flaticon-381-search-2"></i></a></span>
+        </div>
+        <input type="text" class="form-control shadow-sm" placeholder="Rechercher..." [(ngModel)]="searchTerm"
+          (input)="onSearch()">
+      </div>
+  
+      <!-- Indicateur de chargement -->
+      <div *ngIf="isLoading" class="text-center my-3">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+      </div>
+  
+      <!-- Liste des feedbacks -->
+      <div class="d-flex justify-content-center flex-grow-1">
+        <div class="table-container">
+          <div class="table-responsive">
+            <table class="table table-hover text-center align-middle">
+              <thead class="table-dark" style="background: linear-gradient(45deg, #2c3e50, #3498db);">
+                <tr>
+                  <th class="py-3"><i class="fas fa-hashtag me-2"></i> ID</th>
+                  <th class="py-3"><i class="fas fa-comment me-2"></i> Commentaire</th>
+                  <th class="py-3"><i class="fas fa-star me-2"></i> Note</th>
+                  <th class="py-3"><i class="fas fa-cogs me-2"></i> Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let feedback of paginatedFeedback" class="transition-all">
+                  <td class="fw-bold text-truncate" style="max-width: 100px;">{{ feedback.id }}</td>
+                  <td class="text-truncate" style="max-width: 200px;">{{ feedback.comment }}</td>
+                  <td>
+                    <span *ngFor="let star of [1, 2, 3, 4, 5]" class="me-1">
+                      <i class="fas fa-star" [ngClass]="star <= feedback.note ? 'text-warning' : 'text-muted'"
+                        [attr.aria-label]="'Étoile ' + star + (star <= feedback.note ? ' sélectionnée' : ' non sélectionnée')"></i>
+                    </span>
+                  </td>
+                  <td>
+                    <button type="button" class="btn btn-primary btn-sm shadow-sm transition-all" data-bs-toggle="modal"
+                      data-bs-target="#updateFeedbackModal" (click)="prepareEditFeedback(feedback)">
+                      <i class="fas fa-edit me-1"></i> Modifier
+                    </button>
+                    <button class="btn btn-danger btn-sm shadow-sm transition-all" (click)="deleteFeedback(feedback.id)">
+                      <i class="fas fa-trash-alt me-1"></i> Supprimer
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+  
+          <!-- Pagination directement après la table -->
+          <div class="pagination-container" *ngIf="filteredFeedback.length > 0 && !isLoading">
+            <nav>
+              <ul class="pagination">
+                <li class="page-item" [class.disabled]="currentPage === 1">
+                  <button class="page-link" (click)="changePage(currentPage - 1)">Précédent</button>
+                </li>
+                <li class="page-item" *ngFor="let page of getPageNumbers()" [class.active]="page === currentPage">
+                  <button class="page-link" (click)="changePage(page)">{{ page }}</button>
+                </li>
+                <li class="page-item" [class.disabled]="currentPage === totalPages">
+                  <button class="page-link" (click)="changePage(currentPage + 1)">Suivant</button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Message si aucun feedback n'est trouvé -->
+      <div *ngIf="filteredFeedback.length === 0 && !isLoading"
+        class="alert alert-warning text-center mt-3 animate_animated animate_fadeIn">
+        Aucun feedback trouvé pour cet utilisateur.
+      </div>
+  
+      <!-- Modal Ajouter Feedback -->
+      <div class="modal fade" id="addFeedbackModal" tabindex="-1" aria-labelledby="addFeedbackModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Ajouter un Feedback</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+              <form #addFeedbackForm="ngForm" (ngSubmit)="saveFeedback()">
+                <div class="row">
+                  <div class="col-md-12 mb-3">
+                    <label for="addComment" class="form-label fw-semibold"><i class="fas fa-comment me-2"></i>
+                      Commentaire</label>
+                    <textarea class="form-control shadow-sm" id="addComment" name="comment" rows="4"
+                      [(ngModel)]="newFeedback.comment" required #comment="ngModel"></textarea>
+                    <div *ngIf="comment.invalid && (comment.dirty || comment.touched)" class="text-danger">
+                      Le commentaire est obligatoire.
+                    </div>
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label for="addNote" class="form-label fw-semibold"><i class="fas fa-star me-2"></i> Note (1-5)</label>
+                    <div class="star-rating">
+                      <span *ngFor="let star of [1, 2, 3, 4, 5]" class="me-1">
+                        <i class="fas fa-star fa-2x" [ngClass]="star <= newFeedback.note ? 'text-warning' : 'text-muted'"
+                          (click)="newFeedback.note = star" style="cursor: pointer;"
+                          [attr.aria-label]="'Noter ' + star + ' étoile' + (star === 1 ? ' - Pauvre' : star === 2 ? ' - Passable' : star === 3 ? ' - Bon' : star === 4 ? ' - Très Bon' : ' - Excellent')"></i>
+                      </span>
+                    </div>
+                    <small *ngIf="newFeedback.note" class="d-block mt-1">
+                      {{ getNoteLabel(newFeedback.note) }}
+                    </small>
+                    <div *ngIf="!newFeedback.note && (addFeedbackForm.submitted || addFeedbackForm.touched)"
+                      class="text-danger">
+                      La note est obligatoire.
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                  <button type="submit" class="btn btn-primary" [disabled]="!addFeedbackForm.valid">
+                    Ajouter
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Modal Modifier Feedback -->
+      <div class="modal fade" id="updateFeedbackModal" tabindex="-1" aria-labelledby="updateFeedbackModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content shadow-lg rounded-3">
+            <div class="modal-header bg-primary text-white" style="background: linear-gradient(45deg, #3498db, #2980b9);">
+              <h5 class="modal-title fw-bold">
+                <i class="fas fa-edit me-2"></i> Modifier le Feedback
+              </h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+              <form #updateFeedbackForm="ngForm" (ngSubmit)="saveFeedback()">
+                <div class="row">
+                  <div class="col-md-12 mb-3">
+                    <label for="updateComment" class="form-label fw-semibold"><i class="fas fa-comment me-2"></i>
+                      Commentaire</label>
+                    <textarea class="form-control shadow-sm" id="updateComment" name="comment" rows="4"
+                      [(ngModel)]="newFeedback.comment" required #comment="ngModel"></textarea>
+                    <div *ngIf="comment.invalid && (comment.dirty || comment.touched)" class="text-danger">
+                      Le commentaire est obligatoire.
+                    </div>
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label for="updateNote" class="form-label fw-semibold"><i class="fas fa-star me-2"></i> Note (1-5)</label>
+                    <div class="star-rating">
+                      <span *ngFor="let star of [1, 2, 3, 4, 5]" class="me-1">
+                        <i class="fas fa-star fa-2x" [ngClass]="star <= newFeedback.note ? 'text-warning' : 'text-muted'"
+                          (click)="newFeedback.note = star" style="cursor: pointer;"
+                          [attr.aria-label]="'Noter ' + star + ' étoile' + (star === 1 ? ' - Pauvre' : star === 2 ? ' - Passable' : star === 3 ? ' - Bon' : star === 4 ? ' - Très Bon' : ' - Excellent')"></i>
+                      </span>
+                    </div>
+                    <small *ngIf="newFeedback.note" class="d-block mt-1">
+                      {{ getNoteLabel(newFeedback.note) }}
+                    </small>
+                    <div *ngIf="!newFeedback.note && (updateFeedbackForm.submitted || updateFeedbackForm.touched)"
+                      class="text-danger">
+                      La note est obligatoire.
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer border-0">
+                  <button type="submit" class="btn btn-success w-100 shadow transition-all"
+                    [disabled]="!updateFeedbackForm.valid">
+                    <i class="fas fa-save me-2"></i> Mettre à Jour
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

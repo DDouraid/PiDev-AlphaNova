@@ -24,14 +24,19 @@ public class FeedbackService {
         return feedbackRepo.findAll();
     }
 
+    public List<Feedback> getFeedbackByUserId(Long userId) {
+        return feedbackRepo.findByUserId(userId);
+    }
+
     public Feedback updateFeedback(Feedback feedback) {
         return feedbackRepo.findById(feedback.getId())
                 .map(existingEvent -> {
                     existingEvent.setId(feedback.getId());
                     existingEvent.setComment(feedback.getComment());
                     existingEvent.setNote(feedback.getNote());
+                    existingEvent.setUserId(feedback.getUserId());
                     return feedbackRepo.save(existingEvent);
                 })
-                .orElseThrow(() -> new RuntimeException("feedback not found with id: " + feedback.getId()));
+                .orElseThrow(() -> new RuntimeException("Feedback not found with id: " + feedback.getId()));
     }
 }

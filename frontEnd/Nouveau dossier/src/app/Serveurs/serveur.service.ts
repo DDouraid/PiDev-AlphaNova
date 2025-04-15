@@ -5,14 +5,37 @@ import { map, catchError } from 'rxjs/operators';
 import { Event } from '../core/models/Event';
 import { Feedback } from '../core/models/Feedback';
 import { Tasks, TasksStatus } from '../core/models/Tasks';
+import { User } from '../core/models/User';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ServeurService {
-  private apiEndPoint = '/api'; // Proxy base path
+  private apiEndPoint = '/api'; 
 
   constructor(private http: HttpClient) {}
+
+  /* CRUD User */
+  getAllUsers(): Observable<User[]> {
+    const url = `${this.apiEndPoint}/users/findAll`;
+    return this.http.get<User[]>(url).pipe(
+      map(response => response),
+      catchError(error => {
+        console.error('Users Fetch Error:', error);
+        throw error;
+      })
+    );
+  }
+
+  createUser(user: User): Observable<User> {
+    const url = `${this.apiEndPoint}/users/addUser`;
+    return this.http.post<User>(url, user).pipe(
+      catchError(error => {
+        console.error('User Create Error:', error);
+        throw error;
+      })
+    );
+  }
 
   /* CRUD Feedback */
   getAllFeedback(): Observable<Feedback[]> {
@@ -25,6 +48,17 @@ export class ServeurService {
       }),
       catchError(error => {
         console.error('Feedback Fetch Error:', error);
+        throw error;
+      })
+    );
+  }
+
+  getFeedbackByUser(userId: number): Observable<Feedback[]> {
+    const url = `${this.apiEndPoint}/mic1Feedback/findByUser/${userId}`;
+    return this.http.get<Feedback[]>(url).pipe(
+      map(response => response),
+      catchError(error => {
+        console.error('Feedback Fetch By User Error:', error);
         throw error;
       })
     );
@@ -81,13 +115,24 @@ export class ServeurService {
     return this.http.delete<void>(`${this.apiEndPoint}/Event/Event/delete/${id}`);
   }
 
-   /* CRUD Tasks */
+  /* CRUD Tasks */
   getAllTasks(): Observable<Tasks[]> {
-    const url = `${this.apiEndPoint}/mic1Tasks/findAll`; // Aligné avec le backend
+    const url = `${this.apiEndPoint}/mic1Tasks/findAll`;
     return this.http.get<Tasks[]>(url).pipe(
       map(response => response),
       catchError(error => {
         console.error('Tasks Fetch Error:', error);
+        throw error;
+      })
+    );
+  }
+
+  getTasksByUser(userId: number): Observable<Tasks[]> {
+    const url = `${this.apiEndPoint}/mic1Tasks/findByUser/${userId}`;
+    return this.http.get<Tasks[]>(url).pipe(
+      map(response => response),
+      catchError(error => {
+        console.error('Tasks Fetch By User Error:', error);
         throw error;
       })
     );
@@ -104,8 +149,19 @@ export class ServeurService {
     );
   }
 
+  getTaskStatisticsByUser(userId: number): Observable<any> {
+    const url = `${this.apiEndPoint}/mic1Tasks/statisticsByUser/${userId}`;
+    return this.http.get<any>(url).pipe(
+      map(response => response),
+      catchError(error => {
+        console.error('Tasks Statistics Fetch By User Error:', error);
+        throw error;
+      })
+    );
+  }
+
   deleteTask(id: number): Observable<void> {
-    const url = `${this.apiEndPoint}/mic1Tasks/delete/${id}`; // Aligné avec le backend
+    const url = `${this.apiEndPoint}/mic1Tasks/delete/${id}`;
     return this.http.delete<void>(url).pipe(
       map(() => undefined),
       catchError(error => {
@@ -116,7 +172,7 @@ export class ServeurService {
   }
 
   updateTask(task: Tasks): Observable<Tasks> {
-    const url = `${this.apiEndPoint}/mic1Tasks/updateTasks/${task.id}`; // Aligné avec le backend
+    const url = `${this.apiEndPoint}/mic1Tasks/updateTasks/${task.id}`;
     return this.http.put<Tasks>(url, task).pipe(
       catchError(error => {
         console.error('Tasks Update Error:', error);
@@ -126,8 +182,8 @@ export class ServeurService {
   }
 
   createTask(tasks: Tasks): Observable<Tasks> {
-    const url = `${this.apiEndPoint}/mic1Tasks/addTasks`; // Aligné avec le backend
-    console.log('Payload envoyé:', JSON.stringify(tasks)); // Pour déboguer
+    const url = `${this.apiEndPoint}/mic1Tasks/addTasks`;
+    console.log('Payload envoyé:', JSON.stringify(tasks));
     return this.http.post<Tasks>(url, tasks).pipe(
       catchError(error => {
         console.error('Tasks Create Error:', error);
@@ -138,7 +194,7 @@ export class ServeurService {
 
   /*send mail */
   sendEmail(to: string, subject: string, body: string): Observable<string> {
-    const url = `${this.apiEndPoint}/api/email/send`;
+    const url = `${this.apiEndPoint}/mic1Feedback/send`;
     const params = { to, subject, body };
     return this.http.post(url, null, { params, responseType: 'text' });
   }

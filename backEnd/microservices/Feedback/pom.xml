@@ -122,6 +122,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.example</groupId>
+			<artifactId>User</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

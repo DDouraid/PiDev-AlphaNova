@@ -1,7 +1,6 @@
 package org.example.tasks.entities;
 
 import jakarta.persistence.*;
-
 import java.util.Date;
 
 @Entity
@@ -16,24 +15,29 @@ public class Tasks {
     @Enumerated(EnumType.STRING)
     private TasksStatus status;
 
+    @Column(name = "user_id")
+    private Long userId; // Replace User entity with userId
+
     public Tasks() {
     }
 
-    public Tasks(int id, String title, String description, Date startDate, Date endDate, TasksStatus status) {
+    public Tasks(int id, String title, String description, Date startDate, Date endDate, TasksStatus status, Long userId) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
+        this.userId = userId;
     }
 
-    public Tasks(String title, String description, Date startDate, Date endDate, TasksStatus status) {
+    public Tasks(String title, String description, Date startDate, Date endDate, TasksStatus status, Long userId) {
         this.title = title;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
+        this.userId = userId;
     }
 
     public int getId() {
@@ -82,5 +86,13 @@ public class Tasks {
 
     public void setStatus(TasksStatus status) {
         this.status = status;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

@@ -20,15 +20,18 @@ public class TasksController {
         return tasksService.addTasks(tasks);
     }
 
-
     @GetMapping("/findAll")
-    public List<Tasks> getAllEvent() {
+    public List<Tasks> getAllTasks() {
         return tasksService.getAllTasks();
+    }
+
+    @GetMapping("/findByUser/{userId}")
+    public List<Tasks> getTasksByUser(@PathVariable Long userId) {
+        return tasksService.getTasksByUserId(userId);
     }
 
     @PutMapping("/updateTasks/{id}")
     public Tasks updateTasks(@PathVariable Integer id, @RequestBody Tasks tasks) {
-
         tasks.setId(id);
         return tasksService.updateTasks(tasks);
     }
@@ -41,5 +44,10 @@ public class TasksController {
     @GetMapping("/statistics")
     public TaskStatistics getTaskStatistics() {
         return tasksService.getTaskStatistics();
+    }
+
+    @GetMapping("/statisticsByUser/{userId}")
+    public TaskStatistics getTaskStatisticsByUser(@PathVariable Long userId) {
+        return tasksService.getTaskStatisticsByUser(userId);
     }
 }

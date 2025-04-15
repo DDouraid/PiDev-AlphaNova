@@ -5,10 +5,11 @@ export interface Tasks {
   startDate: Date;
   endDate: Date;
   status: TasksStatus;
+  userId: number; // Replace user: User with userId
 }
 
 export enum TasksStatus {
-  TO_DO = 'TO_DO',        // Aligné avec le backend
-  IN_PROGRESS= 'IN_PROGRESS', // Orthographe backend
-  DONE = 'DONE'
+  IN_PROGRESS = 'IN_PROGRESS',
+  DONE = 'DONE',
+  TO_DO = 'TO_DO'
 }

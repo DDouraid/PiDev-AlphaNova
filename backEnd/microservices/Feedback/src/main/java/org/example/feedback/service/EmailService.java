@@ -1,49 +1,42 @@
 package org.example.feedback.service;
 
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
 public class EmailService {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final JavaMailSender mailSender;
 
-    @Value("re_8sJ1DaEs_Q24vs2JPDnw1SQsNk9uTLpBM")
-    private String resendApiKey;
+    @Autowired
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
-    @Value("ayoub.gombra@esprit.tn")
-    private String emailFrom;
+    public void sendEmail(String toEmail, String subject, String body) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-    public void sendEmail(String to, String subject, String body) throws Exception {
-        String url = "https://api.resend.com/emails";
+            helper.setFrom("arjungautam8877@gmail.com");
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(body);
 
-        // Préparer les en-têtes
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + resendApiKey);
-        headers.set("Content-Type", "application/json");
-
-        // Préparer le corps de la requête
-        String requestBody = String.format(
-                "{\"from\": \"%s\", \"to\": \"%s\", \"subject\": \"%s\", \"text\": \"%s\"}",
-                emailFrom, to, subject, body
-        );
-
-        // Créer l'entité HTTP
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-
-        // Envoyer la requête à l'API Resend
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-
-        // Vérifier la réponse
-        if (response.getStatusCode().is2xxSuccessful()) {
-            System.out.println("Email envoyé avec succès : " + response.getBody());
-        } else {
-            throw new Exception("Échec de l'envoi de l'email via Resend : " + response.getBody());
+            mailSender.send(message);
+            System.out.println("Mail sent successfully...");
+        } catch (Exception e) {
+            System.err.println("Failed to send email: " + e.getMessage());
+            throw new RuntimeException("Email sending failed", e);
         }
     }
 }

@@ -49,6 +49,7 @@
             <thead class="table-dark" style="background: linear-gradient(45deg, #2c3e50, #3498db);">
               <tr>
                 <th class="py-3"><i class="fas fa-hashtag me-2"></i> ID</th>
+                <th class="py-3"><i class="fas fa-user me-2"></i> User ID</th> <!-- Added User ID column -->
                 <th class="py-3"><i class="fas fa-comment me-2"></i> Commentaire</th>
                 <th class="py-3"><i class="fas fa-star me-2"></i> Note</th>
                 <th class="py-3"><i class="fas fa-cogs me-2"></i> Actions</th>
@@ -56,7 +57,8 @@
             </thead>
             <tbody>
               <tr *ngFor="let feedback of paginatedFeedback" class="transition-all">
-                <td class="fw-bold text-truncate" style="max-width: 100px;">{{ feedback.id }}</td>
+                <td class="fw/InputMethodListener-bold text-truncate" style="max-width: 100px;">{{ feedback.id }}</td>
+                <td class="text-truncate" style="max-width: 100px;">{{ feedback.userId || 'N/A' }}</td> <!-- Display userId -->
                 <td class="text-truncate" style="max-width: 200px;">{{ feedback.comment }}</td>
                 <td>
                   <span *ngFor="let star of [1, 2, 3, 4, 5]" class="me-1">
@@ -116,6 +118,14 @@
             <form #addFeedbackForm="ngForm" (ngSubmit)="saveFeedback()">
               <div class="row">
                 <div class="col-md-12 mb-3">
+                  <label for="addUserId" class="form-label fw-semibold"><i class="fas fa-user me-2"></i> User ID</label>
+                  <input type="number" class="form-control shadow-sm" id="addUserId" name="userId"
+                    [(ngModel)]="newFeedback.userId" required #userId="ngModel">
+                  <div *ngIf="userId.invalid && (userId.dirty || userId.touched)" class="text-danger">
+                    L'ID utilisateur est obligatoire.
+                  </div>
+                </div>
+                <div class="col-md-12 mb-3">
                   <label for="addComment" class="form-label fw-semibold"><i class="fas fa-comment me-2"></i>
                     Commentaire</label>
                   <textarea class="form-control shadow-sm" id="addComment" name="comment" rows="4"
@@ -168,6 +178,14 @@
           <div class="modal-body p-4">
             <form #updateFeedbackForm="ngForm" (ngSubmit)="saveFeedback()">
               <div class="row">
+                <div class="col-md-12 mb-3">
+                  <label for="updateUserId" class="form-label fw-semibold"><i class="fas fa-user me-2"></i> User ID</label>
+                  <input type="number" class="form-control shadow-sm" id="updateUserId" name="userId"
+                    [(ngModel)]="newFeedback.userId" required #userId="ngModel">
+                  <div *ngIf="userId.invalid && (userId.dirty || userId.touched)" class="text-danger">
+                    L'ID utilisateur est obligatoire.
+                  </div>
+                </div>
                 <div class="col-md-12 mb-3">
                   <label for="updateComment" class="form-label fw-semibold"><i class="fas fa-comment me-2"></i>
                     Commentaire</label>

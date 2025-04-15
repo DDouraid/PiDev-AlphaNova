@@ -1,8 +1,6 @@
 package org.example.feedback.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Feedback {
@@ -12,18 +10,23 @@ public class Feedback {
     private String comment;
     private Float note;
 
+    @Column(name = "user_id") // Map this field to the user_id column in the database
+    private Long userId; // Replace User entity with a simple userId field
+
     public Feedback() {
     }
 
-    public Feedback(int id, String comment, Float note) {
+    public Feedback(int id, String comment, Float note, Long userId) {
         this.id = id;
         this.comment = comment;
         this.note = note;
+        this.userId = userId;
     }
 
-    public Feedback(String comment, Float note) {
+    public Feedback(String comment, Float note, Long userId) {
         this.comment = comment;
         this.note = note;
+        this.userId = userId;
     }
 
     public int getId() {
@@ -48,5 +51,13 @@ public class Feedback {
 
     public void setNote(Float note) {
         this.note = note;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

@@ -8,7 +8,7 @@ declare var bootstrap: any;
 
 @Component({
   selector: 'app-list-feedback',
-  templateUrl: './list-feddback.component.html', // Corrected "feddback" to "feedback"
+  templateUrl: './list-feddback.component.html', 
   styleUrls: ['./list-feddback.component.css'],
   encapsulation: ViewEncapsulation.None
 })
@@ -19,7 +19,8 @@ export class ListFeedbackComponent implements OnInit {
   newFeedback: Feedback = {
     id: 0,
     comment: '',
-    note: 0
+    note: 0,
+    userId: 1 // Default userId for testing (simulating user with ID 1)
   };
   isEditMode: boolean = false;
   addModalInstance: any;
@@ -48,7 +49,7 @@ export class ListFeedbackComponent implements OnInit {
 
   prepareNewFeedback(): void {
     this.isEditMode = false;
-    this.newFeedback = { id: 0, comment: '', note: 0 };
+    this.newFeedback = { id: 0, comment: '', note: 0, userId: 1 }; // Default userId
   }
 
   prepareEditFeedback(feedback: Feedback): void {
@@ -79,7 +80,7 @@ export class ListFeedbackComponent implements OnInit {
   }
 
   isFeedbackValid(feedback: Feedback): boolean {
-    return !!feedback.comment.trim() && feedback.note >= 1 && feedback.note <= 5;
+    return !!feedback.comment.trim() && feedback.note >= 1 && feedback.note <= 5 && !!feedback.userId;
   }
 
   checkForInappropriateWords(feedback: string): boolean {
@@ -95,7 +96,7 @@ export class ListFeedbackComponent implements OnInit {
     }
 
     if (!this.isFeedbackValid(this.newFeedback)) {
-      this.errorMessage = 'Veuillez fournir un commentaire valide et une note (1-5).';
+      this.errorMessage = 'Veuillez fournir un commentaire valide, une note (1-5), et un userId.';
       setTimeout(() => this.errorMessage = null, 2000);
       return;
     }
@@ -114,11 +115,12 @@ export class ListFeedbackComponent implements OnInit {
 
         // Envoi de l'email après l'ajout (uniquement pour un nouveau feedback)
         if (!this.isEditMode) {
-          const to = 'eya.bouzaiene@sesame.com.tn'; // Remplace par l'email du destinataire
+          const to = 'eya.bouzaiene@sesame.com.tn';
           const subject = 'Nouveau Feedback Ajouté';
           const body = 'Votre feedback est bien ajouté !\n\nDétails du feedback :\n' +
                        `Commentaire : ${this.newFeedback.comment}\n` +
-                       `Note : ${this.newFeedback.note}/5`;
+                       `Note : ${this.newFeedback.note}/5\n` +
+                       `Utilisateur ID : ${this.newFeedback.userId}`;
           this.serverService.sendEmail(to, subject, body).subscribe({
             next: (emailResponse) => {
               console.log('Email envoyé : ', emailResponse);
@@ -130,7 +132,7 @@ export class ListFeedbackComponent implements OnInit {
           });
         }
 
-        this.newFeedback = { id: 0, comment: '', note: 0 };
+        this.newFeedback = { id: 0, comment: '', note: 0, userId: 1 };
         setTimeout(() => this.successMessage = null, 3000);
       },
       error => {

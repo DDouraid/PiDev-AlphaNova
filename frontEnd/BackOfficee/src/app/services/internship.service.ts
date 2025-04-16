@@ -2,13 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Internship } from '../models/internship';
+import { InternshipRequestService } from './internship-request.service'; // Adjust the path
+import { InternshipRequest } from '../models/internship-request';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InternshipService {
-  private baseUrl = '/api'; 
-  constructor(private http: HttpClient) {}
+  private baseUrl = '/api';
+
+  constructor(private http: HttpClient, private internshipRequestService: InternshipRequestService) {}
 
   getAllInternships(): Observable<Internship[]> {
     return this.http.get<Internship[]>(`${this.baseUrl}/internships`);
@@ -30,12 +33,20 @@ export class InternshipService {
     return this.http.delete<void>(`${this.baseUrl}/internships/${id}`);
   }
 
-  // New method to update status and end date
   updateStatusAndEndDate(id: number, status: string, endDate: string | null): Observable<Internship> {
     const params: any = { status };
     if (endDate) {
-      params.endDate = endDate; // Already in yyyy-MM-dd format
+      params.endDate = endDate;
     }
     return this.http.put<Internship>(`${this.baseUrl}/internships/${id}/status-end-date`, null, { params });
+  }
+
+  // Delegate to InternshipRequestService for status updates
+  acceptInternshipRequest(id: number, startDate: string, endDate?: string): Observable<InternshipRequest> {
+    return this.internshipRequestService.updateInternshipRequestStatus(id, 'ACCEPTED');
+  }
+
+  rejectInternshipRequest(id: number): Observable<InternshipRequest> {
+    return this.internshipRequestService.updateInternshipRequestStatus(id, 'REJECTED');
   }
 }

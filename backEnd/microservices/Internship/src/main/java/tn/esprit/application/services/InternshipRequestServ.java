@@ -18,17 +18,52 @@ import java.util.Optional;
 @Service
 public class InternshipRequestServ {
 
-    @Autowired
-    private InternshipRequestRepo internshipRequestRepository;
+    private final InternshipRequestRepo internshipRequestRepository;
+    private final InternshipRepo internshipRepository;
+    private final InternshipOfferRepo internshipOfferRepository;
+    private final InterviewServ interviewServ;
+    private final EmailSenderService emailSenderService;
 
     @Autowired
-    private InternshipRepo internshipRepository;
+    public InternshipRequestServ(InternshipRequestRepo internshipRequestRepository, InternshipRepo internshipRepository,
+                                 InternshipOfferRepo internshipOfferRepository, InterviewServ interviewServ,
+                                 EmailSenderService emailSenderService) {
+        this.internshipRequestRepository = internshipRequestRepository;
+        this.internshipRepository = internshipRepository;
+        this.internshipOfferRepository = internshipOfferRepository;
+        this.interviewServ = interviewServ;
+        this.emailSenderService = emailSenderService;
+    }
 
-    @Autowired
-    private InternshipOfferRepo internshipOfferRepository;
+    public InternshipRequest updateInternshipRequestStatus(Long id, String status) {
+        InternshipRequest request = internshipRequestRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+        try {
+            RequestStatus requestStatus = RequestStatus.valueOf(status.toUpperCase());
+            request.setStatus(requestStatus);
+            InternshipRequest updatedRequest = internshipRequestRepository.save(request);
+            if (requestStatus == RequestStatus.ACCEPTED) {
+                // Pass the interview date from the frontend instead of using a fixed value
+                // This will be handled by the InterviewService in the frontend
+            }
+            return updatedRequest;
+        } catch (IllegalArgumentException e) {
+            System.err.println("Invalid status value: " + status + " for request ID " + id + ": " + e.getMessage());
+            throw new RuntimeException("Invalid status value: " + status, e);
+        } catch (Exception e) {
+            System.err.println("Error updating status for request ID " + id + ": " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to update internship request status", e);
+        }
+    }
 
-    @Autowired
-    private EmailSenderService emailSenderService;
+    public InternshipRequest getInternshipRequestById(Long id) {
+        return internshipRequestRepository.findById(id)
+                .orElseThrow(() -> {
+                    System.out.println("Internship request with ID " + id + " not found");
+                    return new RuntimeException("Internship request with ID " + id + " not found");
+                });
+    }
 
     public List<InternshipRequest> findAll() {
         try {
@@ -86,7 +121,7 @@ public class InternshipRequestServ {
 
             Internship internship = new Internship();
             internship.setTitle("Internship for " + internshipRequest.getTitle());
-            internship.setDescription("Created from request ID " + savedRequest.getId() + " for offer ID " + offerId);
+            internship.setDescription("Internship for offer ID " + offerId);
             internship.setStartDate(new Date());
             internship.setEndDate(null);
             internship.setStatus(InternStatus.IN_PROGRESS);
@@ -94,7 +129,6 @@ public class InternshipRequestServ {
             internship.setInternshipRequest(savedRequest);
 
             internshipRepository.save(internship);
-            System.out.println("Created internship for request ID: " + savedRequest.getId());
 
             savedRequest.setInternship(internship);
             return savedRequest;
@@ -109,6 +143,19 @@ public class InternshipRequestServ {
         try {
             InternshipRequest savedRequest = internshipRequestRepository.save(internshipRequest);
             System.out.println("Saved internship request with ID: " + savedRequest.getId() + ", cvPath: " + savedRequest.getCvPath() + ", type: " + savedRequest.getType());
+
+            Internship internship = new Internship();
+            internship.setTitle("Internship for " + internshipRequest.getTitle());
+            internship.setDescription("Spontaneous request ID " + savedRequest.getId());
+            internship.setStartDate(new Date());
+            internship.setEndDate(null);
+            internship.setStatus(InternStatus.IN_PROGRESS);
+            internship.setInternshipOffer(null);
+            internship.setInternshipRequest(savedRequest);
+
+            internshipRepository.save(internship);
+
+            savedRequest.setInternship(internship);
             return savedRequest;
         } catch (Exception e) {
             System.err.println("Error saving internship request: " + e.getMessage());
@@ -159,7 +206,7 @@ public class InternshipRequestServ {
                 if (email != null && !email.isEmpty()) {
                     String subject = status == RequestStatus.ACCEPTED
                             ? "Internship Request Accepted"
-                            : "Internship Request Rejected";
+                            : "Interview Request Rejected";
                     String title = status == RequestStatus.ACCEPTED
                             ? "Your Internship Request Has Been Accepted!"
                             : "Your Internship Request Has Been Rejected";
@@ -174,7 +221,6 @@ public class InternshipRequestServ {
                         emailSenderService.sendSimpleEmail(email, subject, title, message);
                     } catch (Exception e) {
                         System.err.println("Failed to send email for internship request ID " + id + ": " + e.getMessage());
-                        // Log the error but don't throw an exception, as the status update should still succeed
                     }
                 } else {
                     System.out.println("No email address found for internship request ID: " + id);

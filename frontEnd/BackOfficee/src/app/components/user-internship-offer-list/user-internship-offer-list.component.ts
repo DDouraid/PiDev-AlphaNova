@@ -19,6 +19,11 @@ export class UserInternshipOfferListComponent implements OnInit {
   pageSize: number = 5;
   totalPages: number = 1;
 
+  // Alert properties
+  showAlert: boolean = false;
+  alertType: string = 'alert-success';
+  alertMessage: string = '';
+
   constructor(
     private internshipOfferService: InternshipOfferService,
     private router: Router
@@ -50,7 +55,7 @@ export class UserInternshipOfferListComponent implements OnInit {
       },
       error => {
         console.error('Error fetching internship offers:', error);
-        alert('Failed to load internship offers. Please try again later.');
+        this.showCustomAlert('danger', 'Failed to load internship offers. Please try again later.');
       }
     );
   }
@@ -131,5 +136,16 @@ export class UserInternshipOfferListComponent implements OnInit {
     this.router.navigate(['/offer-details'], {
       queryParams: { offer: JSON.stringify(offer) }
     });
+  }
+
+  showCustomAlert(type: 'success' | 'danger' | 'warning', message: string): void {
+    this.alertType = `alert-${type}`;
+    this.alertMessage = message;
+    this.showAlert = true;
+    setTimeout(() => this.closeAlert(), 5000);
+  }
+
+  closeAlert(): void {
+    this.showAlert = false;
   }
 }

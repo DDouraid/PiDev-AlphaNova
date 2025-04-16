@@ -3,8 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InternshipRequestService } from '../../services/internship-request.service';
 import { InternshipRequest } from '../../models/internship-request';
 import { Router } from '@angular/router';
-import { InternshipOfferService } from '../../services/internship-offer.service';
-import { InternshipOffer } from '../../models/internship-offer';
 
 @Component({
   selector: 'app-add-internship-request',
@@ -15,47 +13,26 @@ export class AddInternshipRequestComponent implements OnInit {
   requestForm: FormGroup;
   cvFile: File | null = null;
   isSubmitting: boolean = false;
-  internshipOffers: InternshipOffer[] = [];
-  selectedDuration: number | null = null;
+
+  // Alert properties
+  showAlert: boolean = false;
+  alertType: string = 'alert-success';
+  alertMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
     private internshipRequestService: InternshipRequestService,
-    private internshipOfferService: InternshipOfferService,
     private router: Router
   ) {
     this.requestForm = this.fb.group({
-      offerId: [null], // Optional for spontaneous applications
+      title: ['', Validators.required],
       description: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       cv: [null, Validators.required]
     });
   }
 
-  ngOnInit(): void {
-    this.loadInternshipOffers();
-  }
-
-  loadInternshipOffers(): void {
-    this.internshipOfferService.getAllInternshipOffers().subscribe({
-      next: (offers) => {
-        this.internshipOffers = offers;
-        console.log('Fetched internship offers:', offers);
-      },
-      error: (err) => {
-        console.error('Error fetching internship offers:', err);
-        window.alert('Failed to load internship offers. Please try again.');
-      }
-    });
-  }
-
-  updateDuration(): void {
-    const offerId = this.requestForm.get('offerId')?.value;
-    const offerIdNumber = offerId ? Number(offerId) : null;
-    const selectedOffer = this.internshipOffers.find(offer => offer.id != null && offer.id === offerIdNumber);
-    this.selectedDuration = selectedOffer && selectedOffer.durationInMonths !== undefined ? selectedOffer.durationInMonths : null;
-    console.log('Selected duration:', this.selectedDuration);
-  }
+  ngOnInit(): void {}
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -63,7 +40,7 @@ export class AddInternshipRequestComponent implements OnInit {
       const file = input.files[0];
       console.log('File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
       if (file.size > 5 * 1024 * 1024) {
-        window.alert('File size exceeds 5MB. Please upload a smaller file.');
+        this.showCustomAlert('warning', 'File size exceeds 5MB. Please upload a smaller file.');
         this.cvFile = null;
         input.value = '';
         this.requestForm.get('cv')?.setValue(null);
@@ -90,32 +67,21 @@ export class AddInternshipRequestComponent implements OnInit {
       this.isSubmitting = true;
       const formValue = this.requestForm.value;
 
-      // Determine the title based on whether an offer is selected
-      let title: string;
-      const offerIdNumber = formValue.offerId ? Number(formValue.offerId) : null;
-      const selectedOffer = this.internshipOffers.find(offer => offer.id != null && offer.id === offerIdNumber);
-      if (selectedOffer) {
-        title = `Application for ${selectedOffer.title}`;
-      } else {
-        title = 'Spontaneous Application';
-      }
-
       const internshipRequest: InternshipRequest = {
-        title: title,
+        title: formValue.title,
         description: formValue.description,
         email: formValue.email,
         cv: this.cvFile,
         type: 'spontaneous'
       };
-      console.log('Submitting request:', internshipRequest, 'for offerId:', formValue.offerId);
+      console.log('Submitting request:', internshipRequest);
       console.log('CV to upload:', this.cvFile ? this.cvFile.name : 'No CV');
-      this.internshipRequestService.createInternshipRequest(internshipRequest, formValue.offerId).subscribe({
+      this.internshipRequestService.createInternshipRequest(internshipRequest).subscribe({
         next: (response) => {
           console.log('Request saved:', response);
           this.requestForm.reset();
           this.cvFile = null;
-          this.selectedDuration = null;
-          window.alert('Internship request created successfully!');
+          this.showCustomAlert('success', 'Internship request created successfully!');
           this.isSubmitting = false;
           this.router.navigate(['/listrequests']);
         },
@@ -123,16 +89,16 @@ export class AddInternshipRequestComponent implements OnInit {
           console.error('Error creating request:', err);
           console.log('Error details:', err.message, err.status, err.error);
           const errorMessage = err.error?.message || err.message || 'Unknown error';
-          window.alert('Failed to create internship request: ' + errorMessage);
+          this.showCustomAlert('danger', 'Failed to create internship request: ' + errorMessage);
           this.isSubmitting = false;
         }
       });
     } else {
       if (!this.cvFile) {
-        window.alert('Please upload a CV before submitting.');
+        this.showCustomAlert('warning', 'Please upload a CV before submitting.');
       }
       if (!this.requestForm.valid) {
-        window.alert('Please fill in all required fields correctly.');
+        this.showCustomAlert('warning', 'Please fill in all required fields correctly.');
         console.log('Form errors:', this.requestForm.errors);
         Object.keys(this.requestForm.controls).forEach(key => {
           const control = this.requestForm.get(key);
@@ -147,7 +113,17 @@ export class AddInternshipRequestComponent implements OnInit {
   resetForm(): void {
     this.requestForm.reset();
     this.cvFile = null;
-    this.selectedDuration = null;
     this.router.navigate(['/listrequests']);
+  }
+
+  showCustomAlert(type: 'success' | 'danger' | 'warning', message: string): void {
+    this.alertType = `alert-${type}`;
+    this.alertMessage = message;
+    this.showAlert = true;
+    setTimeout(() => this.closeAlert(), 5000);
+  }
+
+  closeAlert(): void {
+    this.showAlert = false;
   }
 }

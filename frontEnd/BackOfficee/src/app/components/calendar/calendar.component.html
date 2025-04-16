@@ -1,0 +1,85 @@
+<div class="content-body d-flex justify-content-center align-items-center min-vh-100">
+    <!-- Alert Section -->
+    <div *ngIf="showAlert" class="alert {{ alertType }} alert-dismissible fade show position-fixed" role="alert" style="top: 20px; right: 20px; z-index: 1050; min-width: 300px;">
+      <div class="d-flex align-items-center">
+        <i class="bi me-2" [ngClass]="{
+          'bi-check-circle-fill': alertType === 'alert-success',
+          'bi-exclamation-triangle-fill': alertType === 'alert-danger'
+        }"></i>
+        <span>{{ alertMessage }}</span>
+      </div>
+      <button type="button" class="btn-close" (click)="closeAlert()" aria-label="Close"></button>
+    </div>
+  
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8 col-xl-10">
+          <div class="card card-bd">
+            <div class="card-header">
+              <h2 class="text-center my-4">Interview Calendar</h2>
+            </div>
+            <div class="card-body">
+              <!-- Loading Spinner -->
+              <div *ngIf="isLoading" class="text-center my-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+  
+              <!-- Calendar Section -->
+              <div *ngIf="!isLoading" class="table-responsive">
+                <div class="card">
+                  <div class="card-header d-flex justify-content-between align-items-center">
+                    <button class="custom-nav-btn" (click)="navigateMonth(-30)">←</button>
+                    <h4 class="card-title m-0">{{ viewDate | date:'MMMM yyyy' }}</h4>
+                    <button class="custom-nav-btn" (click)="navigateMonth(30)">→</button>
+                  </div>
+                  <div class="card-body">
+                    <mwl-calendar-month-view
+                      [viewDate]="viewDate"
+                      [events]="events"
+                      [refresh]="refresh"
+                      (eventClicked)="handleEventClick($event)"
+                      (dayClicked)="handleDayClick($event)"
+                      class="calendar wider-calendar"
+                    >
+                    </mwl-calendar-month-view>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Modal Template -->
+    <ng-template #InterviewModalTemplate>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Interviews on {{ selectedDate | date:'mediumDate' }}</h5>
+          <button type="button" class="close" (click)="closeModal()" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div *ngIf="selectedDateInterviews.length > 0" class="interview-list">
+            <ul class="list-group">
+              <li class="list-group-item" *ngFor="let interview of selectedDateInterviews">
+                <label class="text-black font-w500">Candidate:</label> {{ interview.userName }}<br>
+                <label class="text-black font-w500">Internship:</label> {{ interview.internship }}<br>
+                <label class="text-black font-w500">Time:</label> {{ interview.interviewDate | date:'shortTime' }}<br>
+                <hr>
+              </li>
+            </ul>
+          </div>
+          <div *ngIf="selectedDateInterviews.length === 0" class="text-center">
+            <p>No interviews scheduled for this date.</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="closeModal()">Close</button>
+        </div>
+      </div>
+    </ng-template>
+  </div>

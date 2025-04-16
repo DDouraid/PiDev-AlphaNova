@@ -30,8 +30,6 @@ export class InternshipRequestService {
     );
   }
 
-  createInternshipRequest(request: InternshipRequest): Observable<InternshipRequest>;
-  createInternshipRequest(request: InternshipRequest, offerId: number): Observable<InternshipRequest>;
   createInternshipRequest(request: InternshipRequest, offerId?: number): Observable<InternshipRequest> {
     const formData = new FormData();
     formData.append('title', request.title || '');
@@ -40,19 +38,9 @@ export class InternshipRequestService {
     formData.append('type', request.type || '');
     if (request.cv) {
       formData.append('cv', request.cv, request.cv.name);
-      console.log('Adding CV to FormData:', request.cv.name);
-    } else {
-      console.log('No CV to add to FormData.');
     }
 
-    let url = `${this.baseUrl}/internship-requests`;
-    if (offerId !== undefined) {
-      console.log('Sending request to create with offerId:', offerId);
-      url = `${this.baseUrl}/internship-requests/${offerId}`;
-    } else {
-      console.log('Sending request to create without offerId.');
-    }
-
+    const url = offerId ? `${this.baseUrl}/internship-requests/${offerId}` : `${this.baseUrl}/internship-requests`;
     return this.http.post<InternshipRequest>(url, formData).pipe(
       catchError(this.handleError('createInternshipRequest'))
     );
@@ -73,7 +61,6 @@ export class InternshipRequestService {
     }
     if (request.cv) {
       formData.append('cv', request.cv, request.cv.name);
-      console.log('Updating CV in FormData:', request.cv.name);
     }
 
     return this.http.put<InternshipRequest>(`${this.baseUrl}/internship-requests/${request.id}`, formData).pipe(
@@ -93,7 +80,6 @@ export class InternshipRequestService {
     if (!id) {
       throw new Error('Internship request ID is required for deletion');
     }
-
     return this.http.delete<void>(`${this.baseUrl}/internship-requests/${id}`).pipe(
       catchError(this.handleError('deleteInternshipRequest'))
     );
@@ -103,9 +89,14 @@ export class InternshipRequestService {
     if (!fileName) {
       throw new Error('File name is required to download CV');
     }
-
     return this.http.get(`${this.baseUrl}/internship-requests/cv/${fileName}`, { responseType: 'blob' }).pipe(
       catchError(this.handleError('downloadCv'))
+    );
+  }
+
+  sendEmail(id: number, status: string): Observable<string> {
+    return this.http.post<string>(`${this.baseUrl}/internship-requests/${id}/email`, { status }, { responseType: 'text' as 'json' }).pipe(
+      catchError(this.handleError('sendEmail'))
     );
   }
 

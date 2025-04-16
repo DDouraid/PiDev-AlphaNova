@@ -36,11 +36,32 @@ public class EmailSenderService {
         Context context = new Context();
         context.setVariable("title", title);
         context.setVariable("message", message);
-        String emailContent = templateEngine.process("email-template", context);
+        String emailContent = templateEngine.process("email-template", context); // Default template
 
         helper.setText(emailContent, true);
 
         mailSender.send(mimeMessage);
         System.out.println("Mail sent to: " + toEmail + " with subject: " + subject);
+    }
+
+    @Async
+    public void sendInterviewEmail(String toEmail, String subject, String userName, String message) throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+
+        helper.setFrom(fromEmail);
+        helper.setTo(toEmail);
+        helper.setSubject(subject);
+
+        Context context = new Context();
+        context.setVariable("userName", userName);
+        context.setVariable("message", message);
+        context.setVariable("subject", subject);
+        String emailContent = templateEngine.process("interview-template", context);
+
+        helper.setText(emailContent, true);
+
+        mailSender.send(mimeMessage);
+        System.out.println("Interview mail sent to: " + toEmail + " with subject: " + subject);
     }
 }

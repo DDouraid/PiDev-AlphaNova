@@ -1,4 +1,17 @@
 <div class="content-body">
+  <!-- Alert Section -->
+  <div *ngIf="showAlert" class="alert {{ alertType }} alert-dismissible fade show position-fixed" role="alert" style="top: 20px; right: 20px; z-index: 1050; min-width: 300px;">
+    <div class="d-flex align-items-center">
+      <i class="bi me-2" [ngClass]="{
+        'bi-check-circle-fill': alertType === 'alert-success',
+        'bi-exclamation-triangle-fill': alertType === 'alert-danger',
+        'bi-exclamation-circle-fill': alertType === 'alert-warning'
+      }"></i>
+      <span>{{ alertMessage }}</span>
+    </div>
+    <button type="button" class="btn-close" (click)="closeAlert()" aria-label="Close"></button>
+  </div>
+
   <h2 class="text-center my-4">Internship Offers ({{ filteredOffers.length }})</h2>
 
   <!-- Search and Filter Inputs -->

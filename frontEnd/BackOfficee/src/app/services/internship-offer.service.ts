@@ -15,19 +15,13 @@ export class InternshipOfferService {
 
   getAllInternshipOffers(): Observable<InternshipOffer[]> {
     return this.http.get<any[]>(`${this.baseUrl}/internship-offers`).pipe(
-      map(offers => {
-        console.log('Raw API response for internship offers:', offers);
-        return offers.map(offer => this.mapToFrontend(offer));
-      })
+      map(offers => offers.map(offer => this.mapToFrontend(offer)))
     );
   }
 
   getInternshipOfferById(id: number): Observable<InternshipOffer> {
     return this.http.get<any>(`${this.baseUrl}/internship-offers/${id}`).pipe(
-      map(offer => {
-        console.log(`Raw API response for offer ID ${id}:`, offer);
-        return this.mapToFrontend(offer);
-      })
+      map(offer => this.mapToFrontend(offer))
     );
   }
 
@@ -37,23 +31,15 @@ export class InternshipOfferService {
 
   createInternshipOffer(offer: InternshipOffer): Observable<InternshipOffer> {
     const backendOffer = this.mapToBackend(offer);
-    console.log('Sending offer to backend:', backendOffer);
     return this.http.post<any>(`${this.baseUrl}/internship-offers`, backendOffer).pipe(
-      map(response => {
-        console.log('Create offer response:', response);
-        return this.mapToFrontend(response);
-      })
+      map(response => this.mapToFrontend(response))
     );
   }
 
   updateInternshipOffer(offer: InternshipOffer): Observable<InternshipOffer> {
     const backendOffer = this.mapToBackend(offer);
-    console.log('Updating offer on backend:', backendOffer);
     return this.http.put<any>(`${this.baseUrl}/internship-offers/${offer.id}`, backendOffer).pipe(
-      map(response => {
-        console.log('Update offer response:', response);
-        return this.mapToFrontend(response);
-      })
+      map(response => this.mapToFrontend(response))
     );
   }
 
@@ -73,10 +59,8 @@ export class InternshipOfferService {
       company: backendOffer.company,
       location: backendOffer.location,
       datePosted: backendOffer.datePosted,
-      durationInMonths: backendOffer.duration_in_months !== undefined && backendOffer.duration_in_months !== null
-        ? Number(backendOffer.duration_in_months)
-        : null,
-      internshipRequests: backendOffer.internships
+      durationInMonths: backendOffer.duration_in_months ? Number(backendOffer.duration_in_months) : null,
+      internshipRequests: backendOffer.internships || []
     };
   }
 
@@ -88,7 +72,7 @@ export class InternshipOfferService {
       company: frontendOffer.company,
       location: frontendOffer.location,
       datePosted: frontendOffer.datePosted,
-      duration_in_months: frontendOffer.durationInMonths, // Match the backend JSON field name
+      duration_in_months: frontendOffer.durationInMonths,
       internships: frontendOffer.internshipRequests
     };
   }

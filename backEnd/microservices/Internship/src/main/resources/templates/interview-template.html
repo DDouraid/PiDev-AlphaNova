@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${subject}"></title>
+</head>
+<body>
+<p>Dear [[${userName}]],</p>
+<p th:text="${message}"></p>
+<p>Best regards,<br>The Admin Team</p>
+</body>
+</html>

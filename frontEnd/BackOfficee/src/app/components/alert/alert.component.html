@@ -1,0 +1,11 @@
+<div *ngFor="let alert of alerts" class="alert {{ getAlertClass(alert.type) }} alert-dismissible fade show position-fixed" role="alert" style="top: 20px; right: 20px; z-index: 1050; min-width: 300px;">
+    <div class="d-flex align-items-center">
+      <i class="bi me-2" [ngClass]="{
+        'bi-check-circle-fill': alert.type === 'success',
+        'bi-exclamation-triangle-fill': alert.type === 'error',
+        'bi-exclamation-circle-fill': alert.type === 'warning'
+      }"></i>
+      <span>{{ alert.message }}</span>
+    </div>
+    <button type="button" class="btn-close" (click)="removeAlert(alert)" aria-label="Close"></button>
+  </div>

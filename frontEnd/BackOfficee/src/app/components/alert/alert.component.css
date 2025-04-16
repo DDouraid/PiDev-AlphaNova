@@ -1,0 +1,9 @@
+.alert {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    padding: 15px;
+  }
+  
+  .alert-dismissible .btn-close {
+    padding: 15px;
+  }

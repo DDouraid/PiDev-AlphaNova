@@ -12,6 +12,11 @@ import { InternshipRequest } from '../../models/internship-request';
 export class OfferDetailsComponent implements OnInit {
   offer: InternshipOffer | null = null;
   applicationForm: { email: string, cv: File | null } = { email: '', cv: null };
+  
+  // Alert properties
+  showAlert: boolean = false;
+  alertType: string = 'alert-success';
+  alertMessage: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -39,13 +44,13 @@ export class OfferDetailsComponent implements OnInit {
       const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (!allowedTypes.includes(file.type)) {
-        alert('Please upload a PDF, DOC, or DOCX file.');
+        this.showCustomAlert('warning', 'Please upload a PDF, DOC, or DOCX file.');
         input.value = '';
         this.applicationForm.cv = null;
         return;
       }
       if (file.size > maxSize) {
-        alert('File size exceeds 5MB. Please upload a smaller file.');
+        this.showCustomAlert('warning', 'File size exceeds 5MB. Please upload a smaller file.');
         input.value = '';
         this.applicationForm.cv = null;
         return;
@@ -57,18 +62,18 @@ export class OfferDetailsComponent implements OnInit {
   submitApplication(): void {
     if (!this.offer) {
       console.error('No offer selected');
-      alert('No offer selected. Please try again.');
+      this.showCustomAlert('danger', 'No offer selected. Please try again.');
       return;
     }
 
     if (this.offer.id === undefined) {
       console.error('Selected offer has no ID');
-      alert('Selected offer is invalid. Please try again.');
+      this.showCustomAlert('danger', 'Selected offer is invalid. Please try again.');
       return;
     }
 
     if (!this.applicationForm.email || !this.applicationForm.cv) {
-      alert('Please provide both an email address and a CV.');
+      this.showCustomAlert('warning', 'Please provide both an email address and a CV.');
       return;
     }
 
@@ -83,13 +88,24 @@ export class OfferDetailsComponent implements OnInit {
     this.internshipRequestService.createInternshipRequest(internshipRequest, this.offer.id).subscribe(
       (response) => {
         console.log('Application submitted successfully:', response);
-        alert('Application submitted successfully!');
+        this.showCustomAlert('success', 'Application submitted successfully!');
         this.applicationForm = { email: '', cv: null };
       },
       (error) => {
         console.error('Error submitting application:', error);
-        alert('Failed to submit application. Please try again.');
+        this.showCustomAlert('danger', 'Failed to submit application. Please try again.');
       }
     );
+  }
+
+  showCustomAlert(type: 'success' | 'danger' | 'warning', message: string): void {
+    this.alertType = `alert-${type}`;
+    this.alertMessage = message;
+    this.showAlert = true;
+    setTimeout(() => this.closeAlert(), 5000);
+  }
+
+  closeAlert(): void {
+    this.showAlert = false;
   }
 }

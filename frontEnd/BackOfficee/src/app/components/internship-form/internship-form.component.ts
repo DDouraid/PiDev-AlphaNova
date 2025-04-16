@@ -20,6 +20,10 @@ export class InternshipFormComponent implements OnInit {
   statuses = Object.values(InternStatus);
   isSubmittingInternship = false;
 
+  showAlert: boolean = false;
+  alertType: string = 'alert-success';
+  alertMessage: string = '';
+
   constructor(private internshipService: InternshipService) {}
 
   ngOnInit(): void {}
@@ -34,15 +38,24 @@ export class InternshipFormComponent implements OnInit {
         this.isSubmittingInternship = false;
         form.resetForm();
         this.internship = { title: '', description: '', startDate: '', endDate: '', status: InternStatus.IN_PROGRESS };
-        // Show success alert
-        window.alert('Internship created successfully!');
+        this.showCustomAlert('success', 'Internship created successfully!');
       },
       error: (err) => {
         console.error('Error creating internship:', err);
         this.isSubmittingInternship = false;
-        // Show error alert
-        window.alert('Failed to create internship. Please try again.');
+        this.showCustomAlert('danger', 'Failed to create internship. Please try again.');
       }
     });
+  }
+
+  showCustomAlert(type: 'success' | 'danger', message: string): void {
+    this.alertType = `alert-${type}`;
+    this.alertMessage = message;
+    this.showAlert = true;
+    setTimeout(() => this.closeAlert(), 5000);
+  }
+
+  closeAlert(): void {
+    this.showAlert = false;
   }
 }

@@ -1,10 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { InternshipService } from '../../services/internship.service';
-import { InternshipOfferService } from '../../services/internship-offer.service';
-import { InternshipRequestService } from '../../services/internship-request.service';
-import { Internship, InternStatus } from '../../models/internship'; // Import InternStatus
-import { InternshipOffer } from '../../models/internship-offer';
-import { InternshipRequest } from '../../models/internship-request';
+import { Internship, InternStatus } from '../../models/internship';
 import { NgForm } from '@angular/forms';
 
 @Component({
@@ -14,11 +10,17 @@ import { NgForm } from '@angular/forms';
 })
 export class InternshipListComponent implements OnInit {
   internships: Internship[] = [];
-  internshipOffers: InternshipOffer[] = [];
-  internshipRequests: InternshipRequest[] = [];
-  selectedInternship: Internship = {} as Internship; // Holds the internship being updated
+  filteredInternships: Internship[] = [];
+  paginatedInternships: Internship[] = [];
 
-  // Internship form properties
+  selectedInternship: Internship = {
+    title: '',
+    description: '',
+    startDate: '',
+    endDate: '',
+    status: InternStatus.IN_PROGRESS
+  };
+
   internship: Internship = {
     title: '',
     description: '',
@@ -26,116 +28,137 @@ export class InternshipListComponent implements OnInit {
     endDate: '',
     status: InternStatus.IN_PROGRESS
   };
-  statuses = Object.values(InternStatus); // Use the enum values
+  statuses = Object.values(InternStatus);
+  filterStatuses: string[] = ['All', ...Object.values(InternStatus)];
+  selectedStatus: string = 'All';
   isSubmittingInternship = false;
+  isLoading = false;
 
-  constructor(
-    private internshipService: InternshipService,
-    private internshipOfferService: InternshipOfferService,
-    private internshipRequestService: InternshipRequestService
-  ) {}
+  // Pagination properties for internships
+  currentPage: number = 1;
+  pageSize: number = 5;
+  totalPages: number = 1;
+
+  // Alert properties
+  showAlert: boolean = false;
+  alertType: string = 'alert-success';
+  alertMessage: string = '';
+
+  constructor(private internshipService: InternshipService) {}
 
   ngOnInit(): void {
     this.loadInternships();
-    this.loadInternshipOffers();
-    this.loadInternshipRequests();
   }
 
   loadInternships(): void {
+    this.isLoading = true;
     this.internshipService.getAllInternships().subscribe(
       data => {
         this.internships = data;
+        this.filteredInternships = [...data];
+        this.applyFilters();
       },
       error => {
         console.error('Error fetching internships:', error);
-        window.alert('Failed to load internships. Please try again or contact support.');
-      }
-    );
-  }
-
-  loadInternshipOffers(): void {
-    this.internshipOfferService.getAllInternshipOffers().subscribe(
-      data => {
-        this.internshipOffers = data;
+        this.showCustomAlert('danger', 'Failed to load internships. Please try again or contact support.');
       },
-      error => {
-        console.error('Error fetching internship offers:', error);
-        window.alert('Failed to load internship offers. Please try again or contact support.');
+      () => {
+        this.isLoading = false;
       }
     );
   }
 
-  loadInternshipRequests(): void {
-    this.internshipRequestService.getAllInternshipRequests().subscribe(
-      data => {
-        this.internshipRequests = data;
-      },
-      error => {
-        console.error('Error fetching internship requests:', error);
-        window.alert('Failed to load internship requests. Please try again or contact support.');
-      }
-    );
+  applyFilters(): void {
+    this.filteredInternships = this.internships.filter(internship => {
+      return this.selectedStatus === 'All' || internship.status === this.selectedStatus;
+    });
+    this.currentPage = 1;
+    this.updatePagination();
   }
 
-  deleteInternship(id: number): void {
+  updatePagination(): void {
+    this.totalPages = Math.ceil(this.filteredInternships.length / this.pageSize);
+    this.currentPage = Math.min(this.currentPage, this.totalPages || 1);
+    this.paginate();
+  }
+
+  paginate(): void {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedInternships = this.filteredInternships.slice(startIndex, endIndex);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.paginate();
+    }
+  }
+
+  getPages(): number[] {
+    const maxVisiblePages = 5;
+    const half = Math.floor(maxVisiblePages / 2);
+    let startPage = Math.max(1, this.currentPage - half);
+    let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+  }
+
+  onStatusChange(): void {
+    this.applyFilters();
+  }
+
+  clearFilters(): void {
+    this.selectedStatus = 'All';
+    this.applyFilters();
+  }
+
+  deleteInternship(id: number | undefined): void {
+    if (id === undefined) {
+      console.error('Cannot delete internship: ID is undefined');
+      this.showCustomAlert('danger', 'Cannot delete internship: Invalid ID.');
+      return;
+    }
+
     this.internshipService.deleteInternship(id).subscribe(
       () => {
-        this.loadInternships(); // Refresh the list after deletion
-        window.alert('Internship deleted successfully!');
+        this.loadInternships();
+        this.showCustomAlert('success', 'Internship deleted successfully!');
       },
       error => {
         console.error('Error deleting internship:', error);
-        window.alert('Failed to delete internship. Please try again or contact support.');
+        this.showCustomAlert('danger', 'Failed to delete internship. Please try again or contact support.');
       }
     );
   }
 
-  deleteInternshipOffer(id: number): void {
-    this.internshipOfferService.deleteInternshipOffer(id).subscribe(
-      () => {
-        this.loadInternshipOffers();
-        window.alert('Internship offer deleted successfully!');
-      },
-      error => {
-        console.error('Error deleting internship offer:', error);
-        window.alert('Failed to delete internship offer. Please try again or contact support.');
-      }
-    );
-  }
-
-  deleteInternshipRequest(id: number): void {
-    this.internshipRequestService.deleteInternshipRequest(id).subscribe(
-      () => {
-        this.loadInternshipRequests();
-        window.alert('Internship request deleted successfully!');
-      },
-      error => {
-        console.error('Error deleting internship request:', error);
-        window.alert('Failed to delete internship request. Please try again or contact support.');
-      }
-    );
-  }
-
-  // Select the internship to update
   selectInternship(internship: Internship): void {
-    this.selectedInternship = { ...internship }; // Create a copy to avoid direct mutation
+    this.selectedInternship = { ...internship };
   }
 
-  // Update the internship
   updateInternship(): void {
+    if (this.selectedInternship.id === undefined) {
+      console.error('Cannot update internship: ID is undefined');
+      this.showCustomAlert('danger', 'Cannot update internship: Invalid ID.');
+      return;
+    }
+
     this.internshipService.updateInternship(this.selectedInternship).subscribe(
       () => {
-        this.loadInternships(); // Refresh the list after update
-        window.alert('Internship updated successfully!');
+        this.loadInternships();
+        this.showCustomAlert('success', 'Internship updated successfully!');
       },
       error => {
         console.error('Error updating internship:', error);
-        window.alert('Failed to update internship. Please try again or contact support.');
+        this.showCustomAlert('danger', 'Failed to update internship. Please try again or contact support.');
       }
     );
   }
 
-  // Add internship form submission
   onSubmitInternship(form: NgForm): void {
     if (!form.valid) return;
 
@@ -146,8 +169,7 @@ export class InternshipListComponent implements OnInit {
         this.isSubmittingInternship = false;
         form.resetForm();
         this.internship = { title: '', description: '', startDate: '', endDate: '', status: InternStatus.IN_PROGRESS };
-        window.alert('Internship created successfully!');
-        // Close the modal
+        this.showCustomAlert('success', 'Internship created successfully!');
         const modal = document.getElementById('addInternshipModal');
         if (modal) {
           const bootstrapModal = (window as any).bootstrap.Modal.getInstance(modal);
@@ -155,14 +177,24 @@ export class InternshipListComponent implements OnInit {
             bootstrapModal.hide();
           }
         }
-        // Refresh the internship list
         this.loadInternships();
       },
       error: (err) => {
         console.error('Error creating internship:', err);
         this.isSubmittingInternship = false;
-        window.alert('Failed to create internship. Please try again.');
+        this.showCustomAlert('danger', 'Failed to create internship. Please try again.');
       }
     });
+  }
+
+  showCustomAlert(type: 'success' | 'danger', message: string): void {
+    this.alertType = `alert-${type}`;
+    this.alertMessage = message;
+    this.showAlert = true;
+    setTimeout(() => this.closeAlert(), 5000);
+  }
+
+  closeAlert(): void {
+    this.showAlert = false;
   }
 }

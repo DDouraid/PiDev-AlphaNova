@@ -8,17 +8,19 @@ import { InternshipOfferListComponent } from './components/internship-offer-list
 import { InternshipRequestListComponent } from './components/internship-request-list/internship-request-list.component';
 import { UserInternshipOfferListComponent } from './components/user-internship-offer-list/user-internship-offer-list.component';
 import { OfferDetailsComponent } from './components/offer-details/offer-details.component';
+import { CalendarComponent } from './components/calendar/calendar.component'; // Import CalendarComponent
 
 const routes: Routes = [
-  { path: 'ListeInternship', component: InternshipListComponent }, 
-  { path: 'add', component: InternshipFormComponent }, 
-  { path: 'addoffer', component: AddInternshipOfferComponent }, 
-  { path: 'addrequest', component: AddInternshipRequestComponent }, 
-  { path: 'listeoffers', component: InternshipOfferListComponent }, // New route for offers list
-  { path: 'listrequests', component: InternshipRequestListComponent }, // New route for requests list
-  { path: '', redirectTo: '/ListeInternship', pathMatch: 'full' }, // Optional: Default route
-  { path: 'user/listeoffers', component: UserInternshipOfferListComponent }, // For the user version
-  { path: 'offer-details', component: OfferDetailsComponent }, // Add the new route
+  { path: 'ListeInternship', component: InternshipListComponent },
+  { path: 'add', component: InternshipFormComponent },
+  { path: 'addoffer', component: AddInternshipOfferComponent },
+  { path: 'addrequest', component: AddInternshipRequestComponent },
+  { path: 'listeoffers', component: InternshipOfferListComponent },
+  { path: 'listrequests', component: InternshipRequestListComponent },
+  { path: '', redirectTo: '/ListeInternship', pathMatch: 'full' },
+  { path: 'user/listeoffers', component: UserInternshipOfferListComponent },
+  { path: 'offer-details', component: OfferDetailsComponent },
+  { path: 'calendar', component: CalendarComponent } // Add the new route for Calendar
 ];
 
 @NgModule({

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; // Add this
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
@@ -12,13 +12,18 @@ import { InternshipRequestService } from './services/internship-request.service'
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AppRoutingModule } from './app-routing.module';
 import { ToastrModule } from 'ngx-toastr';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { ModalModule } from 'ngx-bootstrap/modal'; // Import ModalModule for modals
 import { AddInternshipOfferComponent } from './components/add-internship-offer/add-internship-offer.component';
 import { AddInternshipRequestComponent } from './components/add-internship-request/add-internship-request.component';
 import { InternshipOfferListComponent } from './components/internship-offer-list/internship-offer-list.component';
 import { InternshipRequestListComponent } from './components/internship-request-list/internship-request-list.component';
 import { UserInternshipOfferListComponent } from './components/user-internship-offer-list/user-internship-offer-list.component';
-import { NotificationComponent } from './components/notification/notification.component';
 import { OfferDetailsComponent } from './components/offer-details/offer-details.component';
+import { CalendarComponent } from './components/calendar/calendar.component';
+import { AlertComponent } from './components/alert/alert.component';
+import { CalendarModule, DateAdapter } from 'angular-calendar'; // For calendar functionality
+import { adapterFactory } from 'angular-calendar/date-adapters/date-fns'; // Date adapter for angular-calendar
 
 @NgModule({
   declarations: [
@@ -31,12 +36,15 @@ import { OfferDetailsComponent } from './components/offer-details/offer-details.
     InternshipOfferListComponent,
     InternshipRequestListComponent,
     UserInternshipOfferListComponent,
-    NotificationComponent,
-    OfferDetailsComponent
+    OfferDetailsComponent,
+    CalendarComponent,
+    AlertComponent
   ],
   imports: [
     BrowserModule,
-    BrowserAnimationsModule, // Required for ngx-toastr animations
+    BsDatepickerModule.forRoot(), // Compatible with ngx-bootstrap@10.3.0
+    ModalModule.forRoot(), // Add ModalModule for modals
+    BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
@@ -46,7 +54,11 @@ import { OfferDetailsComponent } from './components/offer-details/offer-details.
       timeOut: 3000,
       closeButton: true,
       progressBar: true,
-      preventDuplicates: true // Optional: prevents duplicate toasts
+      preventDuplicates: true
+    }),
+    CalendarModule.forRoot({ // Configure angular-calendar with date-fns adapter
+      provide: DateAdapter,
+      useFactory: adapterFactory,
     })
   ],
   providers: [

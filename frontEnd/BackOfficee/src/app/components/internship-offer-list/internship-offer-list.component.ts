@@ -20,10 +20,15 @@ export class InternshipOfferListComponent implements OnInit {
     datePosted: undefined,
     durationInMonths: null
   };
+  offerIdToDelete: number | null = null;
   isSubmittingOffer: boolean = false;
-  isLoading: boolean = false; // Added for loading state
+  isLoading: boolean = false;
   requestsForOffer: InternshipRequest[] = [];
   downloadingCv: { [key: string]: boolean } = {};
+
+  showAlert: boolean = false;
+  alertType: string = 'alert-success';
+  alertMessage: string = '';
 
   constructor(private internshipOfferService: InternshipOfferService) {
     const today = new Date();
@@ -54,7 +59,7 @@ export class InternshipOfferListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching internship offers:', error);
-        window.alert('Failed to load internship offers. Please try again or contact support.');
+        this.showCustomAlert('danger', 'Failed to load internship offers. Please try again or contact support.');
       },
       complete: () => {
         this.isLoading = false;
@@ -84,11 +89,11 @@ export class InternshipOfferListComponent implements OnInit {
             durationInMonths: null
           };
           form.resetForm(this.internshipOffer);
-          window.alert('Internship offer created successfully!');
+          this.showCustomAlert('success', 'Internship offer created successfully!');
         },
         error: (error) => {
           console.error('Error creating internship offer:', error);
-          window.alert('Failed to create internship offer. Please try again or contact support.');
+          this.showCustomAlert('danger', 'Failed to create internship offer. Please try again or contact support.');
         },
         complete: () => {
           this.isSubmittingOffer = false;
@@ -96,7 +101,7 @@ export class InternshipOfferListComponent implements OnInit {
       });
     } else {
       console.log('Form is invalid:', form.value);
-      window.alert('Please fill in all required fields correctly.');
+      this.showCustomAlert('warning', 'Please fill in all required fields correctly.');
     }
   }
 
@@ -107,9 +112,38 @@ export class InternshipOfferListComponent implements OnInit {
     };
   }
 
+  selectOfferForDeletion(id: number | undefined): void {
+    if (id === undefined) {
+      this.showCustomAlert('warning', 'Invalid offer ID.');
+      return;
+    }
+    this.offerIdToDelete = id;
+  }
+
+  confirmDeleteInternshipOffer(): void {
+    if (this.offerIdToDelete === null) {
+      this.showCustomAlert('warning', 'No internship offer selected for deletion.');
+      return;
+    }
+
+    this.internshipOfferService.deleteInternshipOffer(this.offerIdToDelete).subscribe({
+      next: () => {
+        this.loadInternshipOffers();
+        this.showCustomAlert('success', 'Internship offer deleted successfully!');
+      },
+      error: (error) => {
+        console.error('Error deleting internship offer:', error);
+        this.showCustomAlert('danger', 'Failed to delete internship offer. Please try again or contact support.');
+      },
+      complete: () => {
+        this.offerIdToDelete = null;
+      }
+    });
+  }
+
   updateInternshipOffer(): void {
     if (!this.selectedInternshipOffer.id) {
-      window.alert('No internship offer selected for update.');
+      this.showCustomAlert('warning', 'No internship offer selected for update.');
       return;
     }
 
@@ -121,34 +155,18 @@ export class InternshipOfferListComponent implements OnInit {
     this.internshipOfferService.updateInternshipOffer(offerToUpdate).subscribe({
       next: () => {
         this.loadInternshipOffers();
-        window.alert('Internship offer updated successfully!');
+        this.showCustomAlert('success', 'Internship offer updated successfully!');
       },
       error: (error) => {
         console.error('Error updating internship offer:', error);
-        window.alert('Failed to update internship offer. Please try again or contact support.');
+        this.showCustomAlert('danger', 'Failed to update internship offer. Please try again or contact support.');
       }
     });
   }
 
-  deleteInternshipOffer(id: number): void {
-    const confirmDelete = confirm('Are you sure you want to delete this internship offer?');
-    if (confirmDelete) {
-      this.internshipOfferService.deleteInternshipOffer(id).subscribe({
-        next: () => {
-          this.loadInternshipOffers();
-          window.alert('Internship offer deleted successfully!');
-        },
-        error: (error) => {
-          console.error('Error deleting internship offer:', error);
-          window.alert('Failed to delete internship offer. Please try again or contact support.');
-        }
-      });
-    }
-  }
-
   viewRequestsForOffer(offer: InternshipOffer): void {
     if (!offer.id) {
-      window.alert('Invalid offer ID.');
+      this.showCustomAlert('warning', 'Invalid offer ID.');
       return;
     }
     this.selectedInternshipOffer = offer;
@@ -159,7 +177,7 @@ export class InternshipOfferListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching requests for offer ID ' + offer.id + ':', error);
-        window.alert('Failed to load requests for this offer. Please try again.');
+        this.showCustomAlert('danger', 'Failed to load requests for this offer. Please try again.');
         this.requestsForOffer = [];
       }
     });
@@ -167,7 +185,7 @@ export class InternshipOfferListComponent implements OnInit {
 
   downloadCv(fileName: string | undefined): void {
     if (!fileName) {
-      window.alert('No CV available to download.');
+      this.showCustomAlert('warning', 'No CV available to download.');
       return;
     }
     this.downloadingCv[fileName] = true;
@@ -176,7 +194,7 @@ export class InternshipOfferListComponent implements OnInit {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = fileName.split('_').slice(1).join('_'); // Clean up the file name
+        a.download = fileName.split('_').slice(1).join('_');
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -184,11 +202,22 @@ export class InternshipOfferListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error downloading CV:', error);
-        window.alert('Failed to download CV. Please try again or contact support.');
+        this.showCustomAlert('danger', 'Failed to download CV. Please try again or contact support.');
       },
       complete: () => {
         this.downloadingCv[fileName] = false;
       }
     });
+  }
+
+  showCustomAlert(type: 'success' | 'danger' | 'warning', message: string): void {
+    this.alertType = `alert-${type}`;
+    this.alertMessage = message;
+    this.showAlert = true;
+    setTimeout(() => this.closeAlert(), 5000);
+  }
+
+  closeAlert(): void {
+    this.showAlert = false;
   }
 }

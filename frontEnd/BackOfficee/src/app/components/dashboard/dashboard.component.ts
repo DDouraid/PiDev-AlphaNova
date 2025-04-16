@@ -1,16 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SearchService } from '../../services/search.service';
+import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
   searchQuery: string = '';
   searchResults: any[] = [];
   isSearching: boolean = false;
+
+  isCalendarOpen = false;
+  bsConfig: Partial<BsDatepickerConfig> = {
+    containerClass: 'theme-default',
+    dateInputFormat: 'YYYY-MM-DD',
+  };
+  selectedDate: Date = new Date();
 
   constructor(
     private searchService: SearchService,
@@ -42,7 +50,7 @@ export class DashboardComponent implements OnInit {
         console.error('Error searching:', err);
         this.searchResults = [];
         this.isSearching = false;
-      }
+      },
     });
   }
 
@@ -55,5 +63,9 @@ export class DashboardComponent implements OnInit {
   clearSearch(): void {
     this.searchQuery = '';
     this.searchResults = [];
+  }
+
+  openCalendar(): void {
+    this.isCalendarOpen = !this.isCalendarOpen;
   }
 }

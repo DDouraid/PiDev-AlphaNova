@@ -1,28 +1,246 @@
 <!-- frontend/src/app/components/home/home.component.html -->
 <div class="container mt-4">
-  <!-- Loading State -->
-  <div class="loading-container" *ngIf="isLoading">
-    <!-- Show spinner while loading -->
-    <div class="loading-spinner">
-      <span class="spinner"></span>
-    </div>
-    <!-- Show admin message if user is admin -->
-    <p *ngIf="adminMessage" class="admin-message">{{ adminMessage }}</p>
+  <!-- Welcome Header -->
+  <div class="welcome-header mb-4">
+    <h2>Welcome to Document Generator!</h2>
+    <p>Generate and manage your documents with ease</p>
   </div>
 
-  <!-- Error Message -->
-  <p *ngIf="errorMessage && !isLoading" class="text-danger">{{ errorMessage }}</p>
+  <!-- Document Generation Buttons -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="d-flex gap-3">
+        <button class="btn btn-primary" (click)="openResumeModal()">
+          Generate Resume
+        </button>
+        <button class="btn btn-primary" (click)="openReportModal()">
+          Generate Report
+        </button>
+        <button class="btn btn-primary" (click)="openAgreementModal()">
+          Generate Agreement
+        </button>
+      </div>
+    </div>
+  </div>
 
-  <!-- User Info (for non-admin users) -->
-  <div *ngIf="!isLoading && !errorMessage && !isAdmin">
-    <h2>Welcome Home, {{ user.username || 'User' }}!</h2>
-    <p>This is the home page for non-admin users.</p>
-    <p>Email: {{ user.email || 'N/A' }}</p>
-    <p>Roles: {{ user.roles.length > 0 ? user.roles.join(', ') : 'None' }}</p>
-    <!-- Suggestion Message -->
-    <p class="suggestion-message" (click)="goToCustomizeProfile()" role="button" tabindex="0" (keypress)="goToCustomizeProfile()">
-      {{ suggestionMessage }}
-    </p>
-    <button class="btn btn-primary" (click)="logout()">Logout</button>
+  <!-- Document Management Section -->
+  <div class="row">
+    <div class="col-md-12">
+      <h3>Document Management</h3>
+
+      <!-- Loading Indicator -->
+      <div *ngIf="isLoading" class="alert alert-info">
+        Loading...
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{errorMessage}}
+      </div>
+
+      <!-- Documents List -->
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Created Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="documents.length === 0">
+              <td colspan="4" class="text-center">No documents found</td>
+            </tr>
+            <tr *ngFor="let doc of documents">
+              <td>{{doc.id}}</td>
+              <td>{{getDocumentTypeLabel(doc.documentType)}}</td>
+              <td>{{formatDate(doc.createdDate)}}</td>
+              <td>
+                <button class="btn btn-sm btn-info me-2" (click)="viewDocument(doc.id)">
+                  View
+                </button>
+                <button class="btn btn-sm btn-success" (click)="downloadDocument(doc.id)">
+                  Download
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PDF Viewer -->
+<div *ngIf="showPdfViewer && pdfUrl && !isLoading" class="pdf-viewer-container">
+  <div class="pdf-viewer-header">
+    <h2>Document Preview</h2>
+    <div class="pdf-viewer-actions">
+      <button class="btn btn-outline-primary" (click)="closePdfViewer()">Back</button>
+    </div>
+  </div>
+  <div class="pdf-frame">
+    <iframe [src]="pdfUrl" frameborder="0"></iframe>
+  </div>
+</div>
+
+<!-- Resume Modal -->
+<div class="modal" [class.show]="showResumeModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Generate Resume</h3>
+      <button class="close-button" (click)="closeResumeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <div class="form-group">
+          <label for="userId">User ID</label>
+          <input
+            type="number"
+            id="userId"
+            class="form-control"
+            [(ngModel)]="userId"
+            name="userId"
+            placeholder="Enter your user ID"
+            required>
+        </div>
+        <div class="form-group">
+          <label for="skills">Skills</label>
+          <textarea
+            id="skills"
+            class="form-control"
+            [(ngModel)]="resumeForm.skills"
+            name="skills"
+            rows="3"
+            placeholder="Enter your skills (comma-separated)"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="experience">Experience</label>
+          <textarea
+            id="experience"
+            class="form-control"
+            [(ngModel)]="resumeForm.experience"
+            name="experience"
+            rows="3"
+            placeholder="Enter your work experience"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="education">Education</label>
+          <textarea
+            id="education"
+            class="form-control"
+            [(ngModel)]="resumeForm.education"
+            name="education"
+            rows="3"
+            placeholder="Enter your education details"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeResumeModal()">Cancel</button>
+          <button class="btn btn-primary" (click)="generateResume()">Generate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Report Modal -->
+<div class="modal" [class.show]="showReportModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Generate Report</h3>
+      <button class="close-button" (click)="closeReportModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <div class="form-group">
+          <label for="userId">User ID</label>
+          <input
+            type="number"
+            id="userId"
+            class="form-control"
+            [(ngModel)]="userId"
+            name="userId"
+            placeholder="Enter your user ID"
+            required>
+        </div>
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input
+            type="text"
+            id="title"
+            class="form-control"
+            [(ngModel)]="reportForm.title"
+            name="title"
+            placeholder="Enter report title">
+        </div>
+        <div class="form-group">
+          <label for="content">Content</label>
+          <textarea
+            id="content"
+            class="form-control"
+            [(ngModel)]="reportForm.content"
+            name="content"
+            rows="5"
+            placeholder="Enter report content"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeReportModal()">Cancel</button>
+          <button class="btn btn-primary" (click)="generateReport()">Generate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Agreement Modal -->
+<div class="modal" [class.show]="showAgreementModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Generate Agreement</h3>
+      <button class="close-button" (click)="closeAgreementModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <div class="form-group">
+          <label for="userId">User ID</label>
+          <input
+            type="number"
+            id="userId"
+            class="form-control"
+            [(ngModel)]="userId"
+            name="userId"
+            placeholder="Enter your user ID"
+            required>
+        </div>
+        <div class="form-group">
+          <label for="companyName">Company Name</label>
+          <input
+            type="text"
+            id="companyName"
+            class="form-control"
+            [(ngModel)]="agreementForm.companyName"
+            name="companyName"
+            placeholder="Enter company name"
+            required>
+        </div>
+        <div class="form-group">
+          <label for="duration">Duration</label>
+          <input
+            type="text"
+            id="duration"
+            class="form-control"
+            [(ngModel)]="agreementForm.duration"
+            name="duration"
+            placeholder="Enter agreement duration"
+            required>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeAgreementModal()">Cancel</button>
+          <button class="btn btn-primary" (click)="generateAgreement()">Generate</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

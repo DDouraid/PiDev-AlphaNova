@@ -51,7 +51,7 @@ export class DashboardComponent implements OnInit {
 
   loadUserInfo(): void {
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      // this.router.navigate(['/login']);
       return;
     }
     this.authService.getCurrentUserFromServer().subscribe({

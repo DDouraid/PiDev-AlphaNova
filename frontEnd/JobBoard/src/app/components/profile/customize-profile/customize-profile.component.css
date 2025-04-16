@@ -51,12 +51,6 @@
   color: #dc3545;
 }
 
-.profile-pic {
-  max-width: 150px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
 .pre {
   white-space: pre-wrap;
   background-color: #f8f9fa;
@@ -67,30 +61,4 @@
 .spinner-border {
   width: 1rem;
   height: 1rem;
-}
-/* Style for suggested skills and languages buttons */
-.btn-outline-secondary {
-  border-color: #fc5130;
-  color: #fc5130;
-  background-color: transparent;
-  transition: all 0.2s ease-in-out;
-}
-
-.btn-outline-secondary:hover {
-  background-color: #fc5130;
-  color: white;
-  border-color: #fc5130;
-}
-
-.btn-sm {
-  padding: 0.25rem 0.75rem;
-  font-size: 0.875rem;
-}
-
-.rounded-pill {
-  border-radius: 50rem;
-}
-
-.d-flex.flex-wrap.gap-2 {
-  gap: 0.5rem;
 }

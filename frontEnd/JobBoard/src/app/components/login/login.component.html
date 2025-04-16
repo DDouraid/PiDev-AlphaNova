@@ -50,6 +50,7 @@
             <div *ngIf="password.errors?.['minlength']">Password must be at least 6 characters long.</div>
           </div>
         </div>
+        <!-- Add Forgot Password link -->
         <a routerLink="/reset-password" class="forgot-password-link"><i class="fas fa-key"></i> Forgot Password ?</a>
         <button type="submit" class="login-button" [disabled]="isLoading || loginForm.invalid">
           <span *ngIf="!isLoading">Sign In</span>
@@ -63,8 +64,8 @@
         <button class="social-button linkedin" (click)="loginWithLinkedIn()">
           <i class="fab fa-linkedin-in"></i> Login with LinkedIn
         </button>
-        <button class="social-button github" (click)="loginWithGitHub()">
-          <i class="fab fa-github"></i> Login with GitHub
+        <button class="social-button google" (click)="loginWithGoogle()">
+          <i class="fab fa-google"></i> Login with Google
         </button>
         <a routerLink="/register" class="register-link">Don't have an account? Register</a>
       </div>

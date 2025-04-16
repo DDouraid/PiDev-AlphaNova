@@ -1,402 +1,124 @@
 <div class="container mt-4">
-  <!-- Premium Promotion -->
-  <div class="card mb-4 shadow-sm bg-light">
-    <div class="card-body text-center">
-      <h4 class="card-title">Enhance Your Profile with Premium</h4>
-      <p class="card-text">Feature profile sections higher, add a custom button, get AI writing assistance, and much more.</p>
-      <p class="card-text">Jebbari and millions of other members use Premium</p>
-      <button class="btn btn-primary">Try Premium for $0</button>
-      <p class="card-text text-muted small">1-month free with 24/7 support. Cancel anytime. We’ll remind you 7 days before your trial ends.</p>
-    </div>
-  </div>
-
-  <!-- Profile Picture Upload -->
-  
+  <h2 class="text-center">Customize Your CV, {{ user.username || 'User' }}!</h2>
+  <p class="text-center text-muted">Email: {{ user.email || 'N/A' }}</p>
+  <p class="text-center text-muted">Roles: {{ (user.roles && user.roles.length > 0) ? user.roles.join(', ') : 'None' }}</p>
 
   <div class="card mt-4 shadow-sm">
     <div class="card-body">
-      <h4 class="card-title">Profile Customization</h4>
-      <form [formGroup]="cvForm" (ngSubmit)="saveProfile()" class="needs-validation" novalidate>
+      <h4 class="card-title">CV Customization</h4>
+      <form [formGroup]="cvForm" (ngSubmit)="saveCV()" class="needs-validation" novalidate>
         <!-- Personal Information -->
         <div class="mb-4">
-          <h5>Personal Information <span class="text-muted small">* Indicates required</span></h5>
+          <h5>Personal Information</h5>
           <div class="row g-3">
-            <div class="col-md-6">
-              <label for="fullName" class="form-label">Full Name *</label>
-              <input type="text" class="form-control" id="fullName" formControlName="fullName" [class.is-invalid]="cvForm.get('fullName')?.invalid && cvForm.get('fullName')?.touched">
-              <div *ngIf="cvForm.get('fullName')?.invalid && cvForm.get('fullName')?.touched" class="invalid-feedback">
-                Full name is required, min 2 and max 100 characters.
+            <div class="col-md-4">
+              <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="fullName" formControlName="personalInfo.fullName" [class.is-invalid]="cvForm.get('personalInfo')?.get('fullName')?.invalid && cvForm.get('personalInfo')?.get('fullName')?.touched">
+              <div *ngIf="cvForm.get('personalInfo')?.get('fullName')?.invalid && cvForm.get('personalInfo')?.get('fullName')?.touched" class="invalid-feedback">
+                Name is required and must be 2-50 characters.
               </div>
             </div>
-            <div class="col-md-6">
-              <label for="headline" class="form-label">Headline</label>
-              <div class="input-group">
-                <input type="text" class="form-control" id="headline" formControlName="headline" [class.is-invalid]="cvForm.get('headline')?.invalid && cvForm.get('headline')?.touched">
-                <button type="button" class="btn btn-outline-secondary" disabled>Get AI Suggestions with Premium</button>
-              </div>
-              <div *ngIf="cvForm.get('headline')?.invalid && cvForm.get('headline')?.touched" class="invalid-feedback">
-                Headline max 120 characters.
-              </div>
-            </div>
-            <div class="col-md-6">
-              <label for="currentPosition" class="form-label">Current Position</label>
-              <input type="text" class="form-control" id="currentPosition" formControlName="currentPosition" [class.is-invalid]="cvForm.get('currentPosition')?.invalid && cvForm.get('currentPosition')?.touched">
-              <div *ngIf="cvForm.get('currentPosition')?.invalid && cvForm.get('currentPosition')?.touched" class="invalid-feedback">
-                Max 100 characters.
-              </div>
-              <button type="button" class="btn btn-link p-0" (click)="addExperience()">Add new position</button>
-            </div>
-            <div class="col-md-6">
-              <label for="industry" class="form-label">Industry</label>
-              <input type="text" class="form-control" id="industry" formControlName="industry" [class.is-invalid]="cvForm.get('industry')?.invalid && cvForm.get('industry')?.touched">
-              <div *ngIf="cvForm.get('industry')?.invalid && cvForm.get('industry')?.touched" class="invalid-feedback">
-                Max 50 characters.
-              </div>
-              <button type="button" class="btn btn-link p-0">Learn more about industry options</button>
-            </div>
-            <div class="col-md-6">
-              <label for="location" class="form-label">Location (City, Country)</label>
-              <input type="text" class="form-control" id="location" formControlName="location" [class.is-invalid]="cvForm.get('location')?.invalid && cvForm.get('location')?.touched">
-              <div *ngIf="cvForm.get('location')?.invalid && cvForm.get('location')?.touched" class="invalid-feedback">
-                Max 100 characters.
-              </div>
-            </div>
-            <div class="col-md-6">
-              <label for="website" class="form-label">Website</label>
-              <input type="url" class="form-control" id="website" formControlName="website" [class.is-invalid]="cvForm.get('website')?.invalid && cvForm.get('website')?.touched">
-              <div *ngIf="cvForm.get('website')?.invalid && cvForm.get('website')?.touched" class="invalid-feedback">
-                Must be a valid URL (e.g., https://example.com) and max 200 characters.
-              </div>
-              <p class="text-muted small">Add a link that will appear at the top of your profile</p>
-            </div>
-            <div class="col-md-6">
-              <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" formControlName="email" [class.is-invalid]="cvForm.get('email')?.invalid && cvForm.get('email')?.touched">
-              <div *ngIf="cvForm.get('email')?.invalid && cvForm.get('email')?.touched" class="invalid-feedback">
-                Must be a valid email and max 100 characters.
-              </div>
-            </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <label for="phone" class="form-label">Phone</label>
-              <input type="tel" class="form-control" id="phone" formControlName="phone" [class.is-invalid]="cvForm.get('phone')?.invalid && cvForm.get('phone')?.touched">
-              <div *ngIf="cvForm.get('phone')?.invalid && cvForm.get('phone')?.touched" class="invalid-feedback">
+              <input type="tel" class="form-control" id="phone" formControlName="personalInfo.phone" [class.is-invalid]="cvForm.get('personalInfo')?.get('phone')?.invalid && cvForm.get('personalInfo')?.get('phone')?.touched">
+              <div *ngIf="cvForm.get('personalInfo')?.get('phone')?.invalid && cvForm.get('personalInfo')?.get('phone')?.touched" class="invalid-feedback">
                 Please enter a 10-digit phone number.
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <label for="address" class="form-label">Address</label>
-              <input type="text" class="form-control" id="address" formControlName="address" [class.is-invalid]="cvForm.get('address')?.invalid && cvForm.get('address')?.touched">
-              <div *ngIf="cvForm.get('address')?.invalid && cvForm.get('address')?.touched" class="invalid-feedback">
-                Max 200 characters.
-              </div>
+              <input type="text" class="form-control" id="address" formControlName="personalInfo.address">
             </div>
-            <!-- About -->
-<div class="mb-4">
-  <h5>About</h5>
-  <textarea class="form-control" id="about" formControlName="about" rows="5" placeholder="Write a brief summary about yourself..." [class.is-invalid]="cvForm.get('about')?.invalid && cvForm.get('about')?.touched"></textarea>
-  <div *ngIf="cvForm.get('about')?.invalid && cvForm.get('about')?.touched" class="invalid-feedback">
-    About section max 2000 characters.
-  </div>
-  <!-- Suggested About Paragraph -->
-  <div class="mt-2">
-    <label class="form-label text-muted small">Need help? Use this template:</label>
-    <div>
-      <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" (click)="addSuggestedAbout()">
-        Insert Suggested About Paragraph
-      </button>
-    </div>
-  </div>
-  <!-- Suggestion for About -->
-  <div class="mt-3 text-muted small">
-    <span>Suggestion: Highlight your experience, skills, and passions to make a strong impression!</span>
-  </div>
-</div>
-          </div>
-          <div class="mt-3">
-            <button type="button" class="btn btn-link p-0">Edit contact info</button>
-          </div>
-          <!-- Suggestion for Personal Information -->
-          <div class="mt-3 text-muted small">
-            <span>Suggestion: Add more details to your profile to stand out!</span>
-            <button type="button" class="btn btn-link p-0 ms-2" (click)="cvForm.reset()">+ Add More Info</button>
           </div>
         </div>
 
         <!-- Education -->
         <div class="mb-4" formArrayName="education">
           <h5>Education</h5>
-          <div *ngFor="let education of educationArray.controls; let i=index" [formGroupName]="i" class="mb-3 p-3 border rounded">
-            <div class="row g-3">
-              <div class="col-md-4">
-                <label [for]="'institution' + i" class="form-label">School <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" [id]="'institution' + i" formControlName="institution" [class.is-invalid]="education.get('institution')?.invalid && education.get('institution')?.touched">
-                <div *ngIf="education.get('institution')?.invalid && education.get('institution')?.touched" class="invalid-feedback">
-                  School is required and max 100 characters.
+          <div *ngIf="educationArray.controls.length > 0">
+            <div *ngFor="let education of educationArray.controls; let i=index" [formGroupName]="i" class="mb-3 p-3 border rounded">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label [for]="'institution' + i" class="form-label">Institution <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [id]="'institution' + i" formControlName="institution" [class.is-invalid]="education.get('institution')?.invalid && education.get('institution')?.touched">
+                  <div *ngIf="education.get('institution')?.invalid && education.get('institution')?.touched" class="invalid-feedback">
+                    Institution is required and max 100 characters.
+                  </div>
                 </div>
-              </div>
-              <div class="col-md-4">
-                <label [for]="'degree' + i" class="form-label">Degree <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" [id]="'degree' + i" formControlName="degree" [class.is-invalid]="education.get('degree')?.invalid && education.get('degree')?.touched">
-                <div *ngIf="education.get('degree')?.invalid && education.get('degree')?.touched" class="invalid-feedback">
-                  Degree is required and max 100 characters.
+                <div class="col-md-4">
+                  <label [for]="'degree' + i" class="form-label">Degree <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [id]="'degree' + i" formControlName="degree" [class.is-invalid]="education.get('degree')?.invalid && education.get('degree')?.touched">
+                  <div *ngIf="education.get('degree')?.invalid && education.get('degree')?.touched" class="invalid-feedback">
+                    Degree is required and max 100 characters.
+                  </div>
                 </div>
-              </div>
-              <div class="col-md-2">
-                <label [for]="'year' + i" class="form-label">Year <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" [id]="'year' + i" formControlName="year" [class.is-invalid]="education.get('year')?.invalid && education.get('year')?.touched">
-                <div *ngIf="education.get('year')?.invalid && education.get('year')?.touched" class="invalid-feedback">
-                  Year must be a 4-digit number between 1900 and {{ currentYear }}.
+                <div class="col-md-2">
+                  <label [for]="'year' + i" class="form-label">Year <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [id]="'year' + i" formControlName="year" [class.is-invalid]="education.get('year')?.invalid && education.get('year')?.touched">
+                  <div *ngIf="education.get('year')?.invalid && education.get('year')?.touched" class="invalid-feedback">
+                    Year must be a 4-digit number between 1900 and {{ currentYear }}.
+                  </div>
                 </div>
-              </div>
-              <div class="col-md-2 d-flex align-items-end">
-                <button type="button" class="btn btn-danger" (click)="removeEducation(i)" [disabled]="educationArray.length <= 1">Remove</button>
+                <div class="col-md-2 d-flex align-items-end">
+                  <button type="button" class="btn btn-danger" (click)="removeEducation(i)" [disabled]="educationArray.length <= 1">Remove</button>
+                </div>
               </div>
             </div>
           </div>
           <div *ngIf="educationArray.length === 0" class="alert alert-info">No education entries added yet.</div>
-          <button type="button" class="btn btn-secondary" (click)="addEducation()">Add new education</button>
-          <!-- Suggestion for Education -->
-          <div class="mt-3 text-muted small">
-            <span>Suggestion: Add another degree or course to showcase your academic background!</span>
-            <button type="button" class="btn btn-link p-0 ms-2" (click)="addEducation()">+ Add Education</button>
-          </div>
+          <button type="button" class="btn btn-secondary" (click)="addEducation()">Add Education</button>
         </div>
 
         <!-- Experience -->
-<div class="mb-4" formArrayName="experience">
-  <h5>Experience</h5>
-  <div *ngFor="let experience of experienceArray.controls; let i=index" [formGroupName]="i" class="mb-3 p-3 border rounded">
-    <div class="row g-3">
-      <div class="col-md-3">
-        <label [for]="'exp-company' + i" class="form-label">Company <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" [id]="'exp-company' + i" formControlName="company" [class.is-invalid]="experience.get('company')?.invalid && experience.get('company')?.touched">
-        <div *ngIf="experience.get('company')?.invalid && experience.get('company')?.touched" class="invalid-feedback">
-          Company name is required and max 100 characters.
-        </div>
-      </div>
-      <div class="col-md-3">
-        <label [for]="'exp-position' + i" class="form-label">Position <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" [id]="'exp-position' + i" formControlName="position" [class.is-invalid]="experience.get('position')?.invalid && experience.get('position')?.touched">
-        <div *ngIf="experience.get('position')?.invalid && experience.get('position')?.touched" class="invalid-feedback">
-          Position is required and max 100 characters.
-        </div>
-      </div>
-      <div class="col-md-2">
-        <label [for]="'exp-duration' + i" class="form-label">Duration <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" [id]="'exp-duration' + i" formControlName="duration" [class.is-invalid]="experience.get('duration')?.invalid && experience.get('duration')?.touched">
-        <div *ngIf="experience.get('duration')?.invalid && experience.get('duration')?.touched" class="invalid-feedback">
-          Duration is required and max 50 characters.
-        </div>
-      </div>
-      <div class="col-md-2 d-flex align-items-end">
-        <button type="button" class="btn btn-danger" (click)="removeExperience(i)">Remove</button>
-      </div>
-      <div class="col-md-12">
-        <label [for]="'exp-description' + i" class="form-label">Description</label>
-        <textarea class="form-control" [id]="'exp-description' + i" formControlName="description" rows="2" [class.is-invalid]="experience.get('description')?.invalid && experience.get('description')?.touched"></textarea>
-        <div *ngIf="experience.get('description')?.invalid && experience.get('description')?.touched" class="invalid-feedback">
-          Description max 500 characters.
-        </div>
-      </div>
-    </div>
-  </div>
-  <div *ngIf="experienceArray.length === 0" class="alert alert-info">No experience added yet.</div>
-  <button type="button" class="btn btn-secondary" (click)="addExperience()">Add Experience</button>
-  <!-- Suggested Experiences -->
-  <div class="mt-2">
-    <label class="form-label text-muted small">Suggested experiences based on your profile</label>
-    <div class="d-flex flex-wrap gap-2">
-      <button *ngFor="let exp of suggestedExperiences" type="button" class="btn btn-outline-secondary btn-sm rounded-pill" (click)="addSuggestedExperience(exp)">
-        {{ exp.position }} at {{ exp.company }} ({{ exp.duration }})
-      </button>
-    </div>
-  </div>
-  <!-- Suggestion for Experience -->
-  <div class="mt-3 text-muted small">
-    <span>Suggestion: Add another experience to highlight your career journey!</span>
-    <button type="button" class="btn btn-link p-0 ms-2" (click)="addExperience()">+ Add Experience</button>
-  </div>
-</div>
-
-      <!-- Skills -->
-<div class="mb-4">
-  <h5>Skills</h5>
-  <textarea class="form-control" id="skills" formControlName="skills" rows="3" placeholder="Enter your skills (one per line)" [class.is-invalid]="cvForm.get('skills')?.invalid && cvForm.get('skills')?.touched"></textarea>
-  <div *ngIf="cvForm.get('skills')?.invalid && cvForm.get('skills')?.touched" class="invalid-feedback">
-    Skills max 500 characters.
-  </div>
-  <!-- Suggested Skills -->
-  <div class="mt-2">
-    <label class="form-label text-muted small">Suggested based on your profile</label>
-    <div class="d-flex flex-wrap gap-2">
-      <button *ngFor="let skill of suggestedSkills" type="button" class="btn btn-outline-secondary btn-sm rounded-pill" (click)="addSkill(skill)">
-        {{ skill }}
-      </button>
-    </div>
-  </div>
-  <!-- Suggestion for Skills -->
-  <div class="mt-3 text-muted small">
-    <span>Suggestion: Add more skills to demonstrate your expertise!</span>
-    <button type="button" class="btn btn-link p-0 ms-2" (click)="cvForm.get('skills')?.setValue((cvForm.get('skills')?.value || '') + '\n')">+ Add Skill</button>
-  </div>
-</div>
-
-<!-- Languages -->
-<div class="mb-4">
-  <h5>Languages I Speak</h5>
-  <textarea class="form-control" id="languages" formControlName="languages" rows="3" placeholder="Enter the languages you speak (one per line, e.g., English - Fluent)" [class.is-invalid]="cvForm.get('languages')?.invalid && cvForm.get('languages')?.touched"></textarea>
-  <div *ngIf="cvForm.get('languages')?.invalid && cvForm.get('languages')?.touched" class="invalid-feedback">
-    Languages max 500 characters.
-  </div>
-  <!-- Suggested Languages -->
-  <div class="mt-2">
-    <label class="form-label text-muted small">Suggested languages</label>
-    <div class="d-flex flex-wrap gap-2">
-      <button *ngFor="let language of suggestedLanguages" type="button" class="btn btn-outline-secondary btn-sm rounded-pill" (click)="addLanguage(language)">
-        {{ language }}
-      </button>
-    </div>
-  </div>
-  <!-- Suggestion for Languages -->
-  <div class="mt-3 text-muted small">
-    <span>Suggestion: Add another language to showcase your communication skills!</span>
-    <button type="button" class="btn btn-link p-0 ms-2" (click)="cvForm.get('languages')?.setValue((cvForm.get('languages')?.value || '') + '\n')">+ Add Language</button>
-  </div>
-</div>
-
-      <!-- Certifications -->
-<div class="mb-4" formArrayName="certifications">
-  <h5>Certifications</h5>
-  <div *ngFor="let certification of certificationsArray.controls; let i=index" [formGroupName]="i" class="mb-3 p-3 border rounded">
-    <div class="row g-3">
-      <div class="col-md-4">
-        <label [for]="'cert-name' + i" class="form-label">Certification Name <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" [id]="'cert-name' + i" formControlName="name" [class.is-invalid]="certification.get('name')?.invalid && certification.get('name')?.touched">
-        <div *ngIf="certification.get('name')?.invalid && certification.get('name')?.touched" class="invalid-feedback">
-          Certification name is required and max 100 characters.
-        </div>
-      </div>
-      <div class="col-md-4">
-        <label [for]="'cert-issuer' + i" class="form-label">Issuer <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" [id]="'cert-issuer' + i" formControlName="issuer" [class.is-invalid]="certification.get('issuer')?.invalid && certification.get('issuer')?.touched">
-        <div *ngIf="certification.get('issuer')?.invalid && certification.get('issuer')?.touched" class="invalid-feedback">
-          Issuer is required and max 100 characters.
-        </div>
-      </div>
-      <div class="col-md-2">
-        <label [for]="'cert-issueDate' + i" class="form-label">Issue Date (YYYY-MM)</label>
-        <input type="text" class="form-control" [id]="'cert-issueDate' + i" formControlName="issueDate" [class.is-invalid]="certification.get('issueDate')?.invalid && certification.get('issueDate')?.touched">
-        <div *ngIf="certification.get('issueDate')?.invalid && certification.get('issueDate')?.touched" class="invalid-feedback">
-          Format: YYYY-MM (e.g., 2023-01).
-        </div>
-      </div>
-      <div class="col-md-2 d-flex align-items-end">
-        <button type="button" class="btn btn-danger" (click)="removeCertification(i)">Remove</button>
-      </div>
-    </div>
-  </div>
-  <div *ngIf="certificationsArray.length === 0" class="alert alert-info">No certifications added yet.</div>
-  <button type="button" class="btn btn-secondary" (click)="addCertification()">Add Certification</button>
-  <!-- Suggested Certifications -->
-  <div class="mt-2">
-    <label class="form-label text-muted small">Suggested certifications based on your profile</label>
-    <div class="d-flex flex-wrap gap-2">
-      <button *ngFor="let cert of suggestedCertifications" type="button" class="btn btn-outline-secondary btn-sm rounded-pill" (click)="addSuggestedCertification(cert)">
-        {{ cert.name }} ({{ cert.issuer }})
-      </button>
-    </div>
-  </div>
-  <!-- Suggestion for Certifications -->
-  <div class="mt-3 text-muted small">
-    <span>Suggestion: Add another certification to boost your credibility!</span>
-    <button type="button" class="btn btn-link p-0 ms-2" (click)="addCertification()">+ Add Certification</button>
-  </div>
-</div>
-
-        <!-- Projects -->
-        <div class="mb-4" formArrayName="projects">
-          <h5>Projects</h5>
-          <div *ngFor="let project of projectsArray.controls; let i=index" [formGroupName]="i" class="mb-3 p-3 border rounded">
-            <div class="row g-3">
-              <div class="col-md-4">
-                <label [for]="'project-name' + i" class="form-label">Project Name <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" [id]="'project-name' + i" formControlName="name" [class.is-invalid]="project.get('name')?.invalid && project.get('name')?.touched">
-                <div *ngIf="project.get('name')?.invalid && project.get('name')?.touched" class="invalid-feedback">
-                  Project name is required and max 100 characters.
+        <div class="mb-4" formArrayName="experience">
+          <h5>Experience</h5>
+          <div *ngIf="experienceArray.controls.length > 0">
+            <div *ngFor="let experience of experienceArray.controls; let i=index" [formGroupName]="i" class="mb-3 p-3 border rounded">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label [for]="'company' + i" class="form-label">Company <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [id]="'company' + i" formControlName="company" [class.is-invalid]="experience.get('company')?.invalid && experience.get('company')?.touched">
+                  <div *ngIf="experience.get('company')?.invalid && experience.get('company')?.touched" class="invalid-feedback">
+                    Company is required and max 100 characters.
+                  </div>
                 </div>
-              </div>
-              <div class="col-md-4">
-                <label [for]="'project-description' + i" class="form-label">Description</label>
-                <textarea class="form-control" [id]="'project-description' + i" formControlName="description" rows="2" [class.is-invalid]="project.get('description')?.invalid && project.get('description')?.touched"></textarea>
-                <div *ngIf="project.get('description')?.invalid && project.get('description')?.touched" class="invalid-feedback">
-                  Description max 500 characters.
+                <div class="col-md-3">
+                  <label [for]="'position' + i" class="form-label">Position <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [id]="'position' + i" formControlName="position" [class.is-invalid]="experience.get('position')?.invalid && experience.get('position')?.touched">
+                  <div *ngIf="experience.get('position')?.invalid && experience.get('position')?.touched" class="invalid-feedback">
+                    Position is required and max 100 characters.
+                  </div>
                 </div>
-              </div>
-              <div class="col-md-2">
-                <label [for]="'project-url' + i" class="form-label">URL</label>
-                <input type="text" class="form-control" [id]="'project-url' + i" formControlName="url" [class.is-invalid]="project.get('url')?.invalid && project.get('url')?.touched">
-                <div *ngIf="project.get('url')?.invalid && project.get('url')?.touched" class="invalid-feedback">
-                  Must be a valid URL (e.g., https://example.com).
+                <div class="col-md-3">
+                  <label [for]="'duration' + i" class="form-label">Duration <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [id]="'duration' + i" formControlName="duration" [class.is-invalid]="experience.get('duration')?.invalid && experience.get('duration')?.touched">
+                  <div *ngIf="experience.get('duration')?.invalid && experience.get('duration')?.touched" class="invalid-feedback">
+                    Duration is required and max 50 characters.
+                  </div>
                 </div>
-              </div>
-              <div class="col-md-2 d-flex align-items-end">
-                <button type="button" class="btn btn-danger" (click)="removeProject(i)">Remove</button>
+                <div class="col-md-2">
+                  <label [for]="'description' + i" class="form-label">Description</label>
+                  <input type="text" class="form-control" [id]="'description' + i" formControlName="description" [class.is-invalid]="experience.get('description')?.invalid && experience.get('description')?.touched">
+                  <div *ngIf="experience.get('description')?.invalid && experience.get('description')?.touched" class="invalid-feedback">
+                    Description max 500 characters.
+                  </div>
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                  <button type="button" class="btn btn-danger" (click)="removeExperience(i)" [disabled]="experienceArray.length <= 1">Remove</button>
+                </div>
               </div>
             </div>
           </div>
-          <div *ngIf="projectsArray.length === 0" class="alert alert-info">No projects added yet.</div>
-          <button type="button" class="btn btn-secondary" (click)="addProject()">Add Project</button>
-          <!-- Suggestion for Projects -->
-          <div class="mt-3 text-muted small">
-            <span>Suggestion: Add another project to showcase your practical experience!</span>
-            <button type="button" class="btn btn-link p-0 ms-2" (click)="addProject()">+ Add Project</button>
-          </div>
+          <div *ngIf="experienceArray.length === 0" class="alert alert-info">No experience entries added yet.</div>
+          <button type="button" class="btn btn-secondary" (click)="addExperience()">Add Experience</button>
         </div>
 
-        <!-- Publications -->
-        <div class="mb-4" formArrayName="publications">
-          <h5>Publications</h5>
-          <div *ngFor="let publication of publicationsArray.controls; let i=index" [formGroupName]="i" class="mb-3 p-3 border rounded">
-            <div class="row g-3">
-              <div class="col-md-3">
-                <label [for]="'pub-title' + i" class="form-label">Title <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" [id]="'pub-title' + i" formControlName="title" [class.is-invalid]="publication.get('title')?.invalid && publication.get('title')?.touched">
-                <div *ngIf="publication.get('title')?.invalid && publication.get('title')?.touched" class="invalid-feedback">
-                  Title is required and max 100 characters.
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label [for]="'pub-publisher' + i" class="form-label">Publisher</label>
-                <input type="text" class="form-control" [id]="'pub-publisher' + i" formControlName="publisher" [class.is-invalid]="publication.get('publisher')?.invalid && publication.get('publisher')?.touched">
-                <div *ngIf="publication.get('publisher')?.invalid && publication.get('publisher')?.touched" class="invalid-feedback">
-                  Publisher max 100 characters.
-                </div>
-              </div>
-              <div class="col-md-2">
-                <label [for]="'pub-date' + i" class="form-label">Publication Date (YYYY-MM)</label>
-                <input type="text" class="form-control" [id]="'pub-date' + i" formControlName="publicationDate" [class.is-invalid]="publication.get('publicationDate')?.invalid && publication.get('publicationDate')?.touched">
-                <div *ngIf="publication.get('publicationDate')?.invalid && publication.get('publicationDate')?.touched" class="invalid-feedback">
-                  Format: YYYY-MM (e.g., 2023-01).
-                </div>
-              </div>
-              <div class="col-md-2">
-                <label [for]="'pub-url' + i" class="form-label">URL</label>
-                <input type="text" class="form-control" [id]="'pub-url' + i" formControlName="url" [class.is-invalid]="publication.get('url')?.invalid && publication.get('url')?.touched">
-                <div *ngIf="publication.get('url')?.invalid && publication.get('url')?.touched" class="invalid-feedback">
-                  Must be a valid URL (e.g., https://example.com).
-                </div>
-              </div>
-              <div class="col-md-2 d-flex align-items-end">
-                <button type="button" class="btn btn-danger" (click)="removePublication(i)">Remove</button>
-              </div>
-            </div>
-          </div>
-          <div *ngIf="publicationsArray.length === 0" class="alert alert-info">No publications added yet.</div>
-          <button type="button" class="btn btn-secondary" (click)="addPublication()">Add Publication</button>
-          <!-- Suggestion for Publications -->
-          <div class="mt-3 text-muted small">
-            <span>Suggestion: Add another publication to highlight your research or writing!</span>
-            <button type="button" class="btn btn-link p-0 ms-2" (click)="addPublication()">+ Add Publication</button>
+        <!-- Skills -->
+        <div class="mb-4">
+          <h5>Skills</h5>
+          <textarea class="form-control" id="skills" formControlName="skills" rows="3" placeholder="Enter your skills (one per line)" [class.is-invalid]="cvForm.get('skills')?.invalid && cvForm.get('skills')?.touched"></textarea>
+          <div *ngIf="cvForm.get('skills')?.invalid && cvForm.get('skills')?.touched" class="invalid-feedback">
+            Skills are required and max 500 characters.
           </div>
         </div>
 
@@ -406,19 +128,21 @@
             <span *ngIf="!isSaving">Save CV</span>
             <span *ngIf="isSaving" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
           </button>
-          <button type="button" class="btn btn-secondary" (click)="togglePreview()">Preview Profile</button>
+          <button type="button" class="btn btn-secondary" (click)="togglePreview()">Preview CV</button>
         </div>
       </form>
       <p *ngIf="errorMessage" class="text-danger mt-2">{{ errorMessage }}</p>
 
-      <!-- Profile Preview -->
+      <!-- CV Preview -->
       <div *ngIf="previewVisible" class="mt-4 p-3 border rounded bg-light">
         <h5>CV Preview</h5>
         <div class="cv-preview-content">
-          <pre>{{ generateProfileText() }}</pre>
+          <pre>{{ generateCVText() }}</pre>
         </div>
-        <button class="btn btn-success mt-2" (click)="downloadCV()">Download as PDF</button>
+        <button class="btn btn-success mt-2" (click)="downloadCV()">Download CV</button>
       </div>
     </div>
   </div>
+<div>
+</div>
 </div>

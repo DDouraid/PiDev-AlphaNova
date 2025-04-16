@@ -1,96 +1,335 @@
-// frontend/src/app/components/home/home.component.ts
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from 'src/services/auth.service';
-import { timer } from 'rxjs'; // Import timer for creating a delay
-import { tap } from 'rxjs/operators'; // Import tap for side effects
+import { Component, type OnInit } from "@angular/core"
+import { Router } from "@angular/router"
+import { HttpClient, HttpParams } from "@angular/common/http"
+import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser"
+import {
+  Document,
+  DocumentType,
+  DocumentResponse,
+  ResumeGenerationRequest,
+  ReportGenerationRequest,
+  AgreementGenerationRequest
+} from "src/models/document.model"
+import { saveAs } from 'file-saver'
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  selector: "app-home",
+  templateUrl: "./home.component.html",
+  styleUrls: ["./home.component.css"],
 })
 export class HomeComponent implements OnInit {
-  user = {
-    username: '',
-    email: '',
-    roles: [] as string[]
-  };
-  isAdmin: boolean = false; // Flag to track if user is admin
-  isLoading: boolean = false; // Loading state
-  errorMessage: string = ''; // Error message for user info fetch
-  adminMessage: string = ''; // Message to display for admin users during loading
-  suggestionMessage: string = ''; // Suggestion message for non-admin users
+  isLoading = false
+  errorMessage = ""
 
-  constructor(private authService: AuthService, private router: Router) {}
+  // Document generation
+  userId: number | null = null
+  showResumeModal = false
+  showReportModal = false
+  showAgreementModal = false
+
+  // PDF viewer
+  pdfUrl: SafeResourceUrl | null = null
+  showPdfViewer = false
+
+  // Document history
+  documents: Document[] = []
+  documentTypes = DocumentType
+
+  // Document generation form data
+  resumeForm = {
+    skills: '',
+    experience: '',
+    education: ''
+  }
+
+  reportForm = {
+    title: '',
+    content: ''
+  }
+
+  agreementForm = {
+    companyName: '',
+    duration: ''
+  }
+
+  backendUrl = "http://localhost:8080"
+
+  constructor(
+    private readonly router: Router,
+    private readonly http: HttpClient,
+    private readonly sanitizer: DomSanitizer,
+  ) {}
 
   ngOnInit(): void {
-    this.loadUserInfo();
+    this.loadDocuments()
   }
 
-  loadUserInfo(): void {
-    console.log('Loading user info, isLoggedIn:', this.authService.isLoggedIn(), 'Token:', this.authService.getToken());
-    if (!this.authService.isLoggedIn()) {
-      console.log('Not logged in, redirecting to login');
-      this.router.navigate(['/login']);
-      return;
+  // Modal controls
+  openResumeModal(): void {
+    this.showResumeModal = true
+  }
+
+  closeResumeModal(): void {
+    this.showResumeModal = false
+  }
+
+  openReportModal(): void {
+    this.showReportModal = true
+  }
+
+  closeReportModal(): void {
+    this.showReportModal = false
+  }
+
+  openAgreementModal(): void {
+    this.showAgreementModal = true
+  }
+
+  closeAgreementModal(): void {
+    this.showAgreementModal = false
+  }
+
+  // Document generation
+  generateResume(): void {
+    if (!this.userId) {
+      this.errorMessage = "Please enter a valid user ID"
+      return
     }
 
-    this.isLoading = true;
-    this.errorMessage = '';
-    this.adminMessage = '';
-    this.suggestionMessage = '';
+    this.isLoading = true
+    this.errorMessage = ""
 
-    // Use timer to ensure the loading state lasts at least 3 seconds
-    const loadingDelay$ = timer(3000); // 3000ms = 3 seconds
+    const request: ResumeGenerationRequest = {
+      ...this.resumeForm,
+      userId: this.userId
+    }
 
-    this.authService.getCurrentUserFromServer().pipe(
-      tap(() => {
-        // Ensure the loading state lasts for at least 3 seconds
-        loadingDelay$.subscribe(() => {
-          this.isLoading = false;
-          // Redirect if admin after the delay
-          if (this.isAdmin) {
-            this.router.navigate(['/dashboard']);
-          }
-        });
+    const params = new HttpParams()
+      .set('skills', request.skills || '')
+      .set('experience', request.experience || '')
+      .set('education', request.education || '')
+      .set('userId', request.userId.toString())
+
+    this.http
+      .post(`${this.backendUrl}/api/resumes`, {}, {
+        params,
+        responseType: 'blob',
+        observe: 'response'
       })
-    ).subscribe({
-      next: (response) => {
-        console.log('User info response:', response);
-        this.user.username = response.username;
-        this.user.email = response.email;
-        this.user.roles = response.roles || [];
-        // Check if user has ADMIN role
-        this.isAdmin = this.user.roles.some(role => role.toUpperCase() === 'ADMIN');
-        console.log('Is Admin:', this.isAdmin);
-        // Set admin message during loading
-        if (this.isAdmin) {
-          this.adminMessage = 'Welcome, Admin! Heading to your dashboard in a moment...';
-        } else {
-          // Set suggestion message for non-admin users
-          this.suggestionMessage = 'Looking to stand out? Customize your profile and upload your CV now to unlock new opportunities!';
-        }
-      },
-      error: (err) => {
-        this.errorMessage = 'Error fetching user info: ' + (err.message || 'Unknown error');
-        console.error('Error fetching user info:', err);
-        // Ensure the loading state lasts for at least 3 seconds even on error
-        loadingDelay$.subscribe(() => {
-          this.isLoading = false;
-          this.router.navigate(['/login']);
-        });
-      }
-    });
+      .subscribe({
+        next: (response) => {
+          const blob = new Blob([response.body as Blob], { type: 'application/pdf' })
+          const url = URL.createObjectURL(blob)
+          this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url)
+          this.showPdfViewer = true
+          this.isLoading = false
+          this.closeResumeModal()
+        },
+        error: (err) => {
+          this.errorMessage = "Error generating resume: " + (err.message || "Unknown error")
+          this.isLoading = false
+          this.closeResumeModal()
+        },
+      })
   }
 
-  // Navigate to the customize profile page
-  goToCustomizeProfile(): void {
-    this.router.navigate(['/customize-profile']);
+  generateReport(): void {
+    if (!this.userId) {
+      this.errorMessage = "Please enter a valid user ID"
+      return
+    }
+
+    this.isLoading = true
+    this.errorMessage = ""
+
+    const request: ReportGenerationRequest = {
+      ...this.reportForm,
+      userId: this.userId
+    }
+
+    const params = new HttpParams()
+      .set('title', request.title || '')
+      .set('content', request.content || '')
+      .set('userId', request.userId.toString())
+
+    this.http
+      .post(`${this.backendUrl}/api/reports`, {}, {
+        params,
+        responseType: 'blob',
+        observe: 'response'
+      })
+      .subscribe({
+        next: (response) => {
+          const blob = new Blob([response.body as Blob], { type: 'application/pdf' })
+          const url = URL.createObjectURL(blob)
+          this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url)
+          this.showPdfViewer = true
+          this.isLoading = false
+          this.closeReportModal()
+        },
+        error: (err) => {
+          this.errorMessage = "Error generating report: " + (err.message || "Unknown error")
+          this.isLoading = false
+          this.closeReportModal()
+        },
+      })
   }
 
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+  generateAgreement(): void {
+    if (!this.userId) {
+      this.errorMessage = "Please enter a valid user ID"
+      return
+    }
+
+    this.isLoading = true
+    this.errorMessage = ""
+
+    const request: AgreementGenerationRequest = {
+      ...this.agreementForm,
+      userId: this.userId
+    }
+
+    const params = new HttpParams()
+      .set('companyName', request.companyName)
+      .set('duration', request.duration)
+      .set('userId', request.userId.toString())
+
+    this.http
+      .post(`${this.backendUrl}/api/agreements`, {}, {
+        params,
+        responseType: 'blob',
+        observe: 'response'
+      })
+      .subscribe({
+        next: (response) => {
+          const blob = new Blob([response.body as Blob], { type: 'application/pdf' })
+          const url = URL.createObjectURL(blob)
+          this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url)
+          this.showPdfViewer = true
+          this.isLoading = false
+          this.closeAgreementModal()
+        },
+        error: (err) => {
+          this.errorMessage = "Error generating agreement: " + (err.message || "Unknown error")
+          this.isLoading = false
+          this.closeAgreementModal()
+        },
+      })
+  }
+
+  closePdfViewer(): void {
+    this.showPdfViewer = false
+    this.pdfUrl = null
+  }
+
+  // Document history methods
+  loadDocuments(): void {
+    // if (!this.userId) {
+    //   return
+    // }
+this.userId =1
+    this.isLoading = true
+    this.errorMessage = ""
+
+    const params = new HttpParams()
+      .set('userId', this.userId.toString())
+
+    this.http
+      .get<Document[]>(`${this.backendUrl}/api/documents/my-documents`, { params })
+      .subscribe({
+        next: (documents) => {
+          this.documents = documents
+          this.isLoading = false
+        },
+        error: (err) => {
+          this.errorMessage = "Error loading documents: " + (err.message || "Unknown error")
+          this.isLoading = false
+        },
+      })
+  }
+
+  viewDocument(documentId: number): void {
+    if (!this.userId) {
+      this.errorMessage = "Please enter a valid user ID"
+      return
+    }
+
+    this.isLoading = true
+    this.errorMessage = ""
+
+    const params = new HttpParams()
+      .set('documentId', documentId.toString())
+      .set('userId', this.userId.toString())
+
+    this.http
+      .get(`${this.backendUrl}/api/documents/view`, {
+        params,
+        responseType: 'blob',
+        observe: 'response'
+      })
+      .subscribe({
+        next: (response) => {
+          const blob = new Blob([response.body as Blob], { type: 'application/pdf' })
+          const url = URL.createObjectURL(blob)
+          this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url)
+          this.showPdfViewer = true
+          this.isLoading = false
+        },
+        error: (err) => {
+          this.errorMessage = "Error viewing document: " + (err.message || "Unknown error")
+          this.isLoading = false
+        },
+      })
+  }
+
+  downloadDocument(documentId: number): void {
+    if (!this.userId) {
+      this.errorMessage = "Please enter a valid user ID"
+      return
+    }
+
+    this.isLoading = true
+    this.errorMessage = ""
+
+    const params = new HttpParams()
+      .set('documentId', documentId.toString())
+      .set('userId', this.userId.toString())
+
+    this.http
+      .get(`${this.backendUrl}/api/documents/download`, {
+        params,
+        responseType: 'blob',
+        observe: 'response'
+      })
+      .subscribe({
+        next: (response) => {
+          const blob = new Blob([response.body as Blob], { type: 'application/pdf' })
+          const filename = response.headers.get('Content-Disposition')?.split('filename=')[1] || 'document.pdf'
+          saveAs(blob, filename)
+          this.isLoading = false
+        },
+        error: (err) => {
+          this.errorMessage = "Error downloading document: " + (err.message || "Unknown error")
+          this.isLoading = false
+        },
+      })
+  }
+
+  getDocumentTypeLabel(type: DocumentType): string {
+    switch (type) {
+      case DocumentType.RESUME:
+        return "Resume"
+      case DocumentType.REPORT:
+        return "Report"
+      case DocumentType.AGREEMENT:
+        return "Agreement"
+      default:
+        return "Unknown"
+    }
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString)
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString()
   }
 }

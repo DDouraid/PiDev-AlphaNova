@@ -46,7 +46,7 @@ export class ProfileComponent implements OnInit {
     console.log('Loading profile, isLoggedIn:', this.authService.isLoggedIn(), 'Token:', this.authService.getToken());
     if (!this.authService.isLoggedIn()) {
       console.log('Not logged in, redirecting to login');
-      this.router.navigate(['/login']);
+      // this.router.navigate(['/login']);
       return;
     }
 

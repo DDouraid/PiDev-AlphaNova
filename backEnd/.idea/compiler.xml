@@ -8,9 +8,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="Supervisor" />
+        <module name="Gestion_Users" />
+        <module name="eureka" />
         <module name="Event" />
         <module name="Application" />
-        <module name="eureka" />
+        <module name="demo" />
         <module name="gateway" />
       </profile>
     </annotationProcessing>
@@ -19,7 +21,9 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="Application" options="-parameters" />
       <module name="Event" options="-parameters" />
+      <module name="Gestion_Users" options="-parameters" />
       <module name="Supervisor" options="-parameters" />
+      <module name="demo" options="-parameters" />
       <module name="eureka" options="-parameters" />
       <module name="gateway" options="-parameters" />
     </option>

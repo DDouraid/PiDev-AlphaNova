@@ -27,6 +27,12 @@ public class GatewayApplication {
                 .route("Supervisor",
                         r -> r.path("/api/**")
                                 .uri("http://localhost:8081"))
+                .route("Document",
+                        r -> r.path("/api/**")
+                                .uri("http://localhost:8083"))
+                .route("User",
+                        r -> r.path("/api/**")
+                                .uri("http://localhost:8088"))
                 .build();
     }
 }

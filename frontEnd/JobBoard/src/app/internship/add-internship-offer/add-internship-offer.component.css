@@ -1,0 +1,12 @@
+:root {
+    --toast-success-bg: #28a745; /* Green background for success */
+    --toast-error-bg: #dc3545;   /* Red background for error */
+  }
+  
+  .toast-success {
+    background-color: var(--toast-success-bg) !important;
+  }
+  
+  .toast-error {
+    background-color: var(--toast-error-bg) !important;
+  }

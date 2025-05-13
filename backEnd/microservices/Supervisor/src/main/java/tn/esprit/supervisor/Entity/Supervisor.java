@@ -26,6 +26,9 @@ public class Supervisor {
     private String email;
     private  String speciality;
 
+    private Long userId; // New field for user ID
+    private String username; // New field for username
+
 
 
 

@@ -1,0 +1,196 @@
+.mode-toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.mode-toggle .btn {
+  flex: 1;
+  text-align: center;
+}
+
+.mode-toggle .btn.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.search-area {
+  min-width: 250px;
+  max-width: 400px;
+}
+
+.search-input {
+  border-left: 0;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  box-shadow: none;
+  border-color: #ced4da;
+}
+
+.search-results {
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 0.25rem;
+  padding: 0;
+}
+
+.search-result-item {
+  padding: 8px 12px;
+  transition: background-color 0.2s ease;
+}
+
+.search-result-item:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+.result-type {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.result-title {
+  font-size: 1rem;
+  color: #212529;
+}
+
+.result-description {
+  font-size: 0.9rem;
+}
+
+/* Calendar Container (Dropdown) */
+.dropdown-menu {
+  min-width: 300px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0;
+  background-color: #fff;
+}
+
+/* Date Input Field */
+.form-control {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: #333;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+  outline: none;
+}
+
+/* Calendar Popup (bsDatepicker) */
+.bs-datepicker {
+  z-index: 1050;
+  font-family: 'Arial', sans-serif;
+  border: none !important;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+/* Calendar Header (Month/Year and Arrows) */
+.bs-datepicker-head {
+  background-color: #007bff !important;
+  padding: 10px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.bs-datepicker-head button {
+  color: #fff !important;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.bs-datepicker-head button:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Calendar Body */
+.bs-datepicker-body {
+  padding: 10px;
+  background-color: #fff;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Days of the Week (Sun, Mon, etc.) */
+.bs-datepicker-body .days .dow {
+  color: #666;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+/* Date Cells */
+.bs-datepicker-body .days .day {
+  color: #333;
+  font-size: 0.9rem;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+/* Hover Effect on Dates */
+.bs-datepicker-body .days .day:hover {
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+/* Selected Date */
+.bs-datepicker-body .days .day.is-selected {
+  background-color: #007bff !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+/* Today's Date */
+.bs-datepicker-body .days .day.is-today {
+  border: 1px solid #007bff;
+  color: #007bff;
+  font-weight: 600;
+}
+
+/* Disabled Dates (e.g., from previous/next month) */
+.bs-datepicker-body .days .day.is-other-month {
+  color: #ccc;
+}
+
+/* Navigation Arrows */
+.bs-datepicker-head .previous,
+.bs-datepicker-head .next {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 5px 10px;
+}
+
+.bs-datepicker-head .previous:hover,
+.bs-datepicker-head .next:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .search-area {
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 576px) {
+  .dropdown-menu {
+    min-width: 250px;
+  }
+
+  .bs-datepicker-body .days .day {
+    padding: 6px;
+    font-size: 0.85rem;
+  }
+}

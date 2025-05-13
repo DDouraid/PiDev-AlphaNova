@@ -7,8 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.http.*;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,8 +16,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.gestion_utilisateurs.models.Role;
 import tn.esprit.gestion_utilisateurs.models.User;
@@ -37,10 +39,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -67,6 +66,26 @@ public class AuthController {
 
 	@Autowired
 	OtpService otpService;
+    @Autowired
+    private RestTemplate restTemplate;
+
+	@GetMapping("/users/{userId}")
+	public ResponseEntity<Object> checkUserExists(@PathVariable Long userId) {
+		return userRepository.findById(userId)
+				.map(user -> ResponseEntity.ok().build())
+				.orElse(ResponseEntity.notFound().build());
+	}
+	@GetMapping("/users/by-username/{username}")
+	public ResponseEntity<Map<String, Object>> getUserByUsername(@PathVariable String username) {
+		return userRepository.findByUsername(username)
+				.map(user -> {
+					Map<String, Object> response = new HashMap<>();
+					response.put("id", user.getId());
+					response.put("username", user.getUsername());
+					return ResponseEntity.ok(response);
+				})
+				.orElse(ResponseEntity.notFound().build());
+	}
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -375,6 +394,48 @@ public class AuthController {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error uploading image: " + e.getMessage()));
 		}
 	}
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+@PostMapping("/profile/CVtoBack")
+public ResponseEntity<?> CVtoBack(Authentication authentication, @RequestParam("cv") MultipartFile cv) {
+	if (authentication == null || !authentication.isAuthenticated()) {
+		return ResponseEntity.status(401).body(new MessageResponse("Error: User not authenticated"));
+	}
+
+	if (cv == null || cv.isEmpty()) {
+		return ResponseEntity.badRequest().body(new MessageResponse("Error: No CV file provided"));
+	}
+
+	try {
+		String uploadDir = "uploads/cvs/";
+		Path uploadPath = Paths.get(uploadDir);
+		if (!Files.exists(uploadPath)) {
+			Files.createDirectories(uploadPath);
+			System.out.println("Created upload directory: " + uploadPath);
+		}
+
+		String originalFilename = cv.getOriginalFilename();
+		String fileExtension = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf(".")) : ".pdf";
+		String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
+		Path filePath = uploadPath.resolve(uniqueFilename);
+
+		Files.copy(cv.getInputStream(), filePath);
+		System.out.println("CV saved to: " + filePath);
+
+		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+		User user = userRepository.findByUsername(userDetails.getUsername())
+				.orElseThrow(() -> new RuntimeException("User not found"));
+		user.setCvFile(uploadDir + uniqueFilename);
+		userRepository.save(user);
+
+		System.out.println("Updated user cvFile: " + (uploadDir + uniqueFilename));
+		return ResponseEntity.ok(new MessageResponse("CV uploaded successfully!"));
+	} catch (Exception e) {
+		System.err.println("Error uploading CV: " + e.getMessage());
+		e.printStackTrace();
+		return ResponseEntity.badRequest().body(new MessageResponse("Error uploading CV: " + e.getMessage()));
+	}
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@PostMapping("/profile/cv")
 	public ResponseEntity<?> uploadCV(Authentication authentication, @RequestParam("cv") MultipartFile cv) {
@@ -536,7 +597,216 @@ public class AuthController {
 
 		return ResponseEntity.ok(new MessageResponse("Password reset successfully!"));
 	}
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+	@PostMapping("/linkedin-callback")
+	public ResponseEntity<?> handleLinkedInCallback(@RequestParam("code") String code) {
+		try {
+			// LinkedIn OAuth configuration
+			String clientId = "77ip9kskqvd40o"; // Replace with your Client ID
+			String clientSecret = "WPL_AP1.Z1a6JQLTfKtXxjNn.qBSgiw=="; // Replace with your Client Secret
+			String redirectUri = "http://localhost:5000/auth/callback";
+
+			// Step 1: Exchange code for access token
+			String tokenUrl = "https://www.linkedin.com/oauth/v2/accessToken";
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+			MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+			body.add("grant_type", "authorization_code");
+			body.add("code", code);
+			body.add("redirect_uri", redirectUri);
+			body.add("client_id", clientId);
+			body.add("client_secret", clientSecret);
+
+			HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+			ResponseEntity<Map> tokenResponse = restTemplate.postForEntity(tokenUrl, request, Map.class);
+
+			Map<String, Object> tokenBody = tokenResponse.getBody();
+			if (tokenBody == null || !tokenBody.containsKey("access_token")) {
+				return ResponseEntity.badRequest().body(new MessageResponse("Error: Failed to obtain access token from LinkedIn"));
+			}
+
+			String accessToken = (String) tokenBody.get("access_token");
+
+			// Step 2: Fetch user data from LinkedIn
+			String userInfoUrl = "https://api.linkedin.com/v2/userinfo";
+			headers = new HttpHeaders();
+			headers.set("Authorization", "Bearer " + accessToken);
+			HttpEntity<String> userEntity = new HttpEntity<>(headers);
+			ResponseEntity<Map> userResponse = restTemplate.exchange(userInfoUrl, HttpMethod.GET, userEntity, Map.class);
+
+			Map<String, Object> userData = userResponse.getBody();
+			if (userData == null) {
+				return ResponseEntity.badRequest().body(new MessageResponse("Error: Failed to fetch LinkedIn user data"));
+			}
+
+			String email = (String) userData.get("email");
+			String givenName = (String) userData.get("given_name");
+			String familyName = (String) userData.get("family_name");
+			String picture = (String) userData.get("picture");
+			String sub = (String) userData.get("sub");
+
+			// Construct a username from given_name and family_name
+			String username = (givenName != null && familyName != null)
+					? givenName + familyName
+					: (givenName != null ? givenName : sub); // Fallback to sub if names are missing
+
+			// Step 3: Check if user exists or create new
+			Optional<User> existingUser = userRepository.findByEmail(email);
+			User user;
+			if (existingUser.isPresent()) {
+				user = existingUser.get();
+				if (user.isBlocked()) {
+					return ResponseEntity.badRequest().body(new MessageResponse("Login failed: Account blocked"));
+				}
+			} else {
+				user = new User();
+				user.setUsername(username); // Use constructed name
+				user.setEmail(email);
+				user.setPassword(encoder.encode(UUID.randomUUID().toString()));
+				Set<Role> roles = new HashSet<>();
+				Role userRole = roleRepository.findByName(UserRole.STUDENT)
+						.orElseThrow(() -> new RuntimeException("Error: Role STUDENT not found"));
+				roles.add(userRole);
+				user.setRoles(roles);
+				user.setProfileImage(picture);
+				userRepository.save(user);
+			}
+
+			// Step 4: Generate JWT
+			UserDetailsImpl userDetails = UserDetailsImpl.build(user);
+			Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+			String jwt = jwtUtils.generateJwtToken(authentication);
+
+			List<String> roles = userDetails.getAuthorities().stream()
+					.map(GrantedAuthority::getAuthority)
+					.collect(Collectors.toList());
+
+			return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId(), username, email, roles, user.getProfileImage(), user.getCvFile()));
+		} catch (Exception e) {
+			System.err.println("Error in LinkedIn OAuth flow: " + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.badRequest().body(new MessageResponse("Error during LinkedIn login: " + e.getMessage()));
+		}
+	}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/github-callback")
+	public ResponseEntity<?> handleGitHubCallback(@RequestParam("code") String code) {
+		if (code == null || code.isEmpty()) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Error: No authorization code provided"));
+		}
+
+		try {
+			// GitHub OAuth configuration
+			String clientId = "Ov23liyPX428Fh4qo4fW";
+			String clientSecret = "26f0840a3c7646d5eddcf0350114201f964d0127";
+			String redirectUri = "http://localhost:8088/api/auth/github-callback";
+
+			// Step 1: Exchange code for access token
+			String tokenUrl = "https://github.com/login/oauth/access_token" +
+					"?client_id=" + clientId +
+					"&client_secret=" + clientSecret +
+					"&code=" + code +
+					"&redirect_uri=" + redirectUri;
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Accept", "application/json");
+			HttpEntity<String> entity = new HttpEntity<>(headers);
+			ResponseEntity<Map> tokenResponse = restTemplate.exchange(tokenUrl, HttpMethod.POST, entity, Map.class);
+
+			Map<String, Object> tokenBody = tokenResponse.getBody();
+			if (tokenBody == null || !tokenBody.containsKey("access_token")) {
+				return ResponseEntity.badRequest().body(new MessageResponse("Error: Failed to obtain access token from GitHub"));
+			}
+
+			String accessToken = (String) tokenBody.get("access_token");
+
+			// Step 2: Fetch user data from GitHub
+			String userUrl = "https://api.github.com/user";
+			headers.set("Authorization", "Bearer " + accessToken);
+			HttpEntity<String> userEntity = new HttpEntity<>(headers);
+			ResponseEntity<Map> userResponse = restTemplate.exchange(userUrl, HttpMethod.GET, userEntity, Map.class);
+
+			Map<String, Object> userData = userResponse.getBody();
+			if (userData == null) {
+				return ResponseEntity.badRequest().body(new MessageResponse("Error: Failed to fetch GitHub user data"));
+			}
+
+			String username = (String) userData.get("login");
+			String email = (String) userData.get("email");
+			String avatarUrl = (String) userData.get("avatar_url");
+
+			// Step 3: Check if user exists
+			Optional<User> existingUser = userRepository.findByUsername(username);
+			User user;
+			if (existingUser.isPresent()) {
+				user = existingUser.get();
+				if (user.isBlocked()) {
+					return ResponseEntity.badRequest().body(new MessageResponse("Login failed: Your account has been blocked. Contact support for assistance."));
+				}
+			} else {
+				if (email != null && userRepository.existsByEmail(email)) {
+					return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use with a different account."));
+				}
+
+				user = new User();
+				user.setUsername(username);
+				user.setEmail(email != null ? email : username + "@github.com");
+				user.setPassword(encoder.encode(UUID.randomUUID().toString()));
+				Set<Role> roles = new HashSet<>();
+				Role userRole = roleRepository.findByName(UserRole.STUDENT)
+						.orElseThrow(() -> new RuntimeException("Error: Role STUDENT not found."));
+				roles.add(userRole);
+				user.setRoles(roles);
+				if (avatarUrl != null) {
+					user.setProfileImage(avatarUrl);
+				}
+				userRepository.save(user);
+			}
+
+			// Step 4: Authenticate and generate JWT
+			UserDetailsImpl userDetails = UserDetailsImpl.build(user);
+			Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+			String jwt = jwtUtils.generateJwtToken(authentication);
+
+			List<String> roles = userDetails.getAuthorities().stream()
+					.map(GrantedAuthority::getAuthority)
+					.collect(Collectors.toList());
+
+			// Step 5: Redirect to appropriate route based on role
+			String redirectUrl;
+			if (roles.contains("ADMIN")) {
+				redirectUrl = "http://localhost:5000/auth/callback?token=" + jwt;
+			} else if (roles.contains("STUDENT")) {
+				redirectUrl = "http://localhost:5000/auth/callback?token=" + jwt;
+			} else {
+				redirectUrl = "http://localhost:5000/auth/callback?token=" + jwt;
+			}
+
+			System.out.println("Redirecting to: " + redirectUrl); // Debug log
+			return ResponseEntity.status(302)
+					.header("Location", redirectUrl)
+					.body(new JwtResponse(jwt, userDetails.getId(), username, user.getEmail(), roles, user.getProfileImage(), user.getCvFile()));
+		} catch (Exception e) {
+			System.err.println("Error in GitHub OAuth flow: " + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.badRequest().body(new MessageResponse("Error during GitHub login: " + e.getMessage()));
+		}
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }
+
+
+
 
 class UpdateProfileRequest {
 	private String username;

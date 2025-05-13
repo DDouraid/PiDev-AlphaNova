@@ -15,6 +15,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import tn.esprit.gestion_utilisateurs.security.jwt.AuthEntryPointJwt;
@@ -22,6 +26,7 @@ import tn.esprit.gestion_utilisateurs.security.jwt.AuthTokenFilter;
 import tn.esprit.gestion_utilisateurs.security.jwt.JwtUtils;
 import tn.esprit.gestion_utilisateurs.security.services.UserDetailsServiceImpl;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -48,6 +53,10 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
 	}
 
 	@Bean
@@ -82,6 +91,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 				.authorizeHttpRequests(auth -> auth
 						// Public endpoints
 						.requestMatchers("/api/auth/**").permitAll()
+						.requestMatchers("/api/auth/signup").permitAll()
 						.requestMatchers("/api/test/**").permitAll()
 						.requestMatchers("/uploads/**").permitAll() // Allow public access to /uploads/**
 						// All other requests require authentication
@@ -93,11 +103,23 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
 		return http.build();
 	}
-
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200")); // Frontend origin
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		configuration.setAllowedHeaders(Arrays.asList("*"));
+		configuration.setAllowCredentials(true);
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/uploads/**")
 				.addResourceLocations("file:uploads/");
 		System.out.println("Static resource handler configured for /uploads/**");
 	}
+
+
 }

@@ -1,0 +1,122 @@
+.transition-all {
+  transition: all 0.3s ease-in-out;
+}
+
+.transition-all:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07) !important; /* Ombre plus douce */
+}
+
+/* Effet de survol sur les lignes de tableau */
+.table-hover tbody tr:hover {
+  background-color: #f3f4f6; /* Gris très clair */
+  transition: background-color 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Bouton Principal - Bleu */
+.btn-primary {
+  background-color: #2563eb; /* Bleu vif */
+  border-color: #2563eb;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(45deg, #2563eb, #3b82f6); /* Dégradé bleu doux */
+  border-color: #3b82f6;
+}
+
+/* Bouton Avertissement - Rouge clair */
+.btn-warning {
+  background-color: #f87171; /* Rouge clair */
+  border-color: #f87171;
+  color: white;
+}
+
+.btn-warning:hover {
+  background: linear-gradient(45deg, #f87171, #fca5a5); /* Dégradé rouge doux */
+  border-color: #fca5a5;
+}
+
+/* Bouton Danger - Rouge intense */
+.btn-danger {
+  background-color: #2563eb; /* Rouge vif */
+  border-color: #2563eb;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(45deg, #dc2626, #ef4444); /* Dégradé rouge fort */
+  border-color: #ef4444;
+}
+
+/* Bouton Succès - Bleu-Rouge */
+.btn-success {
+  background-color: #9333ea; /* Bleu violacé */
+  border-color: #9333ea;
+  color: white;
+}
+
+.btn-success:hover {
+  background: linear-gradient(45deg, #9333ea, #a855f7); /* Dégradé bleu-rouge */
+  border-color: #a855f7;
+}
+
+/* Pagination */
+.pagination {
+  margin: 0;
+}
+
+.page-item.disabled .page-link {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.page-link {
+  color: #2563eb; /* Bleu vif */
+  transition: all 0.3s ease-in-out;
+}
+
+.page-link:hover {
+  background-color: #f87171; /* Rouge clair */
+  color: white;
+}
+
+.page-item.active .page-link {
+  background-color: #2563eb; /* Bleu vif */
+  border-color: #2563eb;
+  color: white;
+}
+/* Dans liste-event.component.css */
+.stats-card {
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.badge-count {
+  font-size: 0.9rem;
+  padding: 5px 10px;
+}
+
+/* Dans liste-event.component.css */
+.chart-container .bg-primary {
+  transition: height 0.5s ease-in-out;
+  min-height: 20px;
+}
+
+.no-stats-message {
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+  color: #856404;
+  padding: 15px;
+  border-radius: 4px;
+}

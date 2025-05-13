@@ -1,0 +1,352 @@
+<div class="content-body">
+  <div class="container mt-4" style="min-height: 100vh; display: flex; flex-direction: column;">
+    <!-- Alerte de succès -->
+    <div *ngIf="successMessage"
+      class="alert alert-success d-flex align-items-center alert-dismissible fade show shadow animate__animated animate__fadeIn"
+      role="alert">
+      <i class="fas fa-check-circle me-2"></i>
+      <strong>{{ successMessage }}</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" (click)="successMessage = null"></button>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="alert alert-danger text-center mt-3 animate__animated animate__fadeIn">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Titre avec boutons (déplacé au-dessus de tout) -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="fw-bold" style="color: #2c3e50; animation: fadeIn 1s ease-in;">
+        <i class="fas fa-user-tie me-2"></i> Gestion des Superviseurs
+      </h2>
+      <div>
+        <!-- Bouton pour ajouter un superviseur -->
+        <button class="btn btn-primary btn-lg shadow-sm transition-all me-2" data-bs-toggle="modal"
+          data-bs-target="#addSupervisorModal" (click)="prepareNewSupervisor()">
+          <i class="fas fa-plus me-2"></i> Ajouter un Superviseur
+        </button>
+        <!-- Bouton pour générer un PDF -->
+        <button class="btn btn-success btn-lg shadow-sm transition-all" data-bs-toggle="modal"
+          data-bs-target="#generatePdfModal" (click)="prepareGeneratePdf()">
+          <i class="fas fa-file-pdf me-2"></i> Générer PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- Barre de recherche -->
+    <div class="mb-3">
+      <div class="input-group shadow-sm">
+        <span class="input-group-text"><i class="fas fa-search"></i></span>
+        <input type="text" class="form-control" placeholder="Rechercher un superviseur par nom..."
+          [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()">
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading" class="text-center my-3">
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
+
+    <!-- Liste des superviseurs -->
+    <div class="d-flex justify-content-center flex-grow-1">
+      <div class="table-responsive shadow-lg rounded-3 overflow-hidden" style="max-width: 90%;">
+        <table class="table table-hover text-center align-middle">
+          <thead class="table-dark" style="background: linear-gradient(45deg, #2c3e50, #3498db);">
+            <tr>
+              <th class="py-3"><i class="fas fa-user me-2"></i> Nom</th>
+              <th class="py-3"><i class="fas fa-envelope me-2"></i> Email</th>
+              <th class="py-3"><i class="fas fa-briefcase me-2"></i> Spécialité</th>
+              <th class="py-3"><i class="fas fa-cogs me-2"></i> Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let supervisor of paginatedSupervisors" class="transition-all">
+              <td class="fw-bold text-truncate" style="max-width: 200px;">{{ supervisor.name }}</td>
+              <td class="text-truncate" style="max-width: 200px;">{{ supervisor.email }}</td>
+              <td>{{ supervisor.speciality }}</td>
+              <td>
+                <button class="btn btn-warning btn-sm me-2 shadow-sm transition-all" data-bs-toggle="modal"
+                  data-bs-target="#updateSupervisorModal" (click)="prepareEditSupervisor(supervisor)">
+                  <i class="fas fa-edit me-1"></i> Modifier
+                </button>
+                <button class="btn btn-danger btn-sm shadow-sm transition-all"
+                  (click)="deleteSupervisor(supervisor.idSup)">
+                  <i class="fas fa-trash-alt me-1"></i> Supprimer
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination ajoutée ici -->
+    <div class="d-flex justify-content-center mt-3" *ngIf="supervisors.length > 0 && !isLoading">
+      <nav>
+        <ul class="pagination">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="changePage(currentPage - 1)">Précédent</button>
+          </li>
+          <li class="page-item" *ngFor="let page of getPageNumbers()" [class.active]="page === currentPage">
+            <button class="page-link" (click)="changePage(page)">{{ page }}</button>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <button class="page-link" (click)="changePage(currentPage + 1)">Suivant</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Message si aucun superviseur n'est trouvé -->
+    <div *ngIf="supervisors.length === 0 && !isLoading"
+      class="alert alert-warning text-center mt-3 animate__animated animate__fadeIn">
+      Aucun superviseur trouvé.
+    </div>
+
+    <!-- Modal Ajouter Superviseur (inchangé) -->
+    <div class="modal fade" id="addSupervisorModal" tabindex="-1" aria-labelledby="addSupervisorModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg rounded-3">
+          <div class="modal-header bg-primary text-white" style="background: linear-gradient(45deg, #3498db, #2980b9);">
+            <h5 class="modal-title fw-bold">
+              <i class="fas fa-plus me-2"></i> Ajouter un Superviseur
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            <form #addSupervisorForm="ngForm" (ngSubmit)="saveSupervisor()">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="addName" class="form-label fw-semibold"><i class="fas fa-user me-2"></i> Nom</label>
+                  <input type="text" class="form-control shadow-sm" id="addName" name="name"
+                    [(ngModel)]="newSupervisor.name" required minlength="3" pattern="[A-Za-zÀ-ÿ\s]+" #name="ngModel"
+                    (input)="validateField('name')">
+                  <div *ngIf="name.invalid && (name.dirty || name.touched)" class="text-danger">
+                    <div *ngIf="name.errors?.['required']">Le nom est obligatoire.</div>
+                    <div *ngIf="name.errors?.['minlength']">Le nom doit contenir au moins 3 caractères.</div>
+                    <div *ngIf="name.errors?.['pattern']">Le nom ne doit contenir que des lettres et des espaces.</div>
+                  </div>
+                  <div *ngIf="nameError && !name.invalid" class="text-danger">{{ nameError }}</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="addEmail" class="form-label fw-semibold"><i class="fas fa-envelope me-2"></i>
+                    Email</label>
+                  <input type="email" class="form-control shadow-sm" id="addEmail" name="email"
+                    [(ngModel)]="newSupervisor.email" required email #email="ngModel" (input)="validateEmail()">
+                  <div *ngIf="email.invalid && (email.dirty || email.touched)" class="text-danger">
+                    <div *ngIf="email.errors?.['required']">L'email est obligatoire.</div>
+                    <div *ngIf="email.errors?.['email']">Veuillez entrer un email valide .
+                    </div>
+                  </div>
+                  <div *ngIf="emailError && !email.invalid" class="text-danger">{{ emailError }}</div>
+                </div>
+                <div class="col-md-12 mb-3">
+                  <label for="addSpeciality" class="form-label fw-semibold"><i class="fas fa-briefcase me-2"></i>
+                    Spécialité</label>
+                  <input type="text" class="form-control shadow-sm" id="addSpeciality" name="speciality"
+                    [(ngModel)]="newSupervisor.speciality" required minlength="3" pattern="[A-Za-zÀ-ÿ\s]+"
+                    #speciality="ngModel" (input)="validateField('speciality')">
+                  <div *ngIf="speciality.invalid && (speciality.dirty || speciality.touched)" class="text-danger">
+                    <div *ngIf="speciality.errors?.['required']">La spécialité est obligatoire.</div>
+                    <div *ngIf="speciality.errors?.['minlength']">La spécialité doit contenir au moins 3 caractères.
+                    </div>
+                    <div *ngIf="speciality.errors?.['pattern']">La spécialité ne doit contenir que des lettres et des
+                      espaces.</div>
+                  </div>
+                  <div *ngIf="specialityError && !speciality.invalid" class="text-danger">{{ specialityError }}</div>
+                </div>
+              </div>
+              <div class="modal-footer border-0">
+                <button type="submit" class="btn btn-success w-100 shadow transition-all"
+                  [disabled]="!addSupervisorForm.valid || emailError">
+                  <i class="fas fa-save me-2"></i> Ajouter
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Modifier Superviseur (inchangé) -->
+    <div class="modal fade" id="updateSupervisorModal" tabindex="-1" aria-labelledby="updateSupervisorModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg rounded-3">
+          <div class="modal-header bg-primary text-white" style="background: linear-gradient(45deg, #3498db, #2980b9);">
+            <h5 class="modal-title fw-bold">
+              <i class="fas fa-edit me-2"></i> Modifier le Superviseur
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            <form #updateSupervisorForm="ngForm" (ngSubmit)="updateSupervisor()">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="updateName" class="form-label fw-semibold"><i class="fas fa-user me-2"></i> Nom</label>
+                  <input type="text" class="form-control shadow-sm" id="updateName" name="name"
+                    [(ngModel)]="newSupervisor.name" required minlength="3" pattern="[A-Za-zÀ-ÿ\s]+" #name="ngModel"
+                    (input)="validateField('name')">
+                  <div *ngIf="name.invalid && (name.dirty || name.touched)" class="text-danger">
+                    <div *ngIf="name.errors?.['required']">Le nom est obligatoire.</div>
+                    <div *ngIf="name.errors?.['minlength']">Le nom doit contenir au moins 3 caractères.</div>
+                    <div *ngIf="name.errors?.['pattern']">Le nom ne doit contenir que des lettres et des espaces.</div>
+                  </div>
+                  <div *ngIf="nameError && !name.invalid" class="text-danger">{{ nameError }}</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="updateEmail" class="form-label fw-semibold"><i class="fas fa-envelope me-2"></i>
+                    Email</label>
+                  <input type="email" class="form-control shadow-sm" id="updateEmail" name="email"
+                    [(ngModel)]="newSupervisor.email" required email #email="ngModel" (input)="validateEmail()">
+                  <div *ngIf="email.invalid && (email.dirty || email.touched)" class="text-danger">
+                    <div *ngIf="email.errors?.['required']">L'email est obligatoire.</div>
+                    <div *ngIf="email.errors?.['email']">Veuillez entrer un email valide .
+                    </div>
+                  </div>
+                  <div *ngIf="emailError && !email.invalid" class="text-danger">{{ emailError }}</div>
+                </div>
+                <div class="col-md-12 mb-3">
+                  <label for="updateSpeciality" class="form-label fw-semibold"><i class="fas fa-briefcase me-2"></i>
+                    Spécialité</label>
+                  <input type="text" class="form-control shadow-sm" id="updateSpeciality" name="speciality"
+                    [(ngModel)]="newSupervisor.speciality" required minlength="3" pattern="[A-Za-zÀ-ÿ\s]+"
+                    #speciality="ngModel" (input)="validateField('speciality')">
+                  <div *ngIf="speciality.invalid && (speciality.dirty || speciality.touched)" class="text-danger">
+                    <div *ngIf="speciality.errors?.['required']">La spécialité est obligatoire.</div>
+                    <div *ngIf="speciality.errors?.['minlength']">La spécialité doit contenir au moins 3 caractères.
+                    </div>
+                    <div *ngIf="speciality.errors?.['pattern']">La spécialité ne doit contenir que des lettres et des
+                      espaces.</div>
+                  </div>
+                  <div *ngIf="specialityError && !speciality.invalid" class="text-danger">{{ specialityError }}</div>
+                </div>
+              </div>
+              <div class="modal-footer border-0">
+                <button type="submit" class="btn btn-success w-100 shadow transition-all"
+                  [disabled]="!updateSupervisorForm.valid || emailError">
+                  <i class="fas fa-save me-2"></i> Mettre à Jour
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Générer PDF -->
+    <div class="modal fade" id="generatePdfModal" tabindex="-1" aria-labelledby="generatePdfModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg rounded-3">
+          <div class="modal-header bg-success text-white" style="background: linear-gradient(45deg, #28a745, #218838);">
+            <h5 class="modal-title fw-bold">
+              <i class="fas fa-file-pdf me-2"></i> Générer un PDF
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"
+              (click)="resetPdfForm()"></button>
+          </div>
+          <div class="modal-body p-4">
+            <!-- Formulaire pour saisir les informations -->
+            <div *ngIf="!previewVisible">
+              <form #pdfForm="ngForm" (ngSubmit)="onPreview()">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="pdfTitle" class="form-label fw-semibold"><i class="fas fa-heading me-2"></i>
+                      Titre</label>
+                    <input type="text" class="form-control shadow-sm" id="pdfTitle" name="title"
+                      [(ngModel)]="pdfData.title" required #title="ngModel">
+                    <div *ngIf="title.invalid && (title.dirty || title.touched)" class="text-danger">
+                      <div *ngIf="title.errors?.['required']">Le titre est obligatoire.</div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="pdfSubject" class="form-label fw-semibold"><i class="fas fa-book me-2"></i>
+                      Sujet</label>
+                    <input type="text" class="form-control shadow-sm" id="pdfSubject" name="subject"
+                      [(ngModel)]="pdfData.subject" required #subject="ngModel">
+                    <div *ngIf="subject.invalid && (subject.dirty || subject.touched)" class="text-danger">
+                      <div *ngIf="subject.errors?.['required']">Le sujet est obligatoire.</div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label for="pdfObjective" class="form-label fw-semibold"><i class="fas fa-bullseye me-2"></i>
+                      Objectif</label>
+                    <input type="text" class="form-control shadow-sm" id="pdfObjective" name="objective"
+                      [(ngModel)]="pdfData.objective" required #objective="ngModel">
+                    <div *ngIf="objective.invalid && (objective.dirty || objective.touched)" class="text-danger">
+                      <div *ngIf="objective.errors?.['required']">L'objectif est obligatoire.</div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="pdfStudentName" class="form-label fw-semibold"><i class="fas fa-user me-2"></i> Nom de
+                      l'étudiant(e)</label>
+                    <input type="text" class="form-control shadow-sm" id="pdfStudentName" name="studentName"
+                      [(ngModel)]="pdfData.studentName" required #studentName="ngModel">
+                    <div *ngIf="studentName.invalid && (studentName.dirty || studentName.touched)" class="text-danger">
+                      <div *ngIf="studentName.errors?.['required']">Le nom est obligatoire.</div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="pdfAcademicLevel" class="form-label fw-semibold"><i
+                        class="fas fa-graduation-cap me-2"></i> Niveau académique</label>
+                    <input type="text" class="form-control shadow-sm" id="pdfAcademicLevel" name="academicLevel"
+                      [(ngModel)]="pdfData.academicLevel" required #academicLevel="ngModel">
+                    <div *ngIf="academicLevel.invalid && (academicLevel.dirty || academicLevel.touched)"
+                      class="text-danger">
+                      <div *ngIf="academicLevel.errors?.['required']">Le niveau académique est obligatoire.</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <button type="submit" class="btn btn-secondary shadow transition-all" [disabled]="!pdfForm.valid">
+                    <i class="fas fa-eye me-2"></i> Prévisualiser
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Section de prévisualisation -->
+            <div *ngIf="previewVisible">
+              <h5 class="text-center mb-3 fw-bold">Aperçu du contenu</h5>
+              <div class="preview-content p-3 border rounded" style="background-color: #f8f9fa;">
+                <p>
+                  À l’aimable attention de la Direction Générale<br /><br />
+                  OBJET: {{ pdfData.title }}<br /><br />
+                  Madame, Monsieur,<br /><br />
+                  L’École Supérieure Privée d’Ingénierie et de Technologies, ESPRIT SA, est un établissement
+                  d’enseignement supérieur privé ayant pour objet principal, la formation d’ingénieurs dans les domaines
+                  des technologies de l’information et de la communication.<br /><br />
+                  Notre objectif consiste à former des ingénieurs opérationnels au terme de leur formation.<br /><br />
+                  Dès lors, nous encourageons nos élèves à mettre en pratique le savoir et les compétences qu’ils ont
+                  acquis au cours de leur cursus universitaire.<br /><br />
+                  C’est également dans le but de les amener à s’intégrer dans l’environnement de l’entreprise que nous
+                  vous demandons de bien vouloir accepter :<br /><br />
+                  L’étudiant(e) : <strong>{{ pdfData.studentName }}</strong><br />
+                  Inscrit(e) en : <strong>{{ pdfData.academicLevel }}</strong><br /><br />
+                  Pour effectuer un stage obligatoire, au sein de votre honorable société.<br /><br />
+                  Nous restons à votre entière disposition pour tout renseignement complémentaire.<br /><br />
+                  En vous remerciant pour votre précieux soutien, nous vous prions d’agréer, Madame, Monsieur,
+                  l’expression de nos salutations distinguées.<br /><br />
+                  Ecandrant X <br />
+                  Département des Stages
+                </p>
+              </div>
+              <div class="d-flex justify-content-between mt-3">
+                <button class="btn btn-outline-secondary shadow transition-all" (click)="previewVisible = false">
+                  <i class="fas fa-arrow-left me-2"></i> Modifier
+                </button>
+                <button class="btn btn-success shadow transition-all" (click)="generatePdf()">
+                  <i class="fas fa-download me-2"></i> Générer PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

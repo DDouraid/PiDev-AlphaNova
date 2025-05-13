@@ -1,0 +1,51 @@
+
+
+  @media (max-width: 576px) {
+    .event-header h2 {
+      font-size: 1.5rem;
+    }
+
+    .detail-item {
+      box-shadow: none;
+    }
+
+    .header-accent {
+      width: 60px;
+    }
+  }
+
+  #map {
+    height: 300px;
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+
+  /* Styles pour la carte */
+.map-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  margin-bottom: 1rem;
+}
+
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+/* Animation pour le chargement */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-map {
+  animation: fadeIn 0.5s ease-in-out;
+}

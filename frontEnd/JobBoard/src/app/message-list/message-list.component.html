@@ -1,0 +1,366 @@
+<div class="card notification-card">
+  <div class="card-header border-0 d-flex justify-content-between align-items-center">
+    <h4 class="fs-20 mb-0 text-black">Messages</h4>
+    <button class="btn btn-orange btn-sm" data-bs-toggle="modal" data-bs-target="#addMessageModal">
+      + Ajouter Nouveau
+    </button>
+  </div>
+  <div class="card-body">
+    <!-- Filter by Receiver ID -->
+    <div class="mb-3">
+      <label for="filterReceiverId" class="text-black font-w500">Filtrer par ID du destinataire</label>
+      <input
+        id="filterReceiverId"
+        type="number"
+        [(ngModel)]="receiverId"
+        (change)="loadMessagesByReceiver()"
+        class="form-control"
+        placeholder="Entrer l'ID du destinataire"
+        autocomplete="off"
+      />
+    </div>
+
+    <!-- Filter by Group ID -->
+    <div class="mb-3">
+      <label for="filterGroupId" class="text-black font-w500">Filtrer par ID du groupe</label>
+      <input
+        id="filterGroupId"
+        type="number"
+        [(ngModel)]="groupId"
+        (change)="loadMessagesByGroup()"
+        class="form-control"
+        placeholder="Entrer l'ID du groupe"
+        autocomplete="off"
+      />
+    </div>
+
+    <!-- Reset Filters -->
+    <button class="btn btn-secondary btn-sm mb-3" (click)="receiverId = null; groupId = null; loadAllMessages()">
+      Afficher tous les messages
+    </button>
+
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
+
+    <!-- Messages List -->
+    <div *ngIf="!isLoading && messages.length === 0" class="no-data">
+      Aucun message trouvé.
+    </div>
+
+    <div class="table-responsive" *ngIf="!isLoading && messages.length > 0">
+      <table class="notification-table" role="table" aria-label="Liste des messages">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Expéditeur</th>
+            <th scope="col">Destinataire</th>
+            <th scope="col">Groupe</th>
+            <th scope="col">Contenu</th>
+            <th scope="col">Pièce jointe</th>
+            <th scope="col">Statut</th>
+            <th scope="col">Créé le</th>
+            <th scope="col">Mis à jour le</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let message of messages" role="row">
+            <td data-label="ID">{{ message.id }}</td>
+            <td data-label="Expéditeur">
+              {{ message.username || ('You' + (message.userId ? ' (ID: ' + message.userId + ')' : '')) || message.senderId || 'Unknown' }}
+            </td>
+            <td data-label="Destinataire">{{ message.receiverId || 'N/A' }}</td>
+            <td data-label="Groupe">{{ message.group ? message.group.name : 'N/A' }}</td>
+            <td data-label="Contenu">{{ message.content }}</td>
+            <td data-label="Pièce jointe">{{ message.attachment || 'Aucune' }}</td>
+            <td data-label="Statut">{{ message.status }}</td>
+            <td data-label="Créé le">{{ message.createdAt | date:'d MMM yyyy, HH:mm' }}</td>
+            <td data-label="Mis à jour le">{{ message.updatedAt | date:'d MMM yyyy, HH:mm' }}</td>
+            <td class="action-buttons">
+              <div *ngIf="canEditMessage(message); else readOnly">
+                <button
+                  class="btn btn-primary btn-sm me-2"
+                  [disabled]="!message.id"
+                  (click)="openEditModal(message)"
+                  data-bs-toggle="modal"
+                  data-bs-target="#editMessageModal"
+                  aria-label="Modifier le message"
+                >
+                  Modifier
+                </button>
+                <button
+                  class="btn btn-danger btn-sm"
+                  [disabled]="!message.id"
+                  (click)="deleteMessage(message.id!)"
+                  aria-label="Supprimer le message"
+                >
+                  Supprimer
+                </button>
+              </div>
+              <ng-template #readOnly>
+                <span class="text-muted"><i class="fas fa-eye me-1"></i> Lecture seule</span>
+              </ng-template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Display success or error messages -->
+    <div *ngIf="successMessage" class="alert alert-success mt-3" role="alert">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3" role="alert">
+      {{ errorMessage }}
+    </div>
+  </div>
+</div>
+
+<!-- Add Message Modal -->
+<div class="modal fade" id="addMessageModal" tabindex="-1" role="dialog" aria-labelledby="addMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fs-20 text-black" id="addMessageModalLabel">Ajouter un message</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="messageForm" (ngSubmit)="onSubmit()">
+          <!-- Message Type Selection -->
+          <div class="form-group mb-3">
+            <label class="text-black font-w500">Type de message</label>
+            <div class="d-flex">
+              <div class="form-check me-3">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  id="messageTypeIndividual"
+                  value="individual"
+                  formControlName="messageType"
+                />
+                <label class="form-check-label" for="messageTypeIndividual">À un individu</label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  id="messageTypeGroup"
+                  value="group"
+                  formControlName="messageType"
+                />
+                <label class="form-check-label" for="messageTypeGroup">À un groupe</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Receiver ID -->
+          <div class="form-group mb-3" *ngIf="messageForm.get('messageType')?.value === 'individual'">
+            <label for="addReceiverId" class="text-black font-w500">ID du destinataire</label>
+            <input
+              id="addReceiverId"
+              formControlName="receiverId"
+              type="number"
+              class="form-control"
+              placeholder="Entrer l'ID du destinataire"
+              autocomplete="off"
+              aria-describedby="receiverIdHelp"
+            />
+            <div
+              *ngIf="messageForm.get('receiverId')?.invalid && messageForm.get('receiverId')?.touched"
+              class="text-danger fs-14 mt-1"
+              id="receiverIdHelp"
+            >
+              L'ID du destinataire doit être un nombre positif si fourni.
+            </div>
+          </div>
+
+          <!-- Group ID -->
+          <div class="form-group mb-3" *ngIf="messageForm.get('messageType')?.value === 'group'">
+            <label for="addGroupId" class="text-black font-w500">Groupe</label>
+            <select id="addGroupId" formControlName="groupId" class="form-control" autocomplete="off">
+              <option value="" disabled>Sélectionner un groupe</option>
+              <option *ngFor="let group of groups" [value]="group.id">{{ group.name }}</option>
+            </select>
+          </div>
+
+          <!-- Content -->
+          <div class="form-group mb-3">
+            <label for="addContent" class="text-black font-w500">Contenu</label>
+            <textarea
+              id="addContent"
+              formControlName="content"
+              class="form-control"
+              placeholder="Entrer le contenu du message"
+              rows="3"
+              autocomplete="off"
+              aria-describedby="contentHelp"
+            ></textarea>
+            <div
+              *ngIf="messageForm.get('content')?.invalid && messageForm.get('content')?.touched"
+              class="text-danger fs-14 mt-1"
+              id="contentHelp"
+            >
+              Le contenu est requis.
+            </div>
+          </div>
+
+          <!-- Attachment -->
+          <div class="form-group mb-3">
+            <label for="addAttachment" class="text-black font-w500">Pièce jointe (optionnel)</label>
+            <input
+              id="addAttachment"
+              formControlName="attachment"
+              type="text"
+              class="form-control"
+              placeholder="Entrer l'URL de la pièce jointe"
+              autocomplete="off"
+            />
+          </div>
+
+          <!-- Status -->
+          <div class="form-group mb-3">
+            <label for="addStatus" class="text-black font-w500">Statut</label>
+            <select id="addStatus" formControlName="status" class="form-control" autocomplete="off">
+              <option *ngFor="let status of messageStatuses" [value]="status">{{ status }}</option>
+            </select>
+            <div
+              *ngIf="messageForm.get('status')?.invalid && messageForm.get('status')?.touched"
+              class="text-danger fs-14 mt-1"
+            >
+              Le statut est requis.
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100" [disabled]="isLoading">
+            <span *ngIf="!isLoading">Envoyer le message</span>
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Message Modal -->
+<div class="modal fade" id="editMessageModal" tabindex="-1" role="dialog" aria-labelledby="editMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fs-20 text-black" id="editMessageModalLabel">Modifier le message</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="editMessageForm" (ngSubmit)="onEditSubmit()">
+          <!-- Receiver ID -->
+          <div class="form-group mb-3">
+            <label for="editReceiverId" class="text-black font-w500">ID du destinataire (optionnel)</label>
+            <input
+              id="editReceiverId"
+              formControlName="receiverId"
+              type="number"
+              class="form-control"
+              placeholder="Entrer l'ID du destinataire"
+              autocomplete="off"
+              aria-describedby="editReceiverIdHelp"
+            />
+            <div
+              *ngIf="editMessageForm.get('receiverId')?.invalid && editMessageForm.get('receiverId')?.touched"
+              class="text-danger fs-14 mt-1"
+              id="editReceiverIdHelp"
+            >
+              L'ID du destinataire doit être un nombre positif si fourni.
+            </div>
+          </div>
+
+          <!-- Group ID -->
+          <div class="form-group mb-3">
+            <label for="editGroupId" class="text-black font-w500">Groupe (optionnel)</label>
+            <select id="editGroupId" formControlName="groupId" class="form-control" autocomplete="off">
+              <option value="" disabled>Sélectionner un groupe</option>
+              <option *ngFor="let group of groups" [value]="group.id">{{ group.name }}</option>
+            </select>
+          </div>
+
+          <!-- Content -->
+          <div class="form-group mb-3">
+            <label for="editContent" class="text-black font-w500">Contenu</label>
+            <textarea
+              id="editContent"
+              formControlName="content"
+              class="form-control"
+              placeholder="Entrer le contenu du message"
+              rows="3"
+              autocomplete="off"
+              aria-describedby="editContentHelp"
+            ></textarea>
+            <div
+              *ngIf="editMessageForm.get('content')?.invalid && editMessageForm.get('content')?.touched"
+              class="text-danger fs-14 mt-1"
+              id="editContentHelp"
+            >
+              Le contenu est requis.
+            </div>
+          </div>
+
+          <!-- Attachment -->
+          <div class="form-group mb-3">
+            <label for="editAttachment" class="text-black font-w500">Pièce jointe (optionnel)</label>
+            <input
+              id="editAttachment"
+              formControlName="attachment"
+              type="text"
+              class="form-control"
+              placeholder="Entrer l'URL de la pièce jointe"
+              autocomplete="off"
+            />
+          </div>
+
+          <!-- Status -->
+          <div class="form-group mb-3">
+            <label for="editStatus" class="text-black font-w500">Statut</label>
+            <select id="editStatus" formControlName="status" class="form-control" autocomplete="off">
+              <option *ngFor="let status of messageStatuses" [value]="status">{{ status }}</option>
+            </select>
+            <div
+              *ngIf="editMessageForm.get('status')?.invalid && editMessageForm.get('status')?.touched"
+              class="text-danger fs-14 mt-1"
+            >
+              Le statut est requis.
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100" [disabled]="isLoading">
+            <span *ngIf="!isLoading">Mettre à jour le message</span>
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirmer la suppression</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ deleteConfirmationMessage }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger btn-sm" (click)="confirmDelete()" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Supprimer</span>
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

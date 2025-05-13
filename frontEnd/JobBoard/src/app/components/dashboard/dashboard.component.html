@@ -1,8 +1,6 @@
 <!-- frontend/src/app/components/dashboard/dashboard.component.html -->
 <h2>Welcome to the Dashboard, {{ user.username || 'User' }}!</h2>
-<p>You have successfully logged in.</p>
-<p>Email: {{ user.email || 'N/A' }}</p>
-<p>Roles: {{ user.roles.length > 0 ? user.roles.join(', ') : 'None' }}</p>
+
 
 <!-- Statistics Section -->
 <div class="row mt-4">
@@ -220,5 +218,18 @@
         <button type="button" class="btn btn-primary" (click)="updateUser()">Save Changes</button>
       </div>
     </div>
+  </div>
+  <div class="dashboard-container">
+    <!-- Timeline Chart -->
+    <div id="chart-timeline" class="chart"></div>
+
+    <!-- Widget Chart 1 -->
+    <div id="widgetChart1" class="chart"></div>
+
+    <!-- Radial Chart -->
+    <div id="radialChart" class="chart"></div>
+
+    <!-- Widget Chart 2 -->
+    <div id="widgetChart2" class="chart"></div>
   </div>
 </div>

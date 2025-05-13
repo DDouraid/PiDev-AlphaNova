@@ -4,8 +4,18 @@
     <file url="file://$PROJECT_DIR$/backEnd/eureka/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backEnd/gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backEnd/microservices/Event/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backEnd/microservices/Feedback/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backEnd/microservices/GestionMatching/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backEnd/microservices/Gestion_Utilisateurs/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backEnd/microservices/Internship/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backEnd/microservices/Interview/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backEnd/microservices/Payement/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backEnd/microservices/Payment/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backEnd/microservices/Supervisor/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backEnd/microservices/Tasks/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backEnd/microservices/YourApp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backEnd/microservices/candidat/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backEnd/microservices/message/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backEnd/microservices/notification/src/main/java" charset="UTF-8" />
   </component>
 </project>

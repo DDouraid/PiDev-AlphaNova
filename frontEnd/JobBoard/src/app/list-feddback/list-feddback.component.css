@@ -1,0 +1,47 @@
+/* src/app/list-feedback/list-feedback.component.css */
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+.table-container {
+  width: 100%;
+  max-width: 90%;
+}
+
+.table-responsive {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.alert-success, .alert-warning {
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.star-rating .fa-star {
+  cursor: pointer;
+}
+
+.modal-content {
+  border: none;
+}
+
+.modal-header {
+  border-bottom: none;
+}
+
+.modal-footer {
+  border-top: none;
+}
+
+.pagination-container {
+  margin-top: 20px;
+}
+
+.spinner-border {
+  margin: 20px auto;
+}

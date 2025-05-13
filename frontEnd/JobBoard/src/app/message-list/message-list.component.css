@@ -1,0 +1,51 @@
+.notification-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .notification-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .notification-table th,
+  .notification-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .notification-table th {
+    background-color: #f8f9fa;
+    font-weight: 500;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .no-data {
+    text-align: center;
+    color: #6c757d;
+    padding: 20px;
+  }
+  
+  .alert {
+    margin-top: 16px;
+  }
+  
+  .form-control {
+    border-radius: 4px;
+  }
+  
+  .btn-orange {
+    background-color: #ff9800;
+    color: white;
+    border: none;
+  }
+  
+  .btn-orange:hover {
+    background-color: #e68900;
+  }

@@ -1,0 +1,68 @@
+
+  .event-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .event-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-header {
+    border-radius: 15px 15px 0 0;
+  }
+
+  .card-body {
+    background-color: #f8f9fa;
+  }
+
+  .pagination {
+    border-radius: 30px;
+    background-color: #f1f3f5;
+    padding: 10px;
+  }
+
+  .page-item .page-link {
+    color: #3498db;
+    border: none;
+  }
+
+  .page-item.active .page-link {
+    background-color: #3498db;
+    color: white;
+  }
+
+  .page-link:hover {
+    background-color: #3498db;
+    color: white;
+  }
+
+  .pagination-rounded .page-link {
+    border-radius: 50px;
+  }
+
+  .btn-outline-primary {
+    border-radius: 25px;
+  }
+
+  .btn-outline-primary:hover {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+  }
+/* Style pour le calendrier */
+mwl-calendar-month-view {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+}
+
+/* Style pour les jours avec des événements */
+.mwl-calendar-month-view .cal-day-cell.cal-has-events {
+  background-color: #e3f2fd;
+  border-radius: 50%;
+}
+
+
+

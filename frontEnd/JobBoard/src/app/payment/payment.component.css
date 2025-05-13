@@ -1,0 +1,44 @@
+.container {
+    max-width: 800px;
+    margin: auto;
+  }
+  
+  .table {
+    margin-top: 20px;
+  }
+  
+  .btn-danger, .btn-success {
+    margin-right: 10px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  .popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+  }
+  
+  .popup-content h2 {
+    margin-top: 0;
+  }
+  
+  .popup-content form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .popup-content input {
+    margin-bottom: 10px;
+  }
+  
+  .popup-content button {
+    margin-top: 10px;
+  }
+  
+  .popup-content button[type="button"] {
+    background-color: red;
+    color: white;
+  }

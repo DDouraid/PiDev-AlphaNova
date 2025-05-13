@@ -1,0 +1,60 @@
+/* src/app/liste-tasks/liste-tasks.component.css */
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+.task-list {
+  min-height: 100px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.task-card {
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.task-card.in-progress {
+  background: #fff3cd;
+}
+
+.task-card.done {
+  background: #d4edda;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+}
+
+.kanban-column {
+  flex: 1;
+  margin: 0 10px;
+}
+
+.kanban-board {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.column-header {
+  color: white;
+  padding: 10px;
+  border-radius: 8px 8px 0 0;
+  text-align: center;
+}
+
+.alert-success {
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

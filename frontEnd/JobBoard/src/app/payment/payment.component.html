@@ -1,0 +1,83 @@
+<div class="row">
+  <div class="col-xl-12 col-xxl-12">
+    <div class="card">
+      <div class="card-header border-0">
+        <h4 class="fs-20 mb-0 text-black">Payment Management</h4>
+      </div>
+      <div class="card-body">
+        <div class="container mt-4">
+          <!-- Success and Error Messages -->
+          <div *ngIf="successMessage" class="alert alert-success">
+            {{ successMessage }}
+          </div>
+          <div *ngIf="errorMessage" class="alert alert-danger">
+            {{ errorMessage }}
+          </div>
+
+          <h2>List of Payments</h2>
+          <div *ngIf="isLoading" class="text-center">
+            <div class="spinner-border" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+          </div>
+
+          <table class="table" *ngIf="!isLoading">
+            <thead>
+              <tr>
+                <th>Amount</th>
+                <th>Mode</th>
+                <th>Date</th>
+                <th>User</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let payment of paginatedRows">
+                <td>{{ payment.amount | number:'1.2-2' }}</td>
+                <td>{{ payment.mode }}</td>
+                <td>{{ payment.date | date:'dd/MM/yyyy' }}</td>
+                <td>{{ payment.username || 'N/A' }}</td>
+                <td>
+                  <button (click)="deletePayment(payment.id!)" class="btn btn-danger">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="pagination">
+            <button (click)="changePage(currentPage - 1)" [disabled]="currentPage <= 1" class="btn btn-secondary">Previous</button>
+            <span class="mx-2">Page {{ currentPage }} of {{ totalPages }}</span>
+            <button (click)="changePage(currentPage + 1)" [disabled]="currentPage >= totalPages" class="btn btn-secondary">Next</button>
+          </div>
+
+          <h3 class="mt-4">Add a Payment</h3>
+          <form (submit)="addPayment()">
+            <div class="form-group">
+              <label for="amount">Amount</label>
+              <input id="amount" class="form-control" [(ngModel)]="newPayment.amount"
+                     placeholder="Amount" type="number" step="0.01" min="0" name="amount" required />
+            </div>
+            <div class="form-group">
+              <label for="mode">Payment Mode</label>
+              <select id="mode" class="form-control" [(ngModel)]="newPayment.mode" name="mode" required>
+                <option value="" disabled selected>Select a mode</option>
+                <option *ngFor="let mode of paymentModes" [value]="mode">{{ mode }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="date">Date</label>
+              <input id="date" class="form-control" [(ngModel)]="newPayment.date"
+                     type="date" name="date" required />
+            </div>
+            <button type="submit" class="btn btn-success mt-2"
+                    [disabled]="!newPayment.amount || !newPayment.mode || !newPayment.date || isLoading">
+              Add Payment
+            </button>
+            <button (click)="startStripeCheckout()" class="btn btn-success mt-2">Pay with Stripe</button>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

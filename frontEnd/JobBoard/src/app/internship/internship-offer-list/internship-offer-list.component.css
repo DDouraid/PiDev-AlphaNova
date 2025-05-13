@@ -1,0 +1,136 @@
+/* Table Styling */
+.custom-table {
+    background-color: #fff;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    width: 100%; /* Ensure table takes full width */
+    min-width: 850px; /* Minimum width to force horizontal scrolling on smaller screens */
+  }
+
+  .custom-table th,
+  .custom-table td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    font-size: 14px;
+    color: #495057;
+  }
+
+  .custom-table thead.table-header {
+    background-color: #007bff; /* Primary blue to match theme */
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .custom-table thead th {
+    border-bottom: 2px solid #e0e0e0;
+  }
+
+  .custom-table tbody tr {
+    transition: background-color 0.3s ease;
+  }
+
+  .custom-table tbody tr:hover {
+    background-color: #f8f9fa; /* Light gray on hover */
+  }
+
+  .custom-table tbody td {
+    border-top: 1px solid #e0e0e0;
+  }
+
+  /* CV Link Styling */
+  .cv-link {
+    color: #007bff; /* Blue to match theme */
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+  }
+
+  .cv-link:hover {
+    color: #0056b3; /* Darker blue on hover */
+    text-decoration: underline;
+  }
+
+  .cv-link i {
+    font-size: 16px;
+  }
+
+  /* Action Buttons */
+  .btn-sm {
+    padding: 6px 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    line-height: 1; /* Ensure proper alignment for icon-only buttons */
+  }
+
+  .btn-primary.btn-sm {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
+  .btn-primary.btn-sm:hover {
+    background-color: #0056b3;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+  }
+
+  .btn-danger.btn-sm {
+    background-color: #dc3545;
+    border-color: #dc3545;
+  }
+
+  .btn-danger.btn-sm:hover {
+    background-color: #c82333;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+  }
+
+  /* Modal Styling */
+  .modal-content {
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .modal-header {
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-label, .text-black.font-w500 {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .form-control {
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+    transition: border-color 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+
+  .is-invalid {
+    border-color: #dc3545;
+  }
+
+  .invalid-feedback {
+    font-size: 0.85rem;
+    color: #dc3545;
+  }
+
+  /* Table Container */
+  .table-responsive {
+    max-width: 100%;
+    overflow-x: auto;
+  }

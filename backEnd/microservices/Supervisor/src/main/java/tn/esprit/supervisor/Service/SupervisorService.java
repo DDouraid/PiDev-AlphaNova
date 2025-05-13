@@ -5,6 +5,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tn.esprit.supervisor.Entity.Supervisor;
 import tn.esprit.supervisor.Repository.SupervisorRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Base64;
 
 import java.util.List;
 
@@ -12,11 +23,16 @@ import java.util.List;
 @Service
 
 public class SupervisorService implements ISupervisorService{
+
+    private static final Logger logger = LoggerFactory.getLogger(SupervisorService.class);
+
+
     @Autowired
     SupervisorRepo supervisorRepo;
 
     @Override
     public Supervisor addSupervisor(Supervisor supervisor) {
+        logger.info("Adding Supervisor: {}", supervisor);
         return supervisorRepo.save(supervisor);
     }
 
@@ -33,19 +49,19 @@ public class SupervisorService implements ISupervisorService{
 
     @Override
     public Supervisor updateSupervisor(Supervisor updateSupervisor) {
-        return supervisorRepo.findById(updateSupervisor.getIdSup())
-                .map(existingSupervisor -> {
-                    existingSupervisor.setName(updateSupervisor.getName());
-                    existingSupervisor.setEmail(updateSupervisor.getEmail());
-                    existingSupervisor.setSpeciality(updateSupervisor.getSpeciality());
-                    return supervisorRepo.save(existingSupervisor);
-                }).orElseThrow(() -> new RuntimeException("Superviseur non trouvé"));
+        Integer id = updateSupervisor.getIdSup();
+        if (id == null || !supervisorRepo.existsById(id)) {
+            throw new RuntimeException("Supervisor not found with id: " + id);
+        }
+        return supervisorRepo.save(updateSupervisor); // JPA will update based on ID
     }
 
     @Override
     public Supervisor getSupervisorById(Integer id) {
         return supervisorRepo.findById(id).get();
     }
+
+
 
 
 }

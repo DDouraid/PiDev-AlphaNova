@@ -4,14 +4,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tn.esprit.application.Clients.UserServiceClient;
+import tn.esprit.application.DTO.UserDTO;
 import tn.esprit.application.entities.InternshipOffer;
 import tn.esprit.application.services.InternshipOfferServ;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:4200", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 @RestController
 @RequestMapping("/internship-offers")
 public class InternshipOfferRest {
+
+    @Autowired
+    private UserServiceClient userServiceClient;
 
     @Autowired
     private InternshipOfferServ internshipOfferService;
@@ -31,8 +37,14 @@ public class InternshipOfferRest {
     }
 
     // Create an internship offer
-    @PostMapping
-    public ResponseEntity<InternshipOffer> createInternshipOffer(@RequestBody InternshipOffer offer) {
+    @PostMapping("/addOffer")
+    public ResponseEntity<InternshipOffer> createInternshipOffer(@RequestBody InternshipOffer offer, @RequestHeader("Authorization") String token) {
+        // Get user info from user service
+        UserDTO user = userServiceClient.getCurrentUser(token);
+
+        // Set user info in event
+        offer.setUserId(user.getId());
+        offer.setUsername(user.getUsername());
         System.out.println("Received Internship Offer: " + offer.getTitle());
         InternshipOffer savedOffer = internshipOfferService.save(offer);
         return new ResponseEntity<>(savedOffer, HttpStatus.CREATED);

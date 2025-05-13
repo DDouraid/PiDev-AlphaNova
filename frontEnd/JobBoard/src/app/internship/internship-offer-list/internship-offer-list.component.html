@@ -1,0 +1,273 @@
+<div class="content-body">
+  <!-- Alert Section -->
+  <div *ngIf="showAlert" class="alert {{ alertType }} alert-dismissible fade show position-fixed" role="alert" style="top: 20px; right: 20px; z-index: 1050; min-width: 300px;">
+    <div class="d-flex align-items-center">
+      <i class="bi me-2" [ngClass]="{
+        'bi-check-circle-fill': alertType === 'alert-success',
+        'bi-exclamation-triangle-fill': alertType === 'alert-danger',
+        'bi-exclamation-circle-fill': alertType === 'alert-warning'
+      }"></i>
+      <span>{{ alertMessage }}</span>
+    </div>
+    <button type="button" class="btn-close" (click)="closeAlert()" aria-label="Close"></button>
+  </div>
+
+  <h2 class="text-center my-4">Internship Offers</h2>
+
+  <!-- Add Internship Offer Button -->
+  <div class="container mb-4 text-center">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addInternshipOfferModal">
+      <i class="bi bi-plus-circle me-2"></i>Add Internship Offer
+    </button>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="text-center my-3">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <div class="table-responsive">
+      <table class="table custom-table table-hover table-bordered text-center align-middle shadow-sm rounded">
+        <thead class="table-header">
+          <tr>
+            <th style="width: 300px;">Title</th>
+            <th style="width: 400px;">Description</th>
+            <th style="width: 200px;">Company</th>
+            <th style="width: 200px;">Location</th>
+            <th style="width: 150px;">Date Posted</th>
+            <th style="width: 150px;">Duration (Months)</th>
+            <th style="width: 200px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let offer of internshipOffers">
+            <td class="text-truncate" style="max-width: 300px;">{{ offer.title }}</td>
+            <td class="text-truncate" style="max-width: 400px;">{{ offer.description }}</td>
+            <td>{{ offer.company || 'N/A' }}</td>
+            <td>{{ offer.location || 'N/A' }}</td>
+            <td>{{ offer.datePosted || 'N/A' }}</td>
+            <td>{{ offer.durationInMonths || 'N/A' }}</td>
+            <td>
+              <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal"
+                      [attr.data-bs-target]="'#updateInternshipOfferModal' + offer.id"
+                      (click)="selectInternshipOffer(offer)"
+                      title="Update">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-danger btn-sm me-2" data-bs-toggle="modal"
+                      [attr.data-bs-target]="'#confirmDeleteOfferModal'"
+                      (click)="selectOfferForDeletion(offer.id)"
+                      title="Delete">
+                <i class="bi bi-trash"></i>
+              </button>
+              <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                      [attr.data-bs-target]="'#viewRequestsModal' + offer.id"
+                      (click)="viewRequestsForOffer(offer)"
+                      title="View Applicants">
+                <i class="bi bi-eye"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Message if no internship offers are found -->
+  <div *ngIf="internshipOffers.length === 0 && !isLoading" class="alert alert-warning text-center mt-3">
+    No internship offers found.
+  </div>
+
+  <!-- Update Internship Offer Modal -->
+  <ng-container *ngFor="let offer of internshipOffers">
+    <div class="modal fade" [id]="'updateInternshipOfferModal' + offer.id" tabindex="-1" aria-labelledby="updateOfferModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateOfferModalLabel">Update Internship Offer</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form #updateOfferForm="ngForm" (ngSubmit)="updateOfferForm.valid && updateInternshipOffer()">
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Title <span class="text-danger">*</span></label>
+                <input [(ngModel)]="selectedInternshipOffer.title" name="offerTitle" class="form-control" required #offerTitle="ngModel" [class.is-invalid]="offerTitle.invalid && (offerTitle.dirty || offerTitle.touched)">
+                <div *ngIf="offerTitle.invalid && (offerTitle.dirty || offerTitle.touched)" class="invalid-feedback">
+                  Title is required.
+                </div>
+              </div>
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Description <span class="text-danger">*</span></label>
+                <textarea [(ngModel)]="selectedInternshipOffer.description" name="offerDescription" class="form-control" required #offerDescription="ngModel" [class.is-invalid]="offerDescription.invalid && (offerDescription.dirty || offerDescription.touched)"></textarea>
+                <div *ngIf="offerDescription.invalid && (offerDescription.dirty || offerDescription.touched)" class="invalid-feedback">
+                  Description is required.
+                </div>
+              </div>
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Company <span class="text-danger">*</span></label>
+                <input [(ngModel)]="selectedInternshipOffer.company" name="company" class="form-control" required #company="ngModel" [class.is-invalid]="company.invalid && (company.dirty || company.touched)">
+                <div *ngIf="company.invalid && (company.dirty || company.touched)" class="invalid-feedback">
+                  Company is required.
+                </div>
+              </div>
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Location <span class="text-danger">*</span></label>
+                <input [(ngModel)]="selectedInternshipOffer.location" name="location" class="form-control" required #location="ngModel" [class.is-invalid]="location.invalid && (location.dirty || location.touched)">
+                <div *ngIf="location.invalid && (location.dirty || location.touched)" class="invalid-feedback">
+                  Location is required.
+                </div>
+              </div>
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Date Posted <span class="text-danger">*</span></label>
+                <div class="cal-icon">
+                  <input type="date" [(ngModel)]="selectedInternshipOffer.datePosted" name="datePosted" class="form-control" required #datePosted="ngModel" [class.is-invalid]="datePosted.invalid && (datePosted.dirty || datePosted.touched)">
+                  <i class="far fa-calendar-alt"></i>
+                </div>
+                <div *ngIf="datePosted.invalid && (datePosted.dirty || datePosted.touched)" class="invalid-feedback">
+                  Date Posted is required.
+                </div>
+              </div>
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Duration (Months)</label>
+                <input type="number" [(ngModel)]="selectedInternshipOffer.durationInMonths" name="durationInMonths" class="form-control" min="1">
+              </div>
+              <div class="form-group text-end">
+                <button type="submit" class="btn btn-primary" [disabled]="!updateOfferForm.valid" data-bs-dismiss="modal">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for Viewing Applicants -->
+    <div class="modal fade" [id]="'viewRequestsModal' + offer.id" tabindex="-1" aria-labelledby="viewRequestsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="viewRequestsModalLabel">Applicants for {{ offer.title }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div *ngIf="requestsForOffer.length === 0" class="alert alert-info text-center">
+              No applicants found for this offer.
+            </div>
+            <div *ngIf="requestsForOffer.length > 0" class="table-responsive">
+              <table class="table table-bordered table-hover table-striped text-center align-middle">
+                <thead class="table-dark">
+                  <tr>
+                    <th style="width: 200px;">Title</th>
+                    <th style="width: 300px;">Description</th>
+                    <th style="width: 200px;">Email</th>
+                    <th style="width: 150px;">CV</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let request of requestsForOffer">
+                    <td class="text-truncate" style="max-width: 200px;">{{ request.title }}</td>
+                    <td class="text-truncate" style="max-width: 300px;">{{ request.description }}</td>
+                    <td>{{ request.email || 'N/A' }}</td>
+                    <td>
+                      <a *ngIf="request.cvPath" href="javascript:void(0)" (click)="downloadCv(request.cvPath)" class="cv-link" title="Download CV">
+                        <span *ngIf="downloadingCv[request.cvPath]" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        <i *ngIf="!downloadingCv[request.cvPath]" class="bi bi-download me-1"></i>
+                        {{ downloadingCv[request.cvPath] ? 'Downloading...' : (request.cvPath.split('_').slice(1).join('_')) }}
+                      </a>
+                      <span *ngIf="!request.cvPath" class="text-muted">No CV</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Modal for adding a new internship offer -->
+  <div class="modal fade" id="addInternshipOfferModal" tabindex="-1" aria-labelledby="addInternshipOfferModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addInternshipOfferModalLabel">Add Internship Offer</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form #offerForm="ngForm" (ngSubmit)="offerForm.valid && onSubmitOffer(offerForm)">
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Title <span class="text-danger">*</span></label>
+              <input [(ngModel)]="internshipOffer.title" name="offerTitle" class="form-control" required #offerTitle="ngModel" [class.is-invalid]="offerTitle.invalid && (offerTitle.dirty || offerTitle.touched)">
+              <div *ngIf="offerTitle.invalid && (offerTitle.dirty || offerTitle.touched)" class="invalid-feedback">
+                Title is required.
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Description <span class="text-danger">*</span></label>
+              <textarea [(ngModel)]="internshipOffer.description" name="offerDescription" class="form-control" required #offerDescription="ngModel" [class.is-invalid]="offerDescription.invalid && (offerDescription.dirty || offerDescription.touched)"></textarea>
+              <div *ngIf="offerDescription.invalid && (offerDescription.dirty || offerDescription.touched)" class="invalid-feedback">
+                Description is required.
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Company <span class="text-danger">*</span></label>
+              <input [(ngModel)]="internshipOffer.company" name="company" class="form-control" required #company="ngModel" [class.is-invalid]="company.invalid && (company.dirty || company.touched)">
+              <div *ngIf="company.invalid && (company.dirty || company.touched)" class="invalid-feedback">
+                Company is required.
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Location <span class="text-danger">*</span></label>
+              <input [(ngModel)]="internshipOffer.location" name="location" class="form-control" required #location="ngModel" [class.is-invalid]="location.invalid && (location.dirty || location.touched)">
+              <div *ngIf="location.invalid && (location.dirty || location.touched)" class="invalid-feedback">
+                Location is required.
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Date Posted <span class="text-danger">*</span></label>
+              <div class="cal-icon">
+                <input type="date" [(ngModel)]="internshipOffer.datePosted" name="datePosted" class="form-control" required #datePosted="ngModel" [class.is-invalid]="datePosted.invalid && (datePosted.dirty || datePosted.touched)">
+                <i class="far fa-calendar-alt"></i>
+              </div>
+              <div *ngIf="datePosted.invalid && (datePosted.dirty || datePosted.touched)" class="invalid-feedback">
+                Date Posted is required.
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Duration (Months)</label>
+              <input type="number" [(ngModel)]="internshipOffer.durationInMonths" name="durationInMonths" class="form-control" min="1">
+            </div>
+            <div class="form-group text-end">
+              <button type="submit" class="btn btn-primary" [disabled]="!offerForm.valid || isSubmittingOffer">
+                <span *ngIf="isSubmittingOffer" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                {{ isSubmittingOffer ? 'Saving...' : 'Save Offer' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal for Deleting Internship Offer -->
+  <div class="modal fade" id="confirmDeleteOfferModal" tabindex="-1" aria-labelledby="confirmDeleteOfferModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmDeleteOfferModalLabel">Confirm Deletion</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this internship offer?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" (click)="confirmDeleteInternshipOffer()" data-bs-dismiss="modal">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

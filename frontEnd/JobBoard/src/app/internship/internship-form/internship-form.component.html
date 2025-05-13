@@ -1,0 +1,94 @@
+<div class="content-body">
+  <!-- Alert Section -->
+  <div *ngIf="showAlert" class="alert {{ alertType }} alert-dismissible fade show position-fixed" role="alert" style="top: 20px; right: 20px; z-index: 1050; min-width: 300px;">
+    <div class="d-flex align-items-center">
+      <i class="bi me-2" [ngClass]="{
+        'bi-check-circle-fill': alertType === 'alert-success',
+        'bi-exclamation-triangle-fill': alertType === 'alert-danger'
+      }"></i>
+      <span>{{ alertMessage }}</span>
+    </div>
+    <button type="button" class="btn-close" (click)="closeAlert()" aria-label="Close"></button>
+  </div>
+
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-xl-6 col-xxl-6 col-lg-8 col-md-10 col-sm-12">
+        <div class="card shadow-sm rounded">
+          <div class="card-header">
+            <h5 class="card-title">Add Internship</h5>
+          </div>
+          <div class="card-body">
+            <form #internshipForm="ngForm" (ngSubmit)="onSubmitInternship(internshipForm)">
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Title <span class="text-danger">*</span></label>
+                <input
+                  type="text"
+                  [(ngModel)]="internship.title"
+                  name="title"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Description <span class="text-danger">*</span></label>
+                <textarea
+                  [(ngModel)]="internship.description"
+                  name="description"
+                  class="form-control"
+                  required
+                ></textarea>
+              </div>
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Start Date <span class="text-danger">*</span></label>
+                <div class="cal-icon">
+                  <input
+                    type="date"
+                    [(ngModel)]="internship.startDate"
+                    name="startDate"
+                    class="form-control"
+                    required
+                  />
+                  <i class="far fa-calendar-alt"></i>
+                </div>
+              </div>
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">End Date</label>
+                <div class="cal-icon">
+                  <input
+                    type="date"
+                    [(ngModel)]="internship.endDate"
+                    name="endDate"
+                    class="form-control"
+                  />
+                  <i class="far fa-calendar-alt"></i>
+                </div>
+              </div>
+              <div class="form-group mb-3">
+                <label class="text-black font-w500">Status <span class="text-danger">*</span></label>
+                <select
+                  [(ngModel)]="internship.status"
+                  name="status"
+                  class="form-control"
+                  required
+                >
+                  <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+                </select>
+              </div>
+              <div class="form-group text-end">
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="!internshipForm.valid || isSubmittingInternship"
+                >
+                  <span *ngIf="isSubmittingInternship" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  {{ isSubmittingInternship ? 'Saving...' : 'Save Internship' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

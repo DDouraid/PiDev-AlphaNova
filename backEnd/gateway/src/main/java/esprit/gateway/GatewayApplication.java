@@ -18,15 +18,49 @@ public class GatewayApplication {
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("Internship",
-                        r -> r.path("/api/**")
-                                .uri("http://localhost:8082"))
                 .route("Event",
-                        r -> r.path("/api/**")
-                                .uri("http://localhost:8085"))
+                        r->r.path("/Event/**")
+                                .uri("lb://Event"))
                 .route("Supervisor",
-                        r -> r.path("/api/**")
-                                .uri("http://localhost:8081"))
+                        r->r.path("/Supervisor/**")
+                                .uri("lb://Supervisor"))
+                .route("Feedback",
+                        r->r.path("/mic1Feedback/**")
+                                .uri("lb://Feedback"))
+                .route("Tasks",
+                        r -> r.path("/mic1Tasks/**")
+                                .uri("lb://Tasks"))
+                .route("MessGroupMember",
+                        r -> r.path("/messages/**")
+                                .uri("lb://MessGroupMember"))
+                .route("MessGroupMember",
+                        r -> r.path("/groups/**")
+                                .uri("lb://MessGroupMember"))
+                .route("MessGroupMember",
+                        r -> r.path("/group-members/**")
+                                .uri("lb://MessGroupMember"))
+                .route("User",
+                        r->r.path("/api/auth/**")
+                                .uri("lb://User"))
+                .route("User",
+                        r->r.path("/api/dashboard/**")
+                                .uri("lb://User"))
+                .route("Payment",
+                        r->r.path("/api/payments/**")
+                                .uri("lb://Payment"))
+                .route("Payment",
+                        r->r.path("/api/payment/**")
+                                .uri("lb://Payment"))
+                .route("Interview",
+                        r->r.path("/api/interviews/**")
+                                .uri("lb://Interview"))
+
+                .route("Internship",
+                        r->r.path("/**")
+                                .uri("http://localhost:8089"))
+
+
+
                 .build();
     }
 }

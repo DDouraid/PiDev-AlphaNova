@@ -1,0 +1,143 @@
+
+
+.card {
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-header {
+    background-color: #ffffff;
+    border-bottom: none;
+    padding: 15px 20px;
+  }
+  
+  .fs-20 {
+    font-size: 20px;
+  }
+  
+  .text-black {
+    color: #000000;
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+  
+  .btn-sm {
+    padding: 5px 12px;
+    font-size: 14px;
+  }
+  
+  .group-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .group-table th,
+  .group-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .group-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .group-table tr:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+  }
+  
+  .btn-info:hover {
+    background-color: #138496;
+    border-color: #138496;
+  }
+  
+  .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+  }
+  
+  .btn-danger:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+  }
+  
+  .no-data {
+    text-align: center;
+    color: #777;
+    padding: 20px;
+  }
+  
+  .loading {
+    text-align: center;
+    padding: 20px;
+    color: #333;
+  }
+  
+  .alert {
+    margin-top: 15px;
+  }
+  
+  .form-control {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 14px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .text-black.font-w500 {
+    font-weight: 500;
+  }
+  
+  .modal-content {
+    border-radius: 8px;
+  }
+  
+  .modal-header {
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .modal-title {
+    font-size: 20px;
+  }
+  
+  .btn-close-white {
+    filter: brightness(0) invert(1);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .group-table {
+      display: block;
+      overflow-x: auto;
+    }
+  
+    .group-table th,
+    .group-table td {
+      min-width: 150px;
+    }
+  }

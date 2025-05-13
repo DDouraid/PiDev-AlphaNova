@@ -1,0 +1,49 @@
+<div class="prediction-container">
+  <div *ngIf="error" class="error-message">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ error }}
+  </div>
+
+  <div *ngIf="showResults && admissionPrediction" class="prediction-result" [ngClass]="{
+    'admitted': admissionPrediction.probability > 0.7,
+    'maybe': admissionPrediction.probability >= 0.4 && admissionPrediction.probability <= 0.7,
+    'not-admitted': admissionPrediction.probability < 0.4
+  }">
+    <div class="prediction-header">
+      <i class="fas" [ngClass]="{
+        'fa-check-circle': admissionPrediction.probability > 0.7,
+        'fa-question-circle': admissionPrediction.probability >= 0.4 && admissionPrediction.probability <= 0.7,
+        'fa-times-circle': admissionPrediction.probability < 0.4
+      }"></i>
+      <h3>{{ getPredictionTitle() }}</h3>
+    </div>
+    
+    <div class="probability-gauge">
+      <div class="gauge-fill" [style.width.%]="admissionPrediction.probability * 100"></div>
+      <span class="probability-text">{{ (admissionPrediction.probability ).toFixed(1) }}%</span>
+    </div>
+
+    <div class="prediction-details">
+      <h4>Prediction Details</h4>
+      <ul>
+        <li><i class="fas fa-circle"></i> Admission Status: {{ admissionPrediction.admitted || 'N/A' }}</li>
+        <li *ngIf="admissionPrediction.recommendedUniversity && admissionPrediction.recommendedUniversity !== 'N/A'"><i class="fas fa-circle"></i> Recommended University: {{ admissionPrediction.recommendedUniversity }}</li>
+        <li><i class="fas fa-circle"></i> Uni Cluster: {{ getClusterExplanation() }}</li>
+        <li *ngIf="!admissionPrediction.recommendedUniversity || admissionPrediction.recommendedUniversity === 'N/A'" style="color:#6366f1; font-style:italic;">
+          
+        </li>
+      </ul>
+      <div *ngIf="admissionPrediction.advice && admissionPrediction.advice.length > 0" class="advice-section">
+        <h4>Advice</h4>
+        <ul>
+          <li *ngFor="let tip of admissionPrediction.advice">{{ tip }}</li>
+        </ul>
+      </div>
+    </div>
+
+    <button class="reset-btn" (click)="resetForm()">
+      <i class="fas fa-redo"></i>
+      Hide Prediction
+    </button>
+  </div>
+</div>

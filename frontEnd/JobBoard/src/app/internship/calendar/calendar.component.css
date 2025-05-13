@@ -1,0 +1,141 @@
+.calendar {
+  height: 500px;
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.wider-calendar .cal-day-cell {
+  min-width: 120px; /* Maintain wider calendar */
+  text-align: center;
+}
+
+.wider-calendar .cal-day-cell.cal-day-selected,
+.wider-calendar .cal-day-cell.cal-open {
+  background-color: #e0f7e0;
+  border: 2px solid #28a745;
+}
+
+.wider-calendar .cal-day-cell.cal-event {
+  background-color: #e0f7e0;
+  position: relative;
+}
+
+.wider-calendar .cal-day-cell.cal-event .cal-day-number {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  padding: 2px 6px;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.wider-calendar .cal-day-cell.cal-event:after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: #dc3545;
+  border-radius: 50%;
+}
+
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.card-bd {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+  padding: 1rem;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.interview-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.list-group-item {
+  border: none;
+  padding: 10px;
+  background-color: #f8f9fa;
+  transition: background-color 0.3s;
+}
+
+.list-group-item:hover {
+  background-color: #e9ecef;
+}
+
+.text-black.font-w500 {
+  color: #000;
+  font-weight: 500;
+}
+
+.modal-content {
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+  padding: 1rem;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  border-top: 1px solid #eee;
+  padding: 1rem;
+  justify-content: flex-end;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+/* Custom navigation button styles */
+.custom-nav-btn {
+  background-color: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: #000; /* Black color for buttons */
+  cursor: pointer;
+  padding: 0 10px;
+  transition: color 0.3s;
+}
+
+.custom-nav-btn:hover {
+  color: #333; /* Slightly darker black on hover */
+}

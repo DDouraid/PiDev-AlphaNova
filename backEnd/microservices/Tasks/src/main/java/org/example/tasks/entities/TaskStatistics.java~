@@ -1,0 +1,21 @@
+package org.example.tasks.entities;
+
+public class TaskStatistics {
+    private Long totalTasks;
+    private Double todoPercentage;
+    private Double inProgressPercentage;
+    private Double donePercentage;
+
+    public TaskStatistics(Long totalTasks, Double todoPercentage, Double inProgressPercentage, Double donePercentage) {
+        this.totalTasks = totalTasks;
+        this.todoPercentage = todoPercentage;
+        this.inProgressPercentage = inProgressPercentage;
+        this.donePercentage = donePercentage;
+    }
+
+    // Getters
+    public Long getTotalTasks() { return totalTasks; }
+    public Double getTodoPercentage() { return todoPercentage; }
+    public Double getInProgressPercentage() { return inProgressPercentage; }
+    public Double getDonePercentage() { return donePercentage; }
+}

@@ -8,24 +8,54 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="Supervisor" />
+        <module name="Gestion_Users" />
+        <module name="Tasks" />
+        <module name="eureka" />
+        <module name="message" />
+        <module name="Internship" />
+        <module name="Interview" />
+        <module name="Notif" />
+        <module name="Application (1)" />
+        <module name="Payment" />
+        <module name="Feedback" />
         <module name="Event" />
         <module name="Gestion_Utilisateurs" />
-        <module name="eureka" />
+        <module name="Application" />
+        <module name="gateway" />
+      </profile>
+      <profile name="Annotation profile for GestionMatching" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+        </processorPath>
+        <module name="GestionMatching" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="candidat" target="17" />
-      <module name="gateway" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Application" options="-parameters" />
+      <module name="Application (1)" options="-parameters" />
       <module name="Event" options="-parameters" />
+      <module name="Feedback" options="-parameters" />
+      <module name="GestionMatching" options="-parameters" />
+      <module name="Gestion_Users" options="-parameters" />
       <module name="Gestion_Utilisateurs" options="-parameters" />
+      <module name="Internship" options="-parameters" />
+      <module name="Interview" options="-parameters" />
+      <module name="Notif" options="-parameters" />
+      <module name="Payment" options="-parameters" />
       <module name="Supervisor" options="-parameters" />
+      <module name="Tasks" options="-parameters" />
       <module name="candidat" options="-parameters" />
       <module name="eureka" options="-parameters" />
       <module name="gateway" options="-parameters" />
+      <module name="message" options="-parameters" />
     </option>
   </component>
 </project>

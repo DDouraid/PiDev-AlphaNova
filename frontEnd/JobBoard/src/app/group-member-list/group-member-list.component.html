@@ -1,0 +1,204 @@
+<div class="container mt-4">
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="clearMessages()"></button>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="clearMessages()"></button>
+  </div>
+
+  <!-- Filter Controls -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <label class="form-label">Filter by Group ID</label>
+          <div class="input-group">
+            <input type="number" class="form-control" [(ngModel)]="groupId" placeholder="Enter Group ID">
+            <button class="btn btn-primary" (click)="loadMembersByGroupId()" [disabled]="!groupId">
+              <i class="fas fa-filter"></i> Filter
+            </button>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Filter by User ID</label>
+          <div class="input-group">
+            <input type="number" class="form-control" [(ngModel)]="userId" placeholder="Enter User ID">
+            <button class="btn btn-primary" (click)="loadGroupsByUserId()" [disabled]="!userId">
+              <i class="fas fa-filter"></i> Filter
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="mt-3">
+        <button class="btn btn-secondary" (click)="loadAllGroupMembers()">
+          <i class="fas fa-sync-alt"></i> Reset Filters
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Group Members Table -->
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="mb-0">Group Members</h3>
+      <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addGroupMemberModal">
+        <i class="fas fa-plus"></i> Add Member
+      </button>
+    </div>
+
+    <div class="card-body">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <!-- No Data Message -->
+      <div *ngIf="!isLoading && groupMembers.length === 0" class="alert alert-info">
+        No group members found
+      </div>
+
+      <!-- Data Table -->
+      <div *ngIf="!isLoading && groupMembers.length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Group Name</th>
+              <th>User ID</th>
+              <th>Username</th>
+              <th>Joined At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let member of groupMembers">
+              <td>{{ member.id }}</td>
+              <td>{{ member.group?.name || 'N/A' }}</td>
+              <td>{{ member.userId }}</td>
+              <td>{{ member.username || 'N/A' }}</td>
+              <td>{{ member.joinedAt | date:'medium' }}</td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  <button class="btn btn-outline-primary" (click)="openEditModal(member)" data-bs-toggle="modal" data-bs-target="#editGroupMemberModal">
+                    <i class="fas fa-edit"></i> Edit
+                  </button>
+                  <button class="btn btn-outline-danger" (click)="deleteGroupMember(member.id!)">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Group Member Modal -->
+<div class="modal fade" id="addGroupMemberModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">Add Group Member</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="groupMemberForm" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label class="form-label">Group ID</label>
+            <input type="number" class="form-control" formControlName="groupId"
+                   [class.is-invalid]="groupMemberForm.get('groupId')?.invalid && groupMemberForm.get('groupId')?.touched">
+            <div *ngIf="groupMemberForm.get('groupId')?.invalid && groupMemberForm.get('groupId')?.touched" class="invalid-feedback">
+              Valid group ID is required
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">User ID</label>
+            <input type="number" class="form-control" formControlName="userId"
+                   [class.is-invalid]="groupMemberForm.get('userId')?.invalid && groupMemberForm.get('userId')?.touched">
+            <div *ngIf="groupMemberForm.get('userId')?.invalid && groupMemberForm.get('userId')?.touched" class="invalid-feedback">
+              Valid user ID is required
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success" [disabled]="groupMemberForm.invalid || isLoading">
+              <span *ngIf="!isLoading">Add Member</span>
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Group Member Modal -->
+<div class="modal fade" id="editGroupMemberModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Edit Group Member</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="editGroupMemberForm" (ngSubmit)="onEditSubmit()">
+          <div class="mb-3">
+            <label class="form-label">Group ID</label>
+            <input type="number" class="form-control" formControlName="groupId"
+                   [class.is-invalid]="editGroupMemberForm.get('groupId')?.invalid && editGroupMemberForm.get('groupId')?.touched">
+            <div *ngIf="editGroupMemberForm.get('groupId')?.invalid && editGroupMemberForm.get('groupId')?.touched" class="invalid-feedback">
+              Valid group ID is required
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">User ID</label>
+            <input type="number" class="form-control" formControlName="userId"
+                   [class.is-invalid]="editGroupMemberForm.get('userId')?.invalid && editGroupMemberForm.get('userId')?.touched">
+            <div *ngIf="editGroupMemberForm.get('userId')?.invalid && editGroupMemberForm.get('userId')?.touched" class="invalid-feedback">
+              Valid user ID is required
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="editGroupMemberForm.invalid || isLoading">
+              <span *ngIf="!isLoading">Save Changes</span>
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Confirm Deletion</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ deleteConfirmationMessage }}</p>
+        <p class="text-danger">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Delete</span>
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

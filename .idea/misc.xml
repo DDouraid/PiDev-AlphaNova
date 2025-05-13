@@ -5,7 +5,26 @@
       <list>
         <option value="$PROJECT_DIR$/backEnd/microservices/Gestion_Utilisateurs/pom.xml" />
         <option value="$PROJECT_DIR$/backEnd/eureka/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/GestionMatching/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/Event/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/Feedback/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/Interview/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/message/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/notification/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/Payement/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/Supervisor/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/Tasks/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/Payment/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/YourApp/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/Internship/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/backEnd/microservices/Payement/pom.xml" />
+        <option value="$PROJECT_DIR$/backEnd/microservices/Payment/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_22" project-jdk-name="openjdk-23" project-jdk-type="JavaSDK">

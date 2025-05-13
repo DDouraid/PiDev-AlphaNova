@@ -1,0 +1,72 @@
+<div class="content-body">
+  <!-- Alert Section -->
+  <div *ngIf="showAlert" class="alert {{ alertType }} alert-dismissible fade show position-fixed" role="alert" style="top: 20px; right: 20px; z-index: 1050; min-width: 300px;">
+    <div class="d-flex align-items-center">
+      <i class="bi me-2" [ngClass]="{
+        'bi-check-circle-fill': alertType === 'alert-success',
+        'bi-exclamation-triangle-fill': alertType === 'alert-danger',
+        'bi-exclamation-circle-fill': alertType === 'alert-warning'
+      }"></i>
+      <span>{{ alertMessage }}</span>
+    </div>
+    <button type="button" class="btn-close" (click)="closeAlert()" aria-label="Close"></button>
+  </div>
+
+  <div class="container">
+    <h2 class="text-center my-4">Internship Offer Details</h2>
+
+    <!-- Offer Details -->
+    <div *ngIf="offer; else noOffer">
+      <div class="card mb-4">
+        <div class="card-body">
+          <h3 class="card-title">{{ offer.title }}</h3>
+          <p class="card-text"><strong>Description:</strong> {{ offer.description }}</p>
+          <p class="card-text"><strong>Company:</strong> {{ offer.company || 'Unknown Company' }}</p>
+          <p class="card-text"><strong>Location:</strong> {{ offer.location || 'Unknown Location' }}</p>
+          <p class="card-text"><strong>Duration:</strong> 
+            {{ offer.durationInMonths !== null && offer.durationInMonths !== undefined ? offer.durationInMonths + ' months' : 'Unknown Duration' }}
+          </p>
+          <p class="card-text"><strong>Date Posted:</strong> 
+            {{ offer.datePosted ? (offer.datePosted | date:'dd/MM/yyyy') : 'Unknown Date' }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Application Form -->
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Apply for This Internship</h4>
+          <form>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Email <span class="text-danger">*</span></label>
+              <input
+                type="email"
+                [(ngModel)]="applicationForm.email"
+                name="email"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Upload CV <span class="text-danger">*</span></label>
+              <input
+                type="file"
+                (change)="onFileSelected($event)"
+                class="form-control"
+                accept=".pdf,.doc,.docx"
+                required
+              />
+            </div>
+            <button type="button" class="btn btn-primary" (click)="submitApplication()">Submit Application</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noOffer>
+      <div class="alert alert-warning text-center mt-3">
+        No internship offer selected.
+      </div>
+    </ng-template>
+  </div>
+</div>

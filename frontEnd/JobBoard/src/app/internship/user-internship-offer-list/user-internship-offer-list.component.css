@@ -1,0 +1,214 @@
+/* Search Bar Styling */
+.search-bar-container {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 10px 20px 10px 40px; /* Extra padding on the left for the icon */
+    border-radius: 25px; /* Rounded corners */
+    border: 1px solid #e0e0e0; /* Light gray border */
+    background-color: #fff; /* White background */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    font-size: 16px;
+    color: #333;
+    outline: none;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .search-input:focus {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow on focus */
+    border-color: #007bff; /* Blue border on focus */
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d; /* Gray color for the icon */
+    font-size: 16px;
+  }
+  
+  /* Location Filter Styling */
+  .location-filter {
+    padding: 10px;
+    border-radius: 25px; /* Rounded corners to match search bar */
+    border: 1px solid #e0e0e0;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Match shadow of search bar */
+    font-size: 16px;
+    color: #333;
+    outline: none;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .location-filter:focus {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Match focus shadow of search bar */
+    border-color: #007bff; /* Blue border on focus */
+  }
+  
+  /* Clear Filters Button Styling */
+  .clear-filters-btn {
+    padding: 10px;
+    border-radius: 25px; /* Rounded corners to match search bar and filter */
+    border: 1px solid #e0e0e0;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Match shadow of search bar and filter */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .clear-filters-btn:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .clear-filters-btn i {
+    color: #6c757d; /* Gray color for the icon */
+    font-size: 16px;
+  }
+  
+  /* Offer List Styling */
+  .offer-list {
+    max-width: 900px; /* Slightly wider for better layout */
+    margin: 0 auto;
+  }
+  
+  .offer-item {
+    background-color: #fff;
+    border: 1px solid #e9ecef; /* Lighter border */
+    border-radius: 10px; /* Softer rounded corners */
+    padding: 20px; /* More padding for a spacious look */
+    margin-bottom: 20px; /* Increased spacing between items */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .offer-item:hover {
+    transform: translateY(-2px); /* Slight lift effect on hover */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); /* Enhanced shadow on hover */
+  }
+  
+  .offer-title {
+    font-size: 1.25rem; /* Slightly larger title */
+    font-weight: 600;
+    color: #f28c38; /* Orange color to match your original design */
+    margin-bottom: 0.75rem;
+  }
+  
+  .offer-description {
+    font-size: 0.95rem; /* Slightly larger for readability */
+    color: #495057; /* Darker gray for better contrast */
+    margin-bottom: 0.75rem;
+    line-height: 1.5; /* Better readability */
+  }
+  
+  .offer-company,
+  .offer-location,
+  .offer-date {
+    font-size: 0.9rem; /* Slightly larger for readability */
+    color: #6c757d; /* Medium gray for secondary info */
+    margin-bottom: 0.5rem;
+  }
+  
+  .offer-company i,
+  .offer-location i,
+  .offer-date i {
+    color: #007bff; /* Blue color for icons to match your original design */
+    font-size: 1rem;
+    margin-right: 8px;
+  }
+  
+  /* Button Styling */
+  .btn-outline-primary {
+    border-color: #007bff;
+    color: #007bff;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .btn-outline-primary:hover {
+    background-color: #007bff;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+  }
+  
+  /* Pagination Styling */
+  .pagination-container {
+    margin-top: 30px;
+  }
+  
+  .pagination {
+    gap: 5px; /* Space between pagination items */
+  }
+  
+  .page-item .page-link {
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+    color: #007bff;
+    background-color: #fff;
+    padding: 8px 12px;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .page-item.active .page-link {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+  }
+  
+  .page-item:not(.disabled) .page-link:hover {
+    background-color: #f8f9fa;
+    color: #0056b3;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+  }
+  
+  .page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #f8f9fa;
+    border-color: #e0e0e0;
+    cursor: not-allowed;
+  }
+  
+  /* Center Text */
+  .text-center {
+    text-align: center;
+  }
+
+  .modal-content {
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .modal-header {
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .modal-footer {
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .form-label {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .form-control {
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+  
+  .text-danger {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }

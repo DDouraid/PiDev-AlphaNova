@@ -1,0 +1,92 @@
+<div class="content-body">
+  <div class="container mt-4 event-container">
+    <div class="event-header">
+      <h2 class="fw-bold text-white text-center animate__animated animate__fadeInDown">
+        <i class="fas fa-calendar-alt me-2"></i> {{ event?.title || 'Détails de l\'événement' }}
+      </h2>
+      <div class="header-accent"></div>
+    </div>
+
+    <div class="event-card-container">
+      <div class="card event-card shadow-lg">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-end align-items-center mb-4 pb-3 border-bottom">
+            <span class="badge bg-primary text-white animate__animated animate__fadeIn">
+              <i class="fas fa-calendar-day me-1"></i>
+              {{ event?.date | date:'fullDate' }}
+            </span>
+          </div>
+
+          <div class="event-details">
+            <div class="detail-item animate__animated animate__fadeInLeft">
+              <div class="d-flex align-items-start">
+                <div class="me-3 text-primary">
+                  <i class="fas fa-map-marker-alt fa-2x"></i>
+                </div>
+                <div>
+                  <h5 class="text-muted mb-2">Lieu</h5>
+                  <p class="fs-5">{{ event?.location }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-item animate__animated animate__fadeInRight">
+              <div class="d-flex align-items-start">
+                <div class="me-3 text-primary">
+                  <i class="fas fa-clock fa-2x"></i>
+                </div>
+                <div>
+                  <h5 class="text-muted mb-2">Heure</h5>
+                  <p class="fs-5">{{ event?.date | date:'shortTime' }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- NOUVELLE SECTION CARTE -->
+            <div class="detail-item animate__animated animate__fadeInUp">
+              <div class="d-flex align-items-start">
+                <div class="me-3 text-primary">
+                  <i class="fas fa-map-marked-alt fa-2x"></i>
+                </div>
+                <div class="w-100">
+                  <h5 class="text-muted mb-2">Localisation sur la carte</h5>
+                  <div class="map-container">
+                    <div id="map"></div>
+                    <small class="text-muted d-block mt-2 text-center">
+                      <i class="fas fa-map-marker-alt me-1"></i> {{event?.location}}
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-item animate__animated animate__fadeInUp">
+              <div class="d-flex align-items-start">
+                <div class="me-3 text-primary">
+                  <i class="fas fa-file-alt fa-2x"></i>
+                </div>
+                <div class="w-100">
+                  <h5 class="text-muted mb-2">Description</h5>
+                  <div class="bg-light p-3 rounded event-description">
+                    <p class="fs-5 mb-0">{{ event?.description }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between mt-4 pt-3 border-top action-buttons">
+            <button routerLink="/FrontEvent" class="btn btn-outline-primary px-4 py-2 shadow-sm animate__animated animate__bounceInLeft">
+              <i class="fas fa-arrow-left me-2"></i> Retour aux événements
+            </button>
+            <div>
+              <button class="btn btn-primary px-4 py-2 shadow-sm animate__animated animate__bounceInRight" (click)="shareEvent()">
+                <i class="fas fa-share-alt me-2"></i> Partager
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

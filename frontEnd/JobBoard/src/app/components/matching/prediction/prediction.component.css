@@ -1,0 +1,352 @@
+.prediction-container {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin: 20px 0;
+  transition: all 0.3s ease;
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.question-form {
+  padding: 20px;
+}
+
+.question-form h3 {
+  color: #1f2937;
+  margin-bottom: 16px;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.form-description {
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.question-group {
+  margin-bottom: 20px;
+}
+
+.question-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.question-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.question-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.question-input::placeholder {
+  color: #9ca3af;
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+.form-actions {
+  margin-top: 32px;
+}
+
+.predict-btn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.predict-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
+}
+
+.predict-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.prediction-result {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: 12px;
+  background: #f8fafc;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.prediction-result.admitted {
+  border-left: 4px solid #22c55e;
+}
+
+.prediction-result.maybe {
+  border-left: 4px solid #f59e0b;
+}
+
+.prediction-result.not-admitted {
+  border-left: 4px solid #ef4444;
+}
+
+.prediction-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  justify-content: center;
+}
+
+.prediction-header i {
+  font-size: 24px;
+}
+
+.prediction-header.admitted i {
+  color: #22c55e;
+}
+
+.prediction-header.maybe i {
+  color: #f59e0b;
+}
+
+.prediction-header.not-admitted i {
+  color: #ef4444;
+}
+
+.probability-gauge {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  margin: 20px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.gauge-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  border-radius: 4px;
+  transition: width 1s ease-in-out;
+}
+
+.probability-text {
+  position: absolute;
+  right: 0;
+  top: -20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.reset-btn {
+  background: #f3f4f6;
+  color: #4b5563;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  transition: all 0.3s ease;
+}
+
+.reset-btn:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.reset-btn i {
+  font-size: 0.75rem;
+}
+
+.prediction-details {
+  margin-top: 20px;
+}
+
+.prediction-details h4 {
+  color: #4b5563;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.prediction-details ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.prediction-details li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.prediction-details li i {
+  font-size: 8px;
+  color: #6366f1;
+}
+
+.correlation-analysis {
+  margin-top: 24px;
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.correlation-analysis h4 {
+  color: #4b5563;
+  margin-bottom: 16px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.correlation-table {
+  margin-bottom: 24px;
+}
+
+.correlation-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.correlation-row.header {
+  background: #f3f4f6;
+  font-weight: 600;
+  color: #4b5563;
+  border-radius: 4px 4px 0 0;
+}
+
+.correlation-row:last-child {
+  border-bottom: none;
+}
+
+.correlation-row .feature {
+  flex: 1;
+  color: #374151;
+}
+
+.correlation-row .value {
+  width: 120px;
+  text-align: right;
+  font-family: monospace;
+  color: #6b7280;
+}
+
+.selected-features {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.selected-features h4 {
+  margin-bottom: 12px;
+}
+
+.selected-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.selected-features li {
+  background: #f3f4f6;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.selected-features li i {
+  color: #6366f1;
+  font-size: 0.75rem;
+}
+
+.match-card {
+  background: rgba(255,255,255,0.95);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(44,62,80,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.match-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+}
+.card-header {
+  background: linear-gradient(135deg, #FF6B6B 60%, #4ECDC4 100%);
+  color: #fff;
+  font-weight: 700;
+  border-radius: 20px 20px 0 0;
+}
+.btn-action {
+  background: linear-gradient(135deg, #4ECDC4, #45B7AF);
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.btn-action:hover {
+  background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+} 

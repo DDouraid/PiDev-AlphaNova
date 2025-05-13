@@ -10,12 +10,14 @@
           <!-- Avatar Section Moved Inside Form -->
           <div class="avatar-section">
             <div class="avatar-wrapper">
-              <div *ngIf="avatarPreview" class="avatar-preview">
-                <img [src]="avatarPreview" alt="Avatar Preview" />
-              </div>
-              <!-- <img src="assets/avatar.png" alt="Avatar" class="avatar" /> -->
               <div class="speech-bubble">
-                <p class="welcome-text">Welcome to AlphaNova</p>
+                <div class="welcome-text-3d">
+                  <span class="thunder-effect">Welcome to</span>
+                  <span class="intern-trek">InternTrek</span>
+                </div>
+              </div>
+              <div class="avatar-preview">
+                <img [src]="avatarPreview || 'assets/avatar.png'" alt="Avatar Preview" class="avatar" />
               </div>
             </div>
           </div>
@@ -102,13 +104,27 @@
           <div class="form-row">
             <div class="input-group">
               <label for="avatar">Upload Avatar (Optional)</label>
-              <input
-                type="file"
-                id="avatar"
-                (change)="onAvatarSelected($event)"
-                accept="image/*"
-                class="input-field"
-              />
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <input
+                  type="file"
+                  id="avatar"
+                  (change)="onAvatarSelected($event)"
+                  accept="image/*"
+                  class="input-field"
+                />
+                or take one
+                <button type="button" class="btn btn-secondary camera-btn" (click)="openCamera()">
+                  <i class="fas fa-camera"></i>
+                </button>
+              </div>
+              <!-- Camera Modal -->
+              <div *ngIf="showCamera" class="camera-modal">
+                <video #video autoplay style="width: 200px; border-radius: 10px;"></video>
+                <br>
+                <button type="button" class="btn btn-primary" (click)="capturePhoto()">Capture</button>
+                <button type="button" class="btn btn-danger" (click)="closeCamera()">Cancel</button>
+                <canvas #canvas style="display: none;"></canvas>
+              </div>
             </div>
           </div>
           <button type="submit" class="register-button" [disabled]="isLoading || registerForm.invalid">

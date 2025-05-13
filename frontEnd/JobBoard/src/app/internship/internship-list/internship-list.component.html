@@ -1,0 +1,253 @@
+<div class="content-body">
+  <!-- Alert Section -->
+  <div *ngIf="showAlert" class="alert {{ alertType }} alert-dismissible fade show position-fixed" role="alert" style="top: 20px; right: 20px; z-index: 1050; min-width: 300px;">
+    <div class="d-flex align-items-center">
+      <i class="bi me-2" [ngClass]="{
+        'bi-check-circle-fill': alertType === 'alert-success',
+        'bi-exclamation-triangle-fill': alertType === 'alert-danger'
+      }"></i>
+      <span>{{ alertMessage }}</span>
+    </div>
+    <button type="button" class="btn-close" (click)="closeAlert()" aria-label="Close"></button>
+  </div>
+
+  <div class="container">
+    <h2 class="text-center my-4">Internships</h2>
+
+    <!-- Filter Section -->
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="statusFilter" class="form-label">Filter by Status</label>
+        <select id="statusFilter" class="form-select" [(ngModel)]="selectedStatus" (change)="onStatusChange()">
+          <option *ngFor="let status of filterStatuses" [value]="status">{{ status }}</option>
+        </select>
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-secondary" (click)="clearFilters()">Clear Filters</button>
+      </div>
+    </div>
+
+    <!-- Add Internship Button -->
+
+
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="text-center my-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Internships Table -->
+    <div *ngIf="!isLoading" class="table-responsive">
+      <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let internship of paginatedInternships">
+            <td>{{ internship.title }}</td>
+            <td>{{ internship.description }}</td>
+            <td>{{ internship.startDate | date:'mediumDate' }}</td>
+            <td>{{ internship.endDate | date:'mediumDate' }}</td>
+            <td>{{ internship.status }}</td>
+            <td>
+              <button class="btn btn-sm btn-warning me-2" (click)="selectInternship(internship)" data-bs-toggle="modal" data-bs-target="#editInternshipModal">
+                Edit
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="deleteInternship(internship.id)">
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination for Internships -->
+    <div *ngIf="!isLoading && filteredInternships.length > 0" class="d-flex justify-content-center">
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" (click)="goToPage(currentPage - 1)" aria-label="Previous">
+              <span aria-hidden="true">«</span>
+            </a>
+          </li>
+          <li class="page-item" *ngFor="let page of getPages()" [class.active]="currentPage === page">
+            <a class="page-link" (click)="goToPage(page)">{{ page }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" (click)="goToPage(currentPage + 1)" aria-label="Next">
+              <span aria-hidden="true">»</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Add Internship Modal -->
+  <div class="modal fade" id="addInternshipModal" tabindex="-1" aria-labelledby="addInternshipModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addInternshipModalLabel">Add Internship</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form #addInternshipForm="ngForm" (ngSubmit)="onSubmitInternship(addInternshipForm)">
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Title <span class="text-danger">*</span></label>
+              <input
+                type="text"
+                [(ngModel)]="internship.title"
+                name="title"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Description <span class="text-danger">*</span></label>
+              <textarea
+                [(ngModel)]="internship.description"
+                name="description"
+                class="form-control"
+                required
+              ></textarea>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Start Date <span class="text-danger">*</span></label>
+              <div class="cal-icon">
+                <input
+                  type="date"
+                  [(ngModel)]="internship.startDate"
+                  name="startDate"
+                  class="form-control"
+                  required
+                />
+                <i class="far fa-calendar-alt"></i>
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">End Date</label>
+              <div class="cal-icon">
+                <input
+                  type="date"
+                  [(ngModel)]="internship.endDate"
+                  name="endDate"
+                  class="form-control"
+                />
+                <i class="far fa-calendar-alt"></i>
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Status <span class="text-danger">*</span></label>
+              <select
+                [(ngModel)]="internship.status"
+                name="status"
+                class="form-control"
+                required
+              >
+                <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="!addInternshipForm.valid || isSubmittingInternship"
+              >
+                <span *ngIf="isSubmittingInternship" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                {{ isSubmittingInternship ? 'Saving...' : 'Save Internship' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Internship Modal -->
+  <div class="modal fade" id="editInternshipModal" tabindex="-1" aria-labelledby="editInternshipModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editInternshipModalLabel">Edit Internship</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Title <span class="text-danger">*</span></label>
+              <input
+                type="text"
+                [(ngModel)]="selectedInternship.title"
+                name="editTitle"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Description <span class="text-danger">*</span></label>
+              <textarea
+                [(ngModel)]="selectedInternship.description"
+                name="editDescription"
+                class="form-control"
+                required
+              ></textarea>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Start Date <span class="text-danger">*</span></label>
+              <div class="cal-icon">
+                <input
+                  type="date"
+                  [(ngModel)]="selectedInternship.startDate"
+                  name="editStartDate"
+                  class="form-control"
+                  required
+                />
+                <i class="far fa-calendar-alt"></i>
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">End Date</label>
+              <div class="cal-icon">
+                <input
+                  type="date"
+                  [(ngModel)]="selectedInternship.endDate"
+                  name="editEndDate"
+                  class="form-control"
+                />
+                <i class="far fa-calendar-alt"></i>
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="text-black font-w500">Status <span class="text-danger">*</span></label>
+              <select
+                [(ngModel)]="selectedInternship.status"
+                name="editStatus"
+                class="form-control"
+                required
+              >
+                <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" (click)="updateInternship()" data-bs-dismiss="modal">
+            Update Internship
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
